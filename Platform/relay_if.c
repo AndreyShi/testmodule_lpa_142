@@ -75,7 +75,7 @@ switch(relay)
 	    else
 		{ RST_U0_CH1; }
 
-	    update_relay_u0(CH_1, state);
+	    //update_relay_u0(CH_1, state);
 	    }
 	else if(ch == CH_2)
 	    {
@@ -84,7 +84,7 @@ switch(relay)
 	    else
 		{ RST_U0_CH2; }
 
-	    update_relay_u0(CH_2, state);
+	    //update_relay_u0(CH_2, state);
 	    }
 	else
 	    { return 0x02; }
@@ -98,7 +98,7 @@ switch(relay)
 	    else
 		{ ANA_CH1; }
 	    
-	    update_sensor_type(CH_1, state);
+	    //update_sensor_type(CH_1, state);
 	    }
 	else if(ch == CH_2)
 	    {
@@ -107,7 +107,7 @@ switch(relay)
 	    else
 		{ ANA_CH2; }
 
-	    update_sensor_type(CH_2, state);
+	    //update_sensor_type(CH_2, state);
 	    }
 	else
 	    { return 0x02; }
@@ -121,7 +121,7 @@ switch(relay)
 	    else
 		{ IN_BOT_SW_CH1; }
 
-	    update_input_type(CH_1, state);
+	    //update_input_type(CH_1, state);
 	    }
 	else if(ch == CH_2)
 	    {
@@ -130,7 +130,7 @@ switch(relay)
 	    else
 		{ IN_BOT_SW_CH2; }
 
-	    update_input_type(CH_2, state);
+	    //update_input_type(CH_2, state);
 	    }
 	else
 	    { return 0x02; }
@@ -144,7 +144,7 @@ switch(relay)
 	    else
 		{ ERR_BOT_SW_CH1; }
 
-	    update_error_type(CH_1, state);
+	    //update_error_type(CH_1, state);
 	    }
 	else if(ch == CH_2)
 	    {
@@ -153,7 +153,7 @@ switch(relay)
 	    else
 		{ ERR_BOT_SW_CH2; }
 
-	    update_error_type(CH_2, state);
+	    //update_error_type(CH_2, state);
 	    }
 	else
 	    { return 0x02; }
@@ -182,7 +182,7 @@ switch(relay)
 	    GND_DISABLE;
 	    }
 
-	update_lpa_power(state);
+	//update_lpa_power(state);
 	break;
 
     default:

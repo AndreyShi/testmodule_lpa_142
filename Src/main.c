@@ -30,7 +30,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "app_export.h"
+#include "gpio_if.h"
+#include "relay_if.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -109,7 +111,14 @@ int main(void)
   MX_USART3_UART_Init();
   MX_USB_OTG_FS_PCD_Init();
   /* USER CODE BEGIN 2 */
-
+  led_set(TM_142_LED_RED, STATE_ON);
+  led_set(TM_142_LED_BLUE, STATE_ON);
+  led_set(TM_142_LED_GREEN, STATE_ON);
+  led_set(TM_142_LED_YELLOW, STATE_ON);
+  relay_set(TM_142_RELAY_U0, CH_1, STATE_OFF);
+  //HAL_Delay(1);
+  //relay_set(TM_142_RELAY_U0, CH_1, STATE_OFF);
+  //relay_set(TM_142_RELAY_SENSOR, CH_1, STATE_OFF);
   /* USER CODE END 2 */
 
   /* Infinite loop */
