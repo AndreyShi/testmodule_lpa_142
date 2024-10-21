@@ -7,7 +7,7 @@
 #include "gpio_if.h"
 #include "relay_if.h"
 
-#include "KModuleState142.h"
+//#include "KModuleState142.h"
 
 //--------------------------------------------------
 #define SET_U0_CH1 GPIOC->BSRR = GPIO_BSRR_BS_5;

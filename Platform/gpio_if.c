@@ -7,7 +7,7 @@
 #include "gpio.h"
 #include "gpio_if.h"
 
-#include "KModuleState142.h"
+//#include "KModuleState142.h"
 
 // светодиоды
 //--------------------------------------------------
