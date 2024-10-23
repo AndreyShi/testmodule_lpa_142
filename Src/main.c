@@ -33,6 +33,8 @@
 #include "app_export.h"
 #include "gpio_if.h"
 #include "relay_if.h"
+#include "adc_if.h"
+#include "dac_if.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -111,10 +113,74 @@ int main(void)
   //MX_USART3_UART_Init();
   //MX_USB_OTG_FS_PCD_Init();
   /* USER CODE BEGIN 2 */
-  relay_set(TM_142_RELAY_U0, CH_1, STATE_OFF);
-  //HAL_Delay(1);
-  //relay_set(TM_142_RELAY_U0, CH_1, STATE_OFF);
-  //relay_set(TM_142_RELAY_SENSOR, CH_1, STATE_OFF);
+  dac_start();
+
+    /* initialize module state */
+  relay_set(TM_142_RELAY_U0, CH_1, TM_142_U0_DISABLE);
+  relay_set(TM_142_RELAY_U0, CH_2, TM_142_U0_DISABLE);
+  relay_set(TM_142_RELAY_SENSOR, CH_1, TM_142_SENSOR_ANA);
+  relay_set(TM_142_RELAY_SENSOR, CH_2, TM_142_SENSOR_ANA);
+  relay_set(TM_142_RELAY_INPUT, CH_1, TM_142_BOT_SW);
+  relay_set(TM_142_RELAY_INPUT, CH_2, TM_142_BOT_SW);
+  relay_set(TM_142_RELAY_ERROR, CH_1, TM_142_BOT_SW);
+  relay_set(TM_142_RELAY_ERROR, CH_2, TM_142_BOT_SW);
+  input_read(TM_142_INPUT_INPUT, CH_1, 0);
+  input_read(TM_142_INPUT_INPUT, CH_2, 0);
+  input_read(TM_142_INPUT_ERROR, CH_1, 0);
+  input_read(TM_142_INPUT_ERROR, CH_2, 0);
+
+  dac_set(CH_ALL, 0);
+
+  adc_get_value(CH_1, TM_142_ADC_OPENCIRC, 0);
+  adc_get_value(CH_1, TM_142_ADC_FEEDBACK, 0);
+  adc_get_value(CH_2, TM_142_ADC_OPENCIRC, 0);
+  adc_get_value(CH_2, TM_142_ADC_FEEDBACK, 0);
+
+  /* calibration procedure {{{ */
+  relay_set(TM_142_RELAY_U0, CH_1, STATE_ON);
+  relay_set(TM_142_RELAY_U0, CH_2, STATE_ON);
+  // attach ground to sensor mock
+  while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { }
+
+  uint16_t tmp = 0;
+  adc_get_value(CH_1, TM_142_ADC_OPENCIRC, &tmp);
+  adc_get_value(CH_1, TM_142_ADC_OPENCIRC, &tmp);
+  adc_get_value(CH_1, TM_142_ADC_OPENCIRC, &tmp);
+  adc_get_value(CH_1, TM_142_ADC_OPENCIRC, &tmp);
+  adc_get_value(CH_1, TM_142_ADC_OPENCIRC, &tmp);
+  adc_get_value(CH_1, TM_142_ADC_OPENCIRC, &tmp);
+
+  adc_get_value(CH_2, TM_142_ADC_OPENCIRC, &tmp);
+  adc_get_value(CH_2, TM_142_ADC_OPENCIRC, &tmp);
+  adc_get_value(CH_2, TM_142_ADC_OPENCIRC, &tmp);
+  adc_get_value(CH_2, TM_142_ADC_OPENCIRC, &tmp);
+  adc_get_value(CH_2, TM_142_ADC_OPENCIRC, &tmp);
+  adc_get_value(CH_2, TM_142_ADC_OPENCIRC, &tmp);
+  
+  relay_set(TM_142_RELAY_U0, CH_1, TM_142_U0_DISABLE);
+  relay_set(TM_142_RELAY_U0, CH_2, TM_142_U0_DISABLE);
+
+  dac_set(CH_1, 0x0000);
+  adc_get_value(CH_1, TM_142_ADC_FEEDBACK, &tmp);
+  dac_set(CH_1, 0x0400);
+  adc_get_value(CH_1, TM_142_ADC_FEEDBACK, &tmp);
+  dac_set(CH_1, 0x0800);
+  adc_get_value(CH_1, TM_142_ADC_FEEDBACK, &tmp);
+  dac_set(CH_1, 0x0C00);
+  adc_get_value(CH_1, TM_142_ADC_FEEDBACK, &tmp);
+  dac_set(CH_1, 0x0000);
+
+  dac_set(CH_2, 0x0000);
+  adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);
+  dac_set(CH_2, 0x0400);
+  adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);
+  dac_set(CH_2, 0x0800);
+  adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);
+  dac_set(CH_2, 0x0C00);
+  adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);
+  dac_set(CH_2, 0x0000);
+
+while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { }
   /* USER CODE END 2 */
 
   /* Infinite loop */

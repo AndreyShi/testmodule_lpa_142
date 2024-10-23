@@ -112,7 +112,7 @@ switch(input)
 		    { *state = STATE_OFF; }
 		}
 
-	    update_input(CH_1, *state);
+	    //update_input(CH_1, *state);
 	    }
 	else if(ch == CH_2)
 	    {
@@ -124,7 +124,7 @@ switch(input)
 		    { *state = STATE_OFF; }
 		}
 
-	    update_input(CH_2, *state);
+	    //update_input(CH_2, *state);
 	    }
 	else
 	    { return 0x02; }
@@ -141,7 +141,7 @@ switch(input)
 		    { *state = STATE_OFF; }
 		}
 
-	    update_error(CH_1, *state);
+	    //update_error(CH_1, *state);
 	    }
 	else if(ch == CH_2)
 	    {
@@ -153,7 +153,7 @@ switch(input)
 		    { *state = STATE_OFF; }
 		}
 
-	    update_error(CH_2, *state);
+	    //update_error(CH_2, *state);
 	    }
 	else
 	    { return 0x02; }
