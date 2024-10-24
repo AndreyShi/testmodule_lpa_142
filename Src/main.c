@@ -35,6 +35,7 @@
 #include "relay_if.h"
 #include "adc_if.h"
 #include "dac_if.h"
+#include "ssd1306.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -101,8 +102,7 @@ int main(void)
   MX_ADC1_Init();
   MX_ADC2_Init();
   MX_DAC_Init();
-  //MX_IWDG_Init();
-  //MX_SPI2_Init();
+  MX_SPI2_Init();
   //MX_TIM1_Init();
   //MX_TIM3_Init();
   //MX_TIM6_Init();
@@ -114,6 +114,8 @@ int main(void)
   //MX_USB_OTG_FS_PCD_Init();
   /* USER CODE BEGIN 2 */
   dac_start();
+  ssd1306_init();
+  
 
     /* initialize module state */
   relay_set(TM_142_RELAY_U0, CH_1, TM_142_U0_DISABLE);
@@ -137,9 +139,10 @@ int main(void)
   adc_get_value(CH_2, TM_142_ADC_FEEDBACK, 0);
 
   /* calibration procedure {{{ */
+  /*
   relay_set(TM_142_RELAY_U0, CH_1, STATE_ON);
   relay_set(TM_142_RELAY_U0, CH_2, STATE_ON);
-  // attach ground to sensor mock
+
   while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { }
 
   uint16_t tmp = 0;
@@ -181,6 +184,7 @@ int main(void)
   dac_set(CH_2, 0x0000);
 
 while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { }
+*/
   /* USER CODE END 2 */
 
   /* Infinite loop */
