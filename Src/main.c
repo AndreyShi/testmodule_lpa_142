@@ -21,7 +21,6 @@
 #include "adc.h"
 #include "dac.h"
 #include "dma.h"
-#include "iwdg.h"
 #include "spi.h"
 #include "tim.h"
 #include "usart.h"
@@ -139,12 +138,12 @@ int main(void)
   adc_get_value(CH_2, TM_142_ADC_FEEDBACK, 0);
 
   /* calibration procedure {{{ */
-  /*
+ 
   relay_set(TM_142_RELAY_U0, CH_1, STATE_ON);
   relay_set(TM_142_RELAY_U0, CH_2, STATE_ON);
 
   while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { }
-
+ /*
   uint16_t tmp = 0;
   adc_get_value(CH_1, TM_142_ADC_OPENCIRC, &tmp);
   adc_get_value(CH_1, TM_142_ADC_OPENCIRC, &tmp);
@@ -192,7 +191,7 @@ while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { }
   while (1)
   {
     /* USER CODE END WHILE */
-  __asm("nop");
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -215,9 +214,8 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 4;

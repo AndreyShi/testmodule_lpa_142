@@ -135,8 +135,8 @@ void Error_Handler(void);
 #define Ch2_gen_ref_GPIO_Port GPIOB
 #define Ch2_gen_out_Pin GPIO_PIN_15
 #define Ch2_gen_out_GPIO_Port GPIOB
-#define id_1_Pin GPIO_PIN_8
-#define id_1_GPIO_Port GPIOD
+#define BGND_enable_Pin GPIO_PIN_8
+#define BGND_enable_GPIO_Port GPIOD
 #define id_2_Pin GPIO_PIN_9
 #define id_2_GPIO_Port GPIOD
 #define id_3_Pin GPIO_PIN_10
