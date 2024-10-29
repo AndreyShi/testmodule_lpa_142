@@ -138,13 +138,14 @@ int main(void)
   adc_get_value(CH_2, TM_142_ADC_FEEDBACK, 0);
 
   /* calibration procedure {{{ */
- 
+  uint16_t tmp = 0;
+ /*
   relay_set(TM_142_RELAY_U0, CH_1, STATE_ON);
   relay_set(TM_142_RELAY_U0, CH_2, STATE_ON);
 
   while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { }
- /*
-  uint16_t tmp = 0;
+
+
   adc_get_value(CH_1, TM_142_ADC_OPENCIRC, &tmp);
   adc_get_value(CH_1, TM_142_ADC_OPENCIRC, &tmp);
   adc_get_value(CH_1, TM_142_ADC_OPENCIRC, &tmp);
@@ -158,32 +159,33 @@ int main(void)
   adc_get_value(CH_2, TM_142_ADC_OPENCIRC, &tmp);
   adc_get_value(CH_2, TM_142_ADC_OPENCIRC, &tmp);
   adc_get_value(CH_2, TM_142_ADC_OPENCIRC, &tmp);
-  
+*/
   relay_set(TM_142_RELAY_U0, CH_1, TM_142_U0_DISABLE);
   relay_set(TM_142_RELAY_U0, CH_2, TM_142_U0_DISABLE);
+  while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { }
 
   dac_set(CH_1, 0x0000);
   adc_get_value(CH_1, TM_142_ADC_FEEDBACK, &tmp);
-  dac_set(CH_1, 0x0400);
-  adc_get_value(CH_1, TM_142_ADC_FEEDBACK, &tmp);
-  dac_set(CH_1, 0x0800);
-  adc_get_value(CH_1, TM_142_ADC_FEEDBACK, &tmp);
-  dac_set(CH_1, 0x0C00);
-  adc_get_value(CH_1, TM_142_ADC_FEEDBACK, &tmp);
+  dac_set(CH_1, 0x0005);//2.5mA
+  adc_get_value(CH_1, TM_142_ADC_FEEDBACK, &tmp); //7
+  dac_set(CH_1, 0x0015);//10.9mA
+  adc_get_value(CH_1, TM_142_ADC_FEEDBACK, &tmp); //22
+  dac_set(CH_1, 0x0023);//18.0mA
+  adc_get_value(CH_1, TM_142_ADC_FEEDBACK, &tmp); //39
   dac_set(CH_1, 0x0000);
 
-  dac_set(CH_2, 0x0000);
-  adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);
-  dac_set(CH_2, 0x0400);
-  adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);
-  dac_set(CH_2, 0x0800);
-  adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);
-  dac_set(CH_2, 0x0C00);
-  adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);
+  dac_set(CH_2, 0x0000);//0.0mA
+  adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);//3
+  dac_set(CH_2, 0x0005);//2.3mA  3.7 mV
+  adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);//6
+  dac_set(CH_2, 0x0015);//10.7mA 15.2 mV
+  adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);//22
+  dac_set(CH_2, 0x0023);//17.8mA 25 mV
+  adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);//36
   dac_set(CH_2, 0x0000);
 
 while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { }
-*/
+/**/
   /* USER CODE END 2 */
 
   /* Infinite loop */
