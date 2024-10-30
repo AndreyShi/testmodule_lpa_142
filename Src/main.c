@@ -117,14 +117,14 @@ int main(void)
   
 
     /* initialize module state */
-  relay_set(TM_142_RELAY_U0, CH_1, TM_142_U0_DISABLE);
-  relay_set(TM_142_RELAY_U0, CH_2, TM_142_U0_DISABLE);
-  relay_set(TM_142_RELAY_SENSOR, CH_1, TM_142_SENSOR_ANA);
-  relay_set(TM_142_RELAY_SENSOR, CH_2, TM_142_SENSOR_ANA);
-  relay_set(TM_142_RELAY_INPUT, CH_1, TM_142_BOT_SW);
-  relay_set(TM_142_RELAY_INPUT, CH_2, TM_142_BOT_SW);
-  relay_set(TM_142_RELAY_ERROR, CH_1, TM_142_BOT_SW);
-  relay_set(TM_142_RELAY_ERROR, CH_2, TM_142_BOT_SW);
+  relay_set(TM_142_RELAY_U0, CH_1, TM_142_U0_DISABLE);// K7
+  relay_set(TM_142_RELAY_U0, CH_2, TM_142_U0_DISABLE);// K7
+  relay_set(TM_142_RELAY_SENSOR, CH_1, TM_142_SENSOR_ANA);//K6
+  relay_set(TM_142_RELAY_SENSOR, CH_2, TM_142_SENSOR_ANA);//K6
+  relay_set(TM_142_RELAY_INPUT, CH_1, TM_142_BOT_SW);//K2K4
+  relay_set(TM_142_RELAY_INPUT, CH_2, TM_142_BOT_SW);//K2K4
+  relay_set(TM_142_RELAY_ERROR, CH_1, TM_142_BOT_SW);//K3K5
+  relay_set(TM_142_RELAY_ERROR, CH_2, TM_142_BOT_SW);//K3K5
   input_read(TM_142_INPUT_INPUT, CH_1, 0);
   input_read(TM_142_INPUT_INPUT, CH_2, 0);
   input_read(TM_142_INPUT_ERROR, CH_1, 0);
@@ -164,25 +164,25 @@ int main(void)
   relay_set(TM_142_RELAY_U0, CH_2, TM_142_U0_DISABLE);
   while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { }
 
-  dac_set(CH_1, 0x0000);
+  dac_set(CH_1, 0x0000); //9.2mv
   adc_get_value(CH_1, TM_142_ADC_FEEDBACK, &tmp);
-  dac_set(CH_1, 0x0005);//2.5mA
+  dac_set(CH_1, 1000);//2.5mA  710mv  719mv
   adc_get_value(CH_1, TM_142_ADC_FEEDBACK, &tmp); //7
-  dac_set(CH_1, 0x0015);//10.9mA
+  dac_set(CH_1, 2000);//10.9mA 1000mv  1440mv
   adc_get_value(CH_1, TM_142_ADC_FEEDBACK, &tmp); //22
-  dac_set(CH_1, 0x0023);//18.0mA
+  dac_set(CH_1, 3000);//18.0mA 1172mv  2160mv
   adc_get_value(CH_1, TM_142_ADC_FEEDBACK, &tmp); //39
-  dac_set(CH_1, 0x0000);
+  dac_set(CH_1, 4095);//1309mv 2946mv
 
-  dac_set(CH_2, 0x0000);//0.0mA
+  dac_set(CH_2, 0x0000);//0.0mA 10mv
   adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);//3
-  dac_set(CH_2, 0x0005);//2.3mA  3.7 mV
+  dac_set(CH_2, 1000);//2.3mA  3.7 mV 719mv
   adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);//6
-  dac_set(CH_2, 0x0015);//10.7mA 15.2 mV
+  dac_set(CH_2, 2000);//10.7mA 15.2 mV 1440mv
   adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);//22
-  dac_set(CH_2, 0x0023);//17.8mA 25 mV
+  dac_set(CH_2, 3000);//17.8mA 25 mV 2160mv
   adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);//36
-  dac_set(CH_2, 0x0000);
+  dac_set(CH_2, 4095); //2950mv
 
 while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { }
 /**/

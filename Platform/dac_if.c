@@ -23,7 +23,7 @@ if(value > DAC_MAX)
 uint32_t val1;
 uint32_t val2;
 
-val1 = HAL_DACEx_DualGetValue(&hdac);
+val1 = HAL_DACEx_DualGetValue(&hdac); // hi 16 bit 2 channel,  lo 16 bit 1 channel
 val2 = val1 >> 16;
 val1 = val1 & 0x0000FFFF;
 
