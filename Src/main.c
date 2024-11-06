@@ -36,6 +36,8 @@
 #include "dac_if.h"
 #include "ssd1306.h"
 #include "usbd_cdc_if.h"
+#include "tim_if.h"
+#include "app_config.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -103,12 +105,12 @@ int main(void)
   MX_ADC2_Init();
   MX_DAC_Init();
   MX_SPI2_Init();
-  //MX_TIM1_Init();
+  MX_TIM1_Init();
   //MX_TIM3_Init();
   //MX_TIM6_Init();
-  //MX_TIM8_Init();
-  //MX_TIM9_Init();
-  //MX_TIM12_Init();
+  MX_TIM8_Init();
+  MX_TIM9_Init();
+  MX_TIM12_Init();
   //MX_USART2_UART_Init();
   //MX_USART3_UART_Init();
   MX_USB_DEVICE_Init();
@@ -187,6 +189,9 @@ int main(void)
 
 while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { }
 /**/
+uint16_t data = 0;
+tim_get_delay(CH_1, &data);
+__asm("nop");
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -246,7 +251,17 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)/*{{{*/
+{
+if(htim->Instance == ch1_meas_tim.Instance)
+    { delay_tim_isr(htim); }
+if(htim->Instance == enc_tim.Instance)
+    { 
+      //enc_tim_isr();//для энкодера подключить файлы encoder.c encoder.h
+    }
+if(htim->Instance == ch2_meas_tim.Instance)
+    { delay_tim_isr(htim); }
+}/*}}}*/
 /* USER CODE END 4 */
 
 /**
