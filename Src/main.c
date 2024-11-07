@@ -38,6 +38,7 @@
 #include "usbd_cdc_if.h"
 #include "tim_if.h"
 #include "app_config.h"
+#include "encoder.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -106,7 +107,7 @@ int main(void)
   MX_DAC_Init();
   MX_SPI2_Init();
   MX_TIM1_Init();
-  //MX_TIM3_Init();
+  MX_TIM3_Init();
   //MX_TIM6_Init();
   MX_TIM8_Init();
   MX_TIM9_Init();
@@ -274,9 +275,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)/*{{{*/
 if(htim->Instance == ch1_meas_tim.Instance)
     { delay_tim_isr(htim); }
 if(htim->Instance == enc_tim.Instance)
-    { 
-      //enc_tim_isr();//для энкодера подключить файлы encoder.c encoder.h
-    }
+    { enc_tim_isr();}
 if(htim->Instance == ch2_meas_tim.Instance)
     { delay_tim_isr(htim); }
 }/*}}}*/
