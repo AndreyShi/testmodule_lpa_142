@@ -18,6 +18,9 @@ uint16_t cursor[2];
 static uint16_t tim_max(uint8_t buf_num);
 
 //--------------------------------------------------
+/*
+one tick is 1/72000000 = 0.000000014 Sec
+*/
 enum _tim_error tim_get_delay(enum _channels channel, uint16_t *val)/*{{{*/
 {
 uint8_t ch;

@@ -10,29 +10,29 @@
 //#include "KModuleState142.h"
 
 //--------------------------------------------------
-#define SET_U0_CH1 GPIOC->BSRR = GPIO_BSRR_BS_5;
-#define RST_U0_CH1 GPIOC->BSRR = GPIO_BSRR_BR_5;
+#define SET_U0_CH1 GPIOC->BSRR = GPIO_BSRR_BS_5;//измерение напряжения
+#define RST_U0_CH1 GPIOC->BSRR = GPIO_BSRR_BR_5;//дискретный или аналоговый имитатор
 
-#define SET_U0_CH2 GPIOD->BSRR = GPIO_BSRR_BS_1;
-#define RST_U0_CH2 GPIOD->BSRR = GPIO_BSRR_BR_1;
+#define SET_U0_CH2 GPIOD->BSRR = GPIO_BSRR_BS_1;//измерение напряжения
+#define RST_U0_CH2 GPIOD->BSRR = GPIO_BSRR_BR_1;//дискретный или аналоговый имитатор
 
-#define DIG_CH1 GPIOC->BSRR = GPIO_BSRR_BS_4;
-#define ANA_CH1 GPIOC->BSRR = GPIO_BSRR_BR_4;
+#define DIG_CH1 GPIOC->BSRR = GPIO_BSRR_BS_4; //дискретный имитатор датчика
+#define ANA_CH1 GPIOC->BSRR = GPIO_BSRR_BR_4; //аналоговый имитатор датчика
 
-#define DIG_CH2 GPIOD->BSRR = GPIO_BSRR_BS_0;
-#define ANA_CH2 GPIOD->BSRR = GPIO_BSRR_BR_0;
+#define DIG_CH2 GPIOD->BSRR = GPIO_BSRR_BS_0; //дискретный имитатор датчика
+#define ANA_CH2 GPIOD->BSRR = GPIO_BSRR_BR_0; //аналоговый имитатор датчика
 
-#define IN_TOP_SW_CH1 GPIOE->BSRR = GPIO_BSRR_BS_12 | GPIO_BSRR_BS_13;
-#define IN_BOT_SW_CH1 GPIOE->BSRR = GPIO_BSRR_BR_12 | GPIO_BSRR_BR_13;
+#define IN_TOP_SW_CH1 GPIOE->BSRR = GPIO_BSRR_BS_12 | GPIO_BSRR_BS_13; // "верхний ключ"
+#define IN_BOT_SW_CH1 GPIOE->BSRR = GPIO_BSRR_BR_12 | GPIO_BSRR_BR_13; // "нижний ключ"
 
-#define IN_TOP_SW_CH2 GPIOD->BSRR = GPIO_BSRR_BS_12 | GPIO_BSRR_BS_13;
-#define IN_BOT_SW_CH2 GPIOD->BSRR = GPIO_BSRR_BR_12 | GPIO_BSRR_BR_13;
+#define IN_TOP_SW_CH2 GPIOD->BSRR = GPIO_BSRR_BS_12 | GPIO_BSRR_BS_13; // "верхний ключ"
+#define IN_BOT_SW_CH2 GPIOD->BSRR = GPIO_BSRR_BR_12 | GPIO_BSRR_BR_13; // "нижний ключ"
 
-#define ERR_TOP_SW_CH1 GPIOE->BSRR = GPIO_BSRR_BS_14 | GPIO_BSRR_BS_15;
-#define ERR_BOT_SW_CH1 GPIOE->BSRR = GPIO_BSRR_BR_14 | GPIO_BSRR_BR_15;
+#define ERR_TOP_SW_CH1 GPIOE->BSRR = GPIO_BSRR_BS_14 | GPIO_BSRR_BS_15;// "верхний ключ"
+#define ERR_BOT_SW_CH1 GPIOE->BSRR = GPIO_BSRR_BR_14 | GPIO_BSRR_BR_15;// "нижний ключ"
 
-#define ERR_TOP_SW_CH2 GPIOD->BSRR = GPIO_BSRR_BS_14 | GPIO_BSRR_BS_15;
-#define ERR_BOT_SW_CH2 GPIOD->BSRR = GPIO_BSRR_BR_14 | GPIO_BSRR_BR_15;
+#define ERR_TOP_SW_CH2 GPIOD->BSRR = GPIO_BSRR_BS_14 | GPIO_BSRR_BS_15;// "верхний ключ"
+#define ERR_BOT_SW_CH2 GPIOD->BSRR = GPIO_BSRR_BR_14 | GPIO_BSRR_BR_15;// "нижний ключ"
 
 #define PWR_ENABLE  GPIOD->BSRR = GPIO_BSRR_BR_2;
 #define PWR_DISABLE GPIOD->BSRR = GPIO_BSRR_BS_2;
