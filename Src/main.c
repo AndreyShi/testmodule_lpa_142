@@ -39,6 +39,7 @@
 #include "tim_if.h"
 #include "app_config.h"
 #include "encoder.h"
+int _write(int file, char *ptr, int len);
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -96,7 +97,9 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+  setvbuf(stdin, NULL, _IONBF, 0);  
+  setvbuf(stdout, NULL, _IONBF, 0);
+  setvbuf(stderr, NULL, _IONBF, 0);
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -270,6 +273,19 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+/*
+Символ новый строки в определенных случаях теряется гдето в недрах библиотеки, к примеру:
+printf("Hello\n");   - символ новый строки "\n" потеряется
+printf("Hello\n",1); - вот так не потеряется
+*/
+int _write(int file, char *ptr, int len)
+{
+    (void)file;
+
+  CDC_Transmit_FS((uint8_t *)ptr, len);
+  return len;
+} 
+
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)/*{{{*/
 {
 if(htim->Instance == ch1_meas_tim.Instance)
