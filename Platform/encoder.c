@@ -7,14 +7,14 @@
 #include "tim.h"
 
 //--------------------------------------------------
-static uint16_t old_value;
+uint16_t old_value;
 
-static volatile uint8_t  enc_idx;
-static volatile uint16_t enc_values[128];
+volatile uint8_t  enc_idx;
+volatile uint16_t enc_values[128];
 //--------------------------------------------------
 void encoder_init(void)
 {
-HAL_TIM_Encoder_Start_IT(&enc_tim, TIM_CHANNEL_1);
+HAL_TIM_Encoder_Start_IT(&enc_tim, TIM_CHANNEL_ALL);
 old_value = enc_tim.Instance->CNT;
 
 enc_idx = 0;

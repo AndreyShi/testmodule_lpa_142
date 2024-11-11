@@ -200,8 +200,13 @@ __asm("nop");
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  uint32_t tmp_tm = 0;
   while (1)
   {
+    /*if(tmp_tm != htim3.Instance->CNT){
+        printf("%d dir:%d\n",htim3.Instance->CNT,htim3.Instance->CR1 & 0x10);
+        tmp_tm = htim3.Instance->CNT;
+    }*/
     //Тест 1 проверка Uo:
     //включить K7 первого канала
     //измерить напряжение
