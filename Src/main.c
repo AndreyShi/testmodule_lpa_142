@@ -282,12 +282,18 @@ void SystemClock_Config(void)
 Символ новый строки в определенных случаях теряется гдето в недрах библиотеки, к примеру:
 printf("Hello\n");   - символ новый строки "\n" потеряется
 printf("Hello\n",1); - вот так не потеряется
+
+UPD: проверка выполнена
+при printf("Hello\n") вызывается _write с len 5 "Hello", а затем 
+сразу _write с len 1 "\n", usb cdc не успевает обработать вызовы 
+поэтому ждем тут отправки предыдущего сообщения
 */
 int _write(int file, char *ptr, int len)
 {
     (void)file;
-
-  CDC_Transmit_FS((uint8_t *)ptr, len);
+  uint32_t tmp = HAL_GetTick();
+  while(CDC_Transmit_FS((uint8_t *)ptr, len) != USBD_OK && HAL_GetTick() - tmp < 1000)
+  {;}
   return len;
 } 
 
