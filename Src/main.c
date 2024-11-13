@@ -171,27 +171,34 @@ int main(void)
   relay_set(TM_142_RELAY_U0, CH_2, TM_142_U0_DISABLE);
   while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { }
 
-  dac_set(CH_1, 0x0000); //9.2mv
-  adc_get_value(CH_1, TM_142_ADC_FEEDBACK, &tmp);
-  dac_set(CH_1, 1000);//2.5mA  710mv  719mv
-  adc_get_value(CH_1, TM_142_ADC_FEEDBACK, &tmp); //7
-  dac_set(CH_1, 2000);//10.9mA 1000mv  1440mv
-  adc_get_value(CH_1, TM_142_ADC_FEEDBACK, &tmp); //22
-  dac_set(CH_1, 3000);//18.0mA 1172mv  2160mv
-  adc_get_value(CH_1, TM_142_ADC_FEEDBACK, &tmp); //39
-  dac_set(CH_1, 4095);//1309mv 2946mv
-
-  dac_set(CH_2, 0x0000);//0.0mA 10mv
-  adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);//3
-  dac_set(CH_2, 1000);//2.3mA  3.7 mV 719mv
-  adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);//6
-  dac_set(CH_2, 2000);//10.7mA 15.2 mV 1440mv
-  adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);//22
-  dac_set(CH_2, 3000);//17.8mA 25 mV 2160mv
-  adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);//36
-  dac_set(CH_2, 4095); //2950mv
-
-while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { }
+/*
+while(1){
+  dac_set(CH_1, 221); // 1.001 mA agilent
+  HAL_Delay(2000);
+  adc_get_value(CH_1, TM_142_ADC_FEEDBACK, &tmp);//224
+  printf("ch1 dac 221  adc: %d\n",tmp);
+  HAL_Delay(5000);
+  dac_set(CH_1, 3759); // 17.003 mA agilent
+  HAL_Delay(2000);
+  adc_get_value(CH_1, TM_142_ADC_FEEDBACK, &tmp);//3755
+  printf("ch1 dac 3759  adc: %d\n",tmp);
+  HAL_Delay(5000);
+} */
+/*
+while(1){
+  dac_set(CH_2, 222); // 1.000 mA agilent
+  HAL_Delay(2000);
+  adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);//225
+  printf("ch2 dac 222  adc: %d\n",tmp);
+  HAL_Delay(5000);
+  dac_set(CH_2, 3779); // 17.003 mA agilent
+  HAL_Delay(2000);
+  adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);//3776
+  printf("ch2 dac 3779  adc: %d\n",tmp);
+  HAL_Delay(5000);
+}
+*/
+//while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { }
 /**/
 uint16_t data = 0;
 tim_get_delay(CH_1, &data);
@@ -279,13 +286,14 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 /*
-Символ новый строки в определенных случаях теряется гдето в недрах библиотеки, к примеру:
+Символ новый строки в определенных случаях теряется при выводе, к примеру:
 printf("Hello\n");   - символ новый строки "\n" потеряется
 printf("Hello\n",1); - вот так не потеряется
 
 UPD: проверка выполнена
 при printf("Hello\n") вызывается _write с len 5 "Hello", а затем 
-сразу _write с len 1 "\n", usb cdc не успевает обработать вызовы 
+сразу _write с len 1 "\n", usb cdc не успевает обработать вызовы _write
+(надо подождать пока придет прерывание об отправленном пакете usb cdc) 
 поэтому ждем тут отправки предыдущего сообщения
 */
 int _write(int file, char *ptr, int len)
