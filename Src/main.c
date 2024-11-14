@@ -39,6 +39,7 @@
 #include "tim_if.h"
 #include "app_config.h"
 #include "encoder.h"
+#include "calibration.h"
 int _write(int file, char *ptr, int len);
 /* USER CODE END Includes */
 
@@ -146,58 +147,57 @@ int main(void)
 
   /* calibration procedure {{{ */
   uint16_t tmp = 0;
- /*
+ 
   relay_set(TM_142_RELAY_U0, CH_1, STATE_ON);
   relay_set(TM_142_RELAY_U0, CH_2, STATE_ON);
 
   while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { }
-
-
-  adc_get_value(CH_1, TM_142_ADC_OPENCIRC, &tmp);
-  adc_get_value(CH_1, TM_142_ADC_OPENCIRC, &tmp);
-  adc_get_value(CH_1, TM_142_ADC_OPENCIRC, &tmp);
-  adc_get_value(CH_1, TM_142_ADC_OPENCIRC, &tmp);
-  adc_get_value(CH_1, TM_142_ADC_OPENCIRC, &tmp);
-  adc_get_value(CH_1, TM_142_ADC_OPENCIRC, &tmp);
-
-  adc_get_value(CH_2, TM_142_ADC_OPENCIRC, &tmp);
-  adc_get_value(CH_2, TM_142_ADC_OPENCIRC, &tmp);
-  adc_get_value(CH_2, TM_142_ADC_OPENCIRC, &tmp);
-  adc_get_value(CH_2, TM_142_ADC_OPENCIRC, &tmp);
-  adc_get_value(CH_2, TM_142_ADC_OPENCIRC, &tmp);
-  adc_get_value(CH_2, TM_142_ADC_OPENCIRC, &tmp);
+/*
+while(1){
+  adc_get_value(CH_1, TM_142_ADC_OPENCIRC, &tmp);//max 14.015 3916  min 1.004 282
+  printf("ch1 adc: %d %2.3fV\n",tmp,calibrate_u0(tmp, CH_1));
+  HAL_Delay(5000);
+}
 */
+/*
+while(1){
+  adc_get_value(CH_2, TM_142_ADC_OPENCIRC, &tmp);//max 14.011 3933 min 1.004 283 
+  printf("ch2 adc: %d %2.3fV\n",tmp,calibrate_u0(tmp, CH_2));
+  HAL_Delay(5000);
+}
+*/
+
   relay_set(TM_142_RELAY_U0, CH_1, TM_142_U0_DISABLE);
   relay_set(TM_142_RELAY_U0, CH_2, TM_142_U0_DISABLE);
   while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { }
 
-/*
+
 while(1){
-  dac_set(CH_1, 221); // 1.001 mA agilent
-  HAL_Delay(2000);
+  dac_set_i(CH_1,1.001);//dac_set(CH_1, 221); // 1.001 mA agilent
+  HAL_Delay(5000);
   adc_get_value(CH_1, TM_142_ADC_FEEDBACK, &tmp);//224
-  printf("ch1 dac 221  adc: %d\n",tmp);
+  printf("ch1 dac 221  adc: %d %2.3fmA\n",tmp,calibrate_i0(tmp, CH_1));
   HAL_Delay(5000);
-  dac_set(CH_1, 3759); // 17.003 mA agilent
-  HAL_Delay(2000);
+  dac_set_i(CH_1,17.003);//dac_set(CH_1, 3759); // 17.003 mA agilent
+  HAL_Delay(5000);
   adc_get_value(CH_1, TM_142_ADC_FEEDBACK, &tmp);//3755
-  printf("ch1 dac 3759  adc: %d\n",tmp);
-  HAL_Delay(5000);
-} */
-/*
-while(1){
-  dac_set(CH_2, 222); // 1.000 mA agilent
-  HAL_Delay(2000);
-  adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);//225
-  printf("ch2 dac 222  adc: %d\n",tmp);
-  HAL_Delay(5000);
-  dac_set(CH_2, 3779); // 17.003 mA agilent
-  HAL_Delay(2000);
-  adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);//3776
-  printf("ch2 dac 3779  adc: %d\n",tmp);
+  printf("ch1 dac 3759  adc: %d %2.3fmA\n",tmp,calibrate_i0(tmp, CH_1));
   HAL_Delay(5000);
 }
-*/
+
+while(1){
+  dac_set(CH_2, 222); // 1.000 mA agilent
+  HAL_Delay(5000);
+  adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);//225
+  printf("ch2 dac 222  adc: %d %2.3fmA\n",tmp,calibrate_i0(tmp, CH_2));
+  HAL_Delay(5000);
+  dac_set(CH_2, 3779); // 17.003 mA agilent
+  HAL_Delay(5000);
+  adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);//3776
+  printf("ch2 dac 3779  adc: %d %2.3fmA\n",tmp,calibrate_i0(tmp, CH_2));
+  HAL_Delay(5000);
+}
+//*/
 //while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { }
 /**/
 uint16_t data = 0;

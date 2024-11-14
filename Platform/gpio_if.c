@@ -168,6 +168,7 @@ return 0x00;
 //--------------------------------------------------
 uint8_t id_read(void)/*{{{*/
 {
+	return 3;
 if(my_id != 0xFF)
     { return my_id; }
     
