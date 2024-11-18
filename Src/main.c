@@ -123,7 +123,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   dac_start();
   ssd1306_init();
-  
+
 
     /* initialize module state */
   relay_set(TM_142_RELAY_U0, CH_1, TM_142_U0_DISABLE);// K7
@@ -172,7 +172,7 @@ while(1){
   relay_set(TM_142_RELAY_U0, CH_2, TM_142_U0_DISABLE);
   while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { }
 
-
+/*
 while(1){
   dac_set_i(CH_1,1.001);//dac_set(CH_1, 221); // 1.001 mA agilent
   HAL_Delay(5000);
@@ -198,7 +198,7 @@ while(1){
   printf("ch2 dac 3779  adc: %d %2.3fmA\n",tmp,calibrate_i0(tmp, CH_2));
   HAL_Delay(5000);
 }
-//*/
+*/
 //while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { }
 /**/
 
@@ -210,10 +210,14 @@ while(1){
   float tmp_f = 0;
   while (1)
   {
-    /*if(tmp_tm != htim3.Instance->CNT){
-        printf("%d dir:%d\n",htim3.Instance->CNT,htim3.Instance->CR1 & 0x10);
+    if(tmp_tm != htim3.Instance->CNT){
+
+
+        //printf("%d dir:%d\n",htim3.Instance->CNT,htim3.Instance->CR1 & 0x10);
+        printf("Hello\n");
         tmp_tm = htim3.Instance->CNT;
-    }*/
+
+    }
     if(id_stend142 == 1){    //Тест 1 проверка Uo:
        relay_set(TM_142_RELAY_U0, CH_1, STATE_ON);//включить K7 первого канала
        HAL_Delay(100);//проверить паузу включения реле
@@ -315,9 +319,11 @@ UPD: проверка выполнена
 int _write(int file, char *ptr, int len)
 {
     (void)file;
-  uint32_t tmp = HAL_GetTick();
-  while(CDC_Transmit_FS((uint8_t *)ptr, len) != USBD_OK && HAL_GetTick() - tmp < 1000)
-  {;}
+  usb_trans_ok = 0;
+  //DBG_PIN_SET;
+  CDC_Transmit_FS((uint8_t *)ptr, len);
+  while(!usb_trans_ok && usb_com_open){;}
+  //DBG_PIN_RS;
   return len;
 } 
 

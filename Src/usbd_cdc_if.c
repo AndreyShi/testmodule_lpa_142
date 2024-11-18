@@ -22,7 +22,8 @@
 #include "usbd_cdc_if.h"
 
 /* USER CODE BEGIN INCLUDE */
-
+uint8_t usb_trans_ok;
+uint8_t usb_com_open;
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -228,11 +229,11 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
     break;
 
     case CDC_SET_CONTROL_LINE_STATE:
-
+    usb_com_open = 0;
     break;
 
     case CDC_SEND_BREAK:
-
+    usb_com_open = 1;
     break;
 
   default:
@@ -311,6 +312,7 @@ static int8_t CDC_TransmitCplt_FS(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
   UNUSED(Buf);
   UNUSED(Len);
   UNUSED(epnum);
+  usb_trans_ok = 1;
   /* USER CODE END 13 */
   return result;
 }

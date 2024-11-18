@@ -27,6 +27,9 @@
 
 #define SSD_COMMAND (GPIOB->BSRR = GPIO_BSRR_BR_13)
 #define SSD_DATA    (GPIOB->BSRR = GPIO_BSRR_BS_13)
+
+#define DBG_PIN_RS  (GPIOB->BSRR = GPIO_BSRR_BR_0)
+#define DBG_PIN_SET (GPIOB->BSRR = GPIO_BSRR_BS_0)
 /*}}}*/
 // Канальные сигналы
 //--------------------------------------------------
