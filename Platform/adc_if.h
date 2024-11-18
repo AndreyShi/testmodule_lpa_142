@@ -23,7 +23,7 @@ extern "C" {
 #endif
 
 extern enum _adc_error adc_get_value(enum _channels channel, enum _adc_input in, uint16_t *val);
-
+extern enum _adc_error adc_get_value_f(enum _channels channel, enum _adc_input in, float *val);
 #ifdef __cplusplus
 }
 #endif

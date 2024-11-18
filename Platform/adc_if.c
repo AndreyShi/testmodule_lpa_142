@@ -14,9 +14,9 @@
 
 //--------------------------------------------------
 __attribute__(( section(".dmaSection") ))
-uint16_t adc_buff1[ADC_BUFF_SIZE];
+uint16_t adc_buff1[ADC_BUFF_SIZE]; // 0-4 index opencirc u0  5-9 index adc_feedback i0
 __attribute__(( section(".dmaSection") ))
-uint16_t adc_buff2[ADC_BUFF_SIZE];
+uint16_t adc_buff2[ADC_BUFF_SIZE]; // 0-4 index opencirc u0  5-9 index adc_feedback i0
 
 //--------------------------------------------------
 static uint16_t adc_avg(uint16_t *buff, enum _adc_input in);
@@ -38,15 +38,41 @@ if(channel == CH_1)
     {
     HAL_ADC_Stop_DMA(&hadc1);
     value = adc_avg(adc_buff1, in);
+    }
+else               
+    {
+    HAL_ADC_Stop_DMA(&hadc2);
+    value = adc_avg(adc_buff2, in);
+    }
+
+if(val != 0)
+    { *val = value; }
+
+return ADC_OK;
+}/*}}}*/
+
+enum _adc_error adc_get_value_f(channels_t channel, adc_input_t in, float *val)
+{
+uint16_t value;
+float value_f;
+
+if(channel == CH_ALL) { return ADC_CHAN; }
+
+if(channel == CH_1)
+    { HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_buff1, ADC_BUFF_SIZE); }
+else
+    { HAL_ADC_Start_DMA(&hadc2, (uint32_t *)adc_buff2, ADC_BUFF_SIZE); }
+
+HAL_Delay(5);
+if(channel == CH_1)
+    {
+    HAL_ADC_Stop_DMA(&hadc1);
+    value = adc_avg(adc_buff1, in);
 
         if(in == TM_142_ADC_FEEDBACK)
-        { 
-            //update_adc(CH_1, in, value, calibrate_i0(value, CH_1)); 
-        }
+           { value_f = calibrate_i0(value, CH_1); }
         else
-        { 
-            //update_adc(CH_1, in, value, calibrate_u0(value, CH_1)); 
-        }
+           { value_f = calibrate_u0(value, CH_1); }
     }
 else               
     {
@@ -54,17 +80,13 @@ else
     value = adc_avg(adc_buff2, in);
 
         if(in == TM_142_ADC_FEEDBACK)
-        { 
-            //update_adc(CH_2, in, value, calibrate_i0(value, CH_2)); 
-        }
+            { value_f = calibrate_i0(value, CH_2); }
         else
-        { 
-            //update_adc(CH_2, in, value, calibrate_u0(value, CH_2)); 
-        }
+            { value_f = calibrate_u0(value, CH_2); }
     }
 
 if(val != 0)
-    { *val = value; }
+    { *val = value_f; }
 
 return ADC_OK;
 }/*}}}*/

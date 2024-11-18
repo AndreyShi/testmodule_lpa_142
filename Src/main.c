@@ -41,6 +41,7 @@
 #include "encoder.h"
 #include "calibration.h"
 int _write(int file, char *ptr, int len);
+int id_stend142;
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -200,28 +201,38 @@ while(1){
 //*/
 //while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { }
 /**/
-uint16_t data = 0;
-tim_get_delay(CH_1, &data);
-__asm("nop");
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   uint32_t tmp_tm = 0;
+  float tmp_f = 0;
   while (1)
   {
     /*if(tmp_tm != htim3.Instance->CNT){
         printf("%d dir:%d\n",htim3.Instance->CNT,htim3.Instance->CR1 & 0x10);
         tmp_tm = htim3.Instance->CNT;
     }*/
-    //Тест 1 проверка Uo:
-    //включить K7 первого канала
-    //измерить напряжение
-    //вывести ошибку в случае если U0 > 12.075 ошибка А, если U0 < 10 Б
-    //включить K7 второго канала
-    //измерить напряжение
-    //вывести ошибку в случае если U0 > 12.075 ошибка А, если U0 < 10 Б
+    if(id_stend142 == 1){    //Тест 1 проверка Uo:
+       relay_set(TM_142_RELAY_U0, CH_1, STATE_ON);//включить K7 первого канала
+       HAL_Delay(100);//проверить паузу включения реле
+       adc_get_value_f(CH_1, TM_142_ADC_OPENCIRC, &tmp_f);//измерить напряжение
+       printf("канал %d %2.3fV\n",CH_1,tmp_f);
+       if(tmp_f > 12.075F)//вывести ошибку в случае если U0 > 12.075 ошибка А, если U0 < 10 Б
+          { printf("канал %d ошибка А\n",CH_1);}
+       else if(tmp_f < 10.000F)
+          { printf("канал %d ошибка Б\n",CH_1);}
 
+       relay_set(TM_142_RELAY_U0, CH_2, STATE_ON);//включить K7 второго канала
+       HAL_Delay(100);//проверить паузу включения реле
+       adc_get_value_f(CH_2, TM_142_ADC_OPENCIRC, &tmp_f);//измерить напряжение
+       printf("канал %d %2.3fV\n",CH_2,tmp_f);
+       if(tmp_f > 12.075F)//вывести ошибку в случае если U0 > 12.075 ошибка А, если U0 < 10 Б
+          { printf("канал %d ошибка А\n",CH_2);}
+       else if(tmp_f < 10.000F)
+          { printf("канал %d ошибка Б>\n",CH_2);}      
+    }else if(id_stend142 == 2){
     //Тест 2 проверка I0:
     //подключить аналоговый имитатор датчика (отключить К7 и К6) первый канал
     //на ЦАП выставить 4095
@@ -229,9 +240,14 @@ __asm("nop");
     //подключить аналоговый имитатор датчика (отключить К7 и К6) второго канала
     //на ЦАП выставить 4095
     //измерить АЦП ,если I0 < 7,5 mA, то ошибка Г, если I0 > 10 mA то ошибка B
-
+    }else if(id_stend142 == 3){ 
     //Тест 3.1
     //подключен аналоговый имитатор датчика. (отключить К7 и К6) 
+    }else if(id_stend142 == 41){
+        uint16_t data = 0;
+        tim_get_delay(CH_1, &data);
+        __asm("nop");
+    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
