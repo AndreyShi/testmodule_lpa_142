@@ -40,6 +40,7 @@
 #include "app_config.h"
 #include "encoder.h"
 #include "calibration.h"
+#include "button_if.h"
 int _write(int file, char *ptr, int len);
 int id_stend142;
 /* USER CODE END Includes */
@@ -123,6 +124,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   dac_start();
   ssd1306_init();
+  button_init();
 
 
     /* initialize module state */
@@ -208,15 +210,17 @@ while(1){
   /* USER CODE BEGIN WHILE */
   uint32_t tmp_tm = 0;
   float tmp_f = 0;
+  uint32_t old_state = 0;
   while (1)
   {
+    button_task();
+    if(old_state != state){
+        printf("button_state: %d\n",state);
+        old_state = state;
+    }
     if(tmp_tm != htim3.Instance->CNT){
-
-
-        //printf("%d dir:%d\n",htim3.Instance->CNT,htim3.Instance->CR1 & 0x10);
-        printf("Hello\n");
+        printf("%d dir:%d\n",htim3.Instance->CNT,htim3.Instance->CR1 & 0x10);
         tmp_tm = htim3.Instance->CNT;
-
     }
     if(id_stend142 == 1){    //Тест 1 проверка Uo:
        relay_set(TM_142_RELAY_U0, CH_1, STATE_ON);//включить K7 первого канала
