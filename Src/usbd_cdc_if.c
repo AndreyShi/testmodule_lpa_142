@@ -181,6 +181,7 @@ static int8_t CDC_DeInit_FS(void)
 static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 {
   /* USER CODE BEGIN 5 */
+  USBD_SetupReqTypedef* req = (USBD_SetupReqTypedef*)pbuf;
   switch(cmd)
   {
     case CDC_SEND_ENCAPSULATED_COMMAND:
@@ -229,11 +230,14 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
     break;
 
     case CDC_SET_CONTROL_LINE_STATE:
-    usb_com_open = 0;
+      if(req->wValue == 3)
+          {usb_com_open = 1;}
+      else
+          {usb_com_open = 0;}
     break;
 
     case CDC_SEND_BREAK:
-    usb_com_open = 1;
+    
     break;
 
   default:

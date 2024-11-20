@@ -314,7 +314,7 @@ UPD: проверка выполнена
 при printf("Hello\n") вызывается _write с len 5 "Hello", а затем 
 сразу _write с len 1 "\n", usb cdc не успевает обработать вызовы _write
 (надо подождать пока придет прерывание об отправленном пакете usb cdc) 
-поэтому ждем тут отправки предыдущего сообщения
+поэтому ждем тут отправки сообщения in while
 */
 int _write(int file, char *ptr, int len)
 {
@@ -322,7 +322,11 @@ int _write(int file, char *ptr, int len)
   usb_trans_ok = 0;
   //DBG_PIN_SET;
   CDC_Transmit_FS((uint8_t *)ptr, len);
-  while(!usb_trans_ok && usb_com_open){;}
+  uint32_t ticks = HAL_GetTick();
+  while(usb_com_open && !usb_trans_ok){
+    if(HAL_GetTick() - ticks > 5)
+        {break;}
+  }
   //DBG_PIN_RS;
   return len;
 } 
