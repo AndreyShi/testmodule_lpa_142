@@ -41,8 +41,12 @@
 #include "encoder.h"
 #include "calibration.h"
 #include "button_if.h"
+#include "render.h"
+#include "resources.h"
+#include "display.h"
 int _write(int file, char *ptr, int len);
 int id_stend142;
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -211,15 +215,18 @@ while(1){
   uint32_t tmp_tm = 0;
   float tmp_f = 0;
   uint32_t old_state = 0;
+  int images = 0;
+
   while (1)
   {
     button_task();
+    display_task();
     if(old_state != state){
-        printf("button_state: %d\n",state);
+        //printf("button_state: %d\n",state);
         old_state = state;
     }
     if(tmp_tm != htim3.Instance->CNT){
-        printf("%d dir:%d\n",htim3.Instance->CNT,htim3.Instance->CR1 & 0x10);
+       // printf("%d dir:%d\n",htim3.Instance->CNT,htim3.Instance->CR1 & 0x10);
         tmp_tm = htim3.Instance->CNT;
     }
     if(id_stend142 == 1){    //Тест 1 проверка Uo:
@@ -231,6 +238,8 @@ while(1){
           { printf("канал %d ошибка А\n",CH_1);}
        else if(tmp_f < 10.000F)
           { printf("канал %d ошибка Б\n",CH_1);}
+       else 
+          { printf("тест 1 канал %d пройден\n",CH_1);}
 
        relay_set(TM_142_RELAY_U0, CH_2, STATE_ON);//включить K7 второго канала
        HAL_Delay(100);//проверить паузу включения реле
@@ -239,18 +248,58 @@ while(1){
        if(tmp_f > 12.075F)//вывести ошибку в случае если U0 > 12.075 ошибка А, если U0 < 10 Б
           { printf("канал %d ошибка А\n",CH_2);}
        else if(tmp_f < 10.000F)
-          { printf("канал %d ошибка Б>\n",CH_2);}      
+          { printf("канал %d ошибка Б>\n",CH_2);}  
+       else 
+          { printf("тест 1 канал %d пройден\n",CH_2);}
+    
     }else if(id_stend142 == 2){
     //Тест 2 проверка I0:
     //подключить аналоговый имитатор датчика (отключить К7 и К6) первый канал
-    //на ЦАП выставить 4095
-    //измерить АЦП ,если I0 < 7,5 mA, то ошибка Г, если I0 > 10 mA то ошибка B
+      relay_set(TM_142_RELAY_U0, CH_1, TM_142_U0_DISABLE);// K7
+      relay_set(TM_142_RELAY_SENSOR, CH_1, TM_142_SENSOR_ANA);//K6
+      dac_set(CH_1,4095);//на ЦАП выставить 4095
+      HAL_Delay(100);//проверить паузу включения реле
+      adc_get_value_f(CH_1, TM_142_ADC_FEEDBACK, &tmp_f);//измерить АЦП ,если I0 < 7,5 mA, то ошибка Г, если I0 > 10 mA то ошибка B
+      printf("канал %d %2.3fmA\n",CH_1,tmp_f);
+      if(tmp_f < 7.5F)
+          { printf("канал %d ошибка Г\n",CH_1);}
+      else if(tmp_f > 10.0F)
+          { printf("канал %d ошибка В\n",CH_1);}
+      else
+          { printf("тест 2 канал %d пройден\n",CH_1);}
     //подключить аналоговый имитатор датчика (отключить К7 и К6) второго канала
-    //на ЦАП выставить 4095
-    //измерить АЦП ,если I0 < 7,5 mA, то ошибка Г, если I0 > 10 mA то ошибка B
+      relay_set(TM_142_RELAY_U0, CH_2, TM_142_U0_DISABLE);// K7
+      relay_set(TM_142_RELAY_SENSOR, CH_2, TM_142_SENSOR_ANA);//K6
+      dac_set(CH_2,4095);//на ЦАП выставить 4095
+      HAL_Delay(100);//проверить паузу включения реле
+      adc_get_value_f(CH_2, TM_142_ADC_FEEDBACK, &tmp_f);//измерить АЦП ,если I0 < 7,5 mA, то ошибка Г, если I0 > 10 mA то ошибка B
+      printf("канал %d %2.3fmA\n",CH_2,tmp_f);
+      if(tmp_f < 7.5F)
+          { printf("канал %d ошибка Г\n",CH_2);}
+      else if(tmp_f > 10.0F)
+          { printf("канал %d ошибка В\n",CH_2);}
+      else
+          { printf("тест 2 канал %d пройден\n",CH_2);}
+
     }else if(id_stend142 == 3){ 
     //Тест 3.1
-    //подключен аналоговый имитатор датчика. (отключить К7 и К6) 
+    //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
+    relay_set(TM_142_RELAY_U0, CH_1, TM_142_U0_DISABLE);// K7
+    relay_set(TM_142_RELAY_SENSOR, CH_1, TM_142_SENSOR_ANA);//K6
+    //подключить входы барьера для режима «нижний ключ» (реле K2..K5).
+    relay_set(TM_142_RELAY_INPUT, CH_1, TM_142_BOT_SW);//K2K4
+    relay_set(TM_142_RELAY_ERROR, CH_1, TM_142_BOT_SW);//K3K5
+    //Установить режим работа барьера «нижний ключ», без инверсии.
+    HAL_Delay(100);//проверить паузу включения реле
+    //увеличиваем ток имитатора датчика от нуля до 0,4 мА 
+    dac_set_i(CH_1,0.4F);
+    HAL_Delay(100);//проверить паузу включения реле
+    state_t cur_state;
+    input_read(TM_142_INPUT_INPUT, CH_1, &cur_state);
+    printf("канал %d ток 0.4mA вход \"работа\": %d",CH_1,cur_state);
+    input_read(TM_142_INPUT_ERROR, CH_1, &cur_state);
+    printf("канал %d ток 0.4mA вход \"работа\": %d",CH_1,cur_state);
+
     }else if(id_stend142 == 41){
         uint16_t data = 0;
         tim_get_delay(CH_1, &data);

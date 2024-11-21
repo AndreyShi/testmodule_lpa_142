@@ -79,17 +79,10 @@ ssd_set_disp(true);
 for(uint8_t i=0; i<8; i++)
     {
     for(uint8_t j=0; j<128; j++)
-	{ ssd_frame_buff[128*i + j] = 0x33; }
+	{ ssd_frame_buff[128*i + j] = 0x00; }
     }
 SSD_DATA;
 HAL_SPI_Transmit(&ssd_spi, ssd_frame_buff, 128*8, 1); 
-HAL_Delay(1000);
-render_image(0, 0, false, &command_error_img);
-
-SSD_DATA;
-HAL_SPI_Transmit(&ssd_spi, ssd_frame_buff, 128*8, 1); 
-
-ssd_set_disp(true);
 
 ssd_busy = false;
 }/*}}}*/

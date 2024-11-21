@@ -1,0 +1,6 @@
+/*
+Модуль вывода информации на дисплей
+*/
+#include <stdint.h>
+
+void display_task();
