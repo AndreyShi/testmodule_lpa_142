@@ -228,6 +228,16 @@ while(1){
     if(tmp_tm != htim3.Instance->CNT){
        // printf("%d dir:%d\n",htim3.Instance->CNT,htim3.Instance->CR1 & 0x10);
         tmp_tm = htim3.Instance->CNT;
+        state_t cur_state;
+        input_read(TM_142_INPUT_INPUT, CH_1, &cur_state);
+        printf("канал %d ток 0.4mA вход \"работа\": %d\n",CH_1,cur_state);
+        input_read(TM_142_INPUT_ERROR, CH_1, &cur_state);
+        printf("канал %d ток 0.4mA вход \"ошибка\": %d\n",CH_1,cur_state);
+
+        input_read(TM_142_INPUT_INPUT, CH_2, &cur_state);
+        printf("канал %d ток 0.4mA вход \"работа\": %d\n",CH_2,cur_state);
+        input_read(TM_142_INPUT_ERROR, CH_2, &cur_state);
+        printf("канал %d ток 0.4mA вход \"ошибка\": %d\n",CH_2,cur_state);
     }
     if(id_stend142 == 1){    //Тест 1 проверка Uo:
        relay_set(TM_142_RELAY_U0, CH_1, STATE_ON);//включить K7 первого канала
@@ -372,11 +382,10 @@ UPD: проверка выполнена
 int _write(int file, char *ptr, int len)
 {
     (void)file;
-  usb_trans_ok = 0;
   //DBG_PIN_SET;
   CDC_Transmit_FS((uint8_t *)ptr, len);
   uint32_t ticks = HAL_GetTick();
-  while(usb_com_open && !usb_trans_ok){
+  while(get_usb_com_open() && !get_usb_trans_ok()){
     if(HAL_GetTick() - ticks > 5)
         {break;}
   }

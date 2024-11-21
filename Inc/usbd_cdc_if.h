@@ -30,8 +30,8 @@
 #include "usbd_cdc.h"
 
 /* USER CODE BEGIN INCLUDE */
-extern uint8_t usb_trans_ok;
-extern uint8_t usb_com_open;
+uint8_t get_usb_trans_ok(void);
+uint8_t get_usb_com_open(void);
 /* USER CODE END INCLUDE */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY

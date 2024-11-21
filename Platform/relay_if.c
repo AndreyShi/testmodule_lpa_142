@@ -42,6 +42,7 @@
 
 //--------------------------------------------------
 static uint32_t power_phase;
+static uint8_t lpa_power;
 //--------------------------------------------------
 void relay_init(void)/*{{{*/
 {
@@ -172,6 +173,7 @@ switch(relay)
 		{
 		PWR_ENABLE;
 		power_phase = 0;
+		lpa_power = 1;
 		} // done for now
 	    else
 		{ return 0; }
@@ -180,6 +182,7 @@ switch(relay)
 	    {
 	    PWR_DISABLE;
 	    GND_DISABLE;
+		lpa_power = 0;
 	    }
 
 	//update_lpa_power(state);
@@ -191,4 +194,7 @@ switch(relay)
 
 return 255;
 }/*}}}*/
+
+uint8_t get_lpa_power(void)
+{return lpa_power;}
 //--------------------------------------------------
