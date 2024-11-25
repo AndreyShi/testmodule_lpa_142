@@ -3,7 +3,7 @@
 //--------------------------------------------------
 #ifndef RELAY_IF_H
 #define RELAY_IF_H
-
+#include "common.h"
 //--------------------------------------------------
 #ifdef __cplusplus
 extern "C" {

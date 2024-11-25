@@ -3,7 +3,6 @@
 #include "render.h"
 #include "resources.h"
 #include "ssd1306.h"
-#include "common.h" //для файла relay_if.h
 #include "relay_if.h"
 
 /* replace the zero with appropriate data pointer */
