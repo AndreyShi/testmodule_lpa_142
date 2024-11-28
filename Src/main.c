@@ -223,22 +223,22 @@ while(1){
     button_task();
     display_task();
     if(old_state != state){
-        //printf("button_state: %d\n",state);
+        printf("button_state: %d\n",state);
         old_state = state;
     }
     if(tmp_tm != htim3.Instance->CNT){
-       // printf("%d dir:%d\n",htim3.Instance->CNT,htim3.Instance->CR1 & 0x10);
+        printf("%d dir:%d\n",htim3.Instance->CNT,htim3.Instance->CR1 & 0x10);
         tmp_tm = htim3.Instance->CNT;
-        state_t cur_state;
-        input_read(TM_142_INPUT_INPUT, CH_1, &cur_state);
-        printf("канал %d ток 0.4mA вход \"работа\": %d\n",CH_1,cur_state);
-        input_read(TM_142_INPUT_ERROR, CH_1, &cur_state);
-        printf("канал %d ток 0.4mA вход \"ошибка\": %d\n",CH_1,cur_state);
+        //state_t cur_state;
+        //input_read(TM_142_INPUT_INPUT, CH_1, &cur_state);
+        //printf("канал %d ток 0.4mA вход \"работа\": %d\n",CH_1,cur_state);
+        //input_read(TM_142_INPUT_ERROR, CH_1, &cur_state);
+        //printf("канал %d ток 0.4mA вход \"ошибка\": %d\n",CH_1,cur_state);
 
-        input_read(TM_142_INPUT_INPUT, CH_2, &cur_state);
-        printf("канал %d ток 0.4mA вход \"работа\": %d\n",CH_2,cur_state);
-        input_read(TM_142_INPUT_ERROR, CH_2, &cur_state);
-        printf("канал %d ток 0.4mA вход \"ошибка\": %d\n",CH_2,cur_state);
+        //input_read(TM_142_INPUT_INPUT, CH_2, &cur_state);
+        //printf("канал %d ток 0.4mA вход \"работа\": %d\n",CH_2,cur_state);
+        //input_read(TM_142_INPUT_ERROR, CH_2, &cur_state);
+        //printf("канал %d ток 0.4mA вход \"ошибка\": %d\n",CH_2,cur_state);
     }
 
     if(id_stend142 == 1){    

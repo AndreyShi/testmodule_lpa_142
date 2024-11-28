@@ -8,10 +8,13 @@
 #include "tim_if.h"
 #include <stdio.h>
 
+//--задержки перед измерениями АЦП
 #define DELAY_BOOT 1000 //1000ms
 #define DELAY_1    500 //500ms
 #define DELAY_2    400 //400ms
 
+
+//---уровни используемые в предыдущем стенде
 #define LEVEL_1 0x00, 0x00, 0x00, 0x00  //0.0F
 #define LEVEL_2 0x3F, 0x00, 0x00, 0x00  //0.5F
 #define LEVEL_3 0x40, 0x00, 0x00, 0x00  //2.0F
@@ -23,8 +26,11 @@
 
 float tmp_f;
 
+/*
+Тест 1 проверка U0
+*/
 void test_1(void){      
-      //Тест 1 проверка Uo:
+
        relay_set(TM_142_RELAY_U0, CH_1, STATE_ON);//включить K7 первого канала
        HAL_Delay(DELAY_1);//проверить паузу включения реле
        adc_get_value_f(CH_1, TM_142_ADC_OPENCIRC, &tmp_f);//измерить напряжение
@@ -50,8 +56,10 @@ void test_1(void){
     return;
 }
 
+/*
+Тест 2 проверка I0
+*/
 void test_2(void){
-    //Тест 2 проверка I0:
     //подключить аналоговый имитатор датчика (отключить К7 и К6) первый канал
       relay_set(TM_142_RELAY_U0, CH_1, TM_142_U0_DISABLE);// K7
       relay_set(TM_142_RELAY_SENSOR, CH_1, TM_142_SENSOR_ANA);//K6
@@ -82,8 +90,10 @@ void test_2(void){
     return;
 }
 
+/*
+Тест 3.1
+*/
 void test_3_1(void){
-    //Тест 3.1
     //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
     relay_set(TM_142_RELAY_U0, CH_1, TM_142_U0_DISABLE);// K7
     relay_set(TM_142_RELAY_SENSOR, CH_1, TM_142_SENSOR_ANA);//K6
@@ -91,10 +101,9 @@ void test_3_1(void){
     relay_set(TM_142_RELAY_INPUT, CH_1, TM_142_BOT_SW);//K2K4
     relay_set(TM_142_RELAY_ERROR, CH_1, TM_142_BOT_SW);//K3K5
     //Установить режим работа барьера «нижний ключ», без инверсии.
-    HAL_Delay(DELAY_2);//проверить паузу включения реле
     //увеличиваем ток имитатора датчика от нуля до 0,4 мА 
-    dac_set_i(CH_1,0.4F);
-    HAL_Delay(DELAY_2);//проверить паузу включения реле
+    dac_set_i(CH_1,0.1F);
+    HAL_Delay(DELAY_2);
     state_t cur_state;
     input_read(TM_142_INPUT_INPUT, CH_1, &cur_state);
     printf("канал %d ток 0.4mA вход \"работа\": %d",CH_1,cur_state);

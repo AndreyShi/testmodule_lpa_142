@@ -13,8 +13,12 @@ image_t barr_control_img = { 107, 17, false, 0 };
 image_t status_img       = {  26, 10,  true, 0 };
 image_t hex_dig_img      = {   7, 10,  true, 0 };
 
+
+//------переменные "защелки" для одиночного вывода на дисплей-----
 static uint8_t disp_usb_com_open;
 static uint8_t disp_lpa_power;
+//----------------------------------------------------------------
+
 
 void display_task(){
     bool render_now = false;
@@ -25,7 +29,7 @@ void display_task(){
        else
             {render_box(88, 0, usb_img.w, usb_img.h, true);}//очистить
        render_now = true;
-       disp_usb_com_open = get_usb_com_open();
+       disp_usb_com_open = get_usb_com_open();//защелка
     }
 
     if(disp_lpa_power != get_lpa_power()){
@@ -34,7 +38,7 @@ void display_task(){
        else
            {render_box(59, 2, power_img.w, power_img.h, true);}//очистить
        render_now = true;
-       disp_lpa_power = get_lpa_power(); 
+       disp_lpa_power = get_lpa_power(); //защелка
     }
 
     if(render_now){
