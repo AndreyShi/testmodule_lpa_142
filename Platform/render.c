@@ -66,7 +66,7 @@ for(uint16_t j = page_s; j <= page_e; j++)
     }
 }/*}}}*/
 //--------------------------------------------------
-void render_image(uint8_t x, uint8_t y, bool inverted, const image_t *img)/*{{{*/
+void render_image(uint8_t x, uint8_t y, bool inverted,bool immediately, const image_t *img)/*{{{*/
 {
 uint8_t chunk;
 uint8_t page_s;
@@ -105,9 +105,12 @@ for(uint16_t j = page_s; j <= page_e; j++)
 	ssd_frame_buff[pos] = ssd_frame_buff[pos] | chunk;
         }
     }
+
+    if(immediately)
+        { ssd1306_render_now();}
 }/*}}}*/
 //--------------------------------------------------
-void render_text(uint8_t x, uint8_t y, bool inverted, const char *fmt, ...)/*{{{*/
+void render_text(uint8_t x, uint8_t y, bool inverted,bool immediately, const char *fmt, ...)/*{{{*/
 {
 char sym;
 char tmp[100];
@@ -135,7 +138,7 @@ while((sym = *cur) != 0 && cur - tmp < 4)
 	{ sym = sym - 'a' + 10; }
     else if(sym == ',' || sym == '.')
 	{
-	render_image(cx, y+hex_dig_img.h-2, inverted, &comma_img);
+	render_image(cx, y+hex_dig_img.h-2, inverted,0, &comma_img);
 	cx += comma_img.w + 2;
 	continue;
 	}
@@ -143,9 +146,12 @@ while((sym = *cur) != 0 && cur - tmp < 4)
 	{ continue; }
 
     hex_dig_img.data = hex_dig_data[sym];
-    render_image(cx, y, inverted, &hex_dig_img);
+    render_image(cx, y, inverted,0, &hex_dig_img);
     cx += hex_dig_img.w + 1;
     };
+
+    if(immediately)
+        { ssd1306_render_now();}
 }/*}}}*/
 //--------------------------------------------------
 static uint8_t get_chunk(const image_t *img, uint8_t x, uint8_t y, uint16_t page_x, uint16_t page_y)/*{{{*/

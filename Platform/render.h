@@ -25,8 +25,8 @@ extern void render_cls(void);
 
 extern void render_dot(uint8_t x, uint8_t y, bool inverted);
 extern void render_box(uint8_t x, uint8_t y, uint8_t w, uint8_t h, bool inverted);
-extern void render_image(uint8_t x, uint8_t y, bool inverted, const image_t *img);
-extern void render_text(uint8_t x, uint8_t y, bool inverted, const char *fmt, ...);
+extern void render_image(uint8_t x, uint8_t y, bool inverted,bool immediately, const image_t *img);
+extern void render_text(uint8_t x, uint8_t y, bool inverted, bool immediately, const char *fmt, ...);
 
 #ifdef __cplusplus
 };

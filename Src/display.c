@@ -25,7 +25,7 @@ void display_task(){
 
     if(disp_usb_com_open != get_usb_com_open()){
        if(get_usb_com_open())
-            {render_image(88, 0, false, &usb_img);}
+            {render_image(88, 0, false,0, &usb_img);}
        else
             {render_box(88, 0, usb_img.w, usb_img.h, true);}//очистить
        render_now = true;
@@ -34,7 +34,7 @@ void display_task(){
 
     if(disp_lpa_power != get_lpa_power()){
        if(get_lpa_power())
-           {render_image(59, 2, false, &power_img);}
+           {render_image(59, 2, false,0, &power_img);}
        else
            {render_box(59, 2, power_img.w, power_img.h, true);}//очистить
        render_now = true;
