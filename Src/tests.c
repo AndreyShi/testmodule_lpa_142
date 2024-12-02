@@ -10,6 +10,7 @@
 #include "resources.h"
 #include "ssd1306.h"
 #include <stdio.h>
+#include "display.h"
 
 //--задержки перед измерениями АЦП
 #define DELAY_BOOT 1000 //1000ms
@@ -34,42 +35,44 @@ float tmp_f;
 */
 void test_1(void){      
 
-       image_t *err_img;
+       render_box(0, 15, DISPLAY_X_MAX, DISPLAY_Y_MAX - 15, 1 ); //очистка
+       ssd1306_render_now();
 
        relay_set(TM_142_RELAY_U0, CH_1, STATE_ON);//включить K7 первого канала
        HAL_Delay(DELAY_1);//проверить паузу включения реле
        adc_get_value_f(CH_1, TM_142_ADC_OPENCIRC, &tmp_f);//измерить напряжение
-       printf("канал %d %2.3fV\n",CH_1,tmp_f);
-       render_text( 12, 33, 0,0, "%0.2f", tmp_f);
+       printf("тест 1, канал %d: %2.3fV, ",CH_1,tmp_f);
+       render_text( 12, 15, 0,0, "%2.3f", tmp_f);
 
        if(tmp_f > 12.075F){//вывести ошибку в случае если U0 > 12.075 ошибка А, если U0 < 10 Б
-            printf("канал %d ошибка А\n",CH_1);
-            err_img = &(errors_img[0]);
-	        render_image(32 - (err_img->w/2), 30, 0,0, err_img);
-          }else if(tmp_f < 10.000F){ 
-            printf("канал %d ошибка Б\n",CH_1);
-            err_img = &(errors_img[1]);
-	        render_image(32 - (err_img->w/2), 30, 0,0, err_img);
-          }else { 
-            printf("тест 1 канал %d пройден\n",CH_1);
-            render_image(45, 17, 0,0, &success_img);
-          }
-
-       ssd1306_render_now();
+            printf("ошибка: А\n");
+	        render_image(20, 30, 0,0, &errors_img[0]); 
+        }else if(tmp_f < 10.000F){ 
+            printf("ошибка: Б\n");
+	        render_image(20, 30, 0,0, &errors_img[1]);      
+        }else { 
+            printf("ок\n");
+            render_image(20, 25, 0,0, &success_img);
+        }
 
        relay_set(TM_142_RELAY_U0, CH_2, STATE_ON);//включить K7 второго канала
        HAL_Delay(DELAY_1);//проверить паузу включения реле
        adc_get_value_f(CH_2, TM_142_ADC_OPENCIRC, &tmp_f);//измерить напряжение
-       printf("канал %d %2.3fV\n",CH_2,tmp_f);
-       render_text( 76, 33, 0,1, "%0.2f", tmp_f);
+       printf("тест 1, канал %d: %2.3fV, ",CH_2,tmp_f);
+       render_text( 76, 15, 0,0, "%2.3f", tmp_f);
 
-       if(tmp_f > 12.075F)//вывести ошибку в случае если U0 > 12.075 ошибка А, если U0 < 10 Б
-          { printf("канал %d ошибка А\n",CH_2);}
-       else if(tmp_f < 10.000F)
-          { printf("канал %d ошибка Б>\n",CH_2);}  
-       else 
-          { printf("тест 1 канал %d пройден\n",CH_2);}
+       if(tmp_f > 12.075F){ //вывести ошибку в случае если U0 > 12.075 ошибка А, если U0 < 10 Б
+          printf("ошибка: А\n");
+          render_image(80, 30, 0,0, &errors_img[0]);
+        }else if(tmp_f < 10.000F){ 
+          printf("ошибка: Б\n");
+          render_image(80, 30, 0,0, &errors_img[1]);
+        }else { 
+          printf("ок\n");
+          render_image(80, 25, 0,0, &success_img);
+        }
 
+    ssd1306_render_now();
     return;
 }
 

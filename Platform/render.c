@@ -126,7 +126,7 @@ uint8_t cx;
 cur = tmp;
 cx = x;
 
-while((sym = *cur) != 0 && cur - tmp < 4)
+while((sym = *cur) != 0 && cur - tmp < 6)
     {
     cur++;
 

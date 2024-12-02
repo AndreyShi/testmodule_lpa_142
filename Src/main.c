@@ -220,6 +220,10 @@ while(1){
 
   while (1)
   {
+    int ub = usb_cdc_task();
+    if(ub == 1)
+        {test_1();}
+
     button_task();
     display_task();
     if(old_state != state){

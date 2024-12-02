@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 //--------------------------------------------------
+#define SSD_BF_SIZE 1024
 extern uint8_t ssd_frame_buff[128*8];
 //--------------------------------------------------
 #ifdef __cplusplus

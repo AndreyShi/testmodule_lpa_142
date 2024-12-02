@@ -24,6 +24,7 @@
 /* USER CODE BEGIN INCLUDE */
 static uint8_t usb_trans_ok;
 static uint8_t usb_com_open;
+static uint8_t usb_recieve_ok;
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -268,6 +269,7 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   /* USER CODE BEGIN 6 */
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+  usb_recieve_ok = 1;
   return (USBD_OK);
   /* USER CODE END 6 */
 }
@@ -325,8 +327,23 @@ static int8_t CDC_TransmitCplt_FS(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
 uint8_t get_usb_trans_ok(void)
 {return usb_trans_ok;}
+
 uint8_t get_usb_com_open(void)
 {return usb_com_open;}
+
+int usb_cdc_task()
+{
+    if(usb_recieve_ok == 0)
+        { return 0;}
+    usb_recieve_ok = 0;
+
+    if(strcmp((const char*)UserRxBufferFS,"start test 1") == 0)
+        {return 1;}
+    else if(strcmp((const char*)UserRxBufferFS,"старт тест 1") == 0)
+        {return 1;}
+
+  return 0;
+}
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
 /**

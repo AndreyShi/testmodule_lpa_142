@@ -32,6 +32,7 @@
 /* USER CODE BEGIN INCLUDE */
 uint8_t get_usb_trans_ok(void);
 uint8_t get_usb_com_open(void);
+int usb_cdc_task();
 /* USER CODE END INCLUDE */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
