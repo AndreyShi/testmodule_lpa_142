@@ -24,6 +24,9 @@ uint8_t page;
 dot  = 1 << y%8;
 page = y/8;
 
+if(128*page + x >= SSD_BF_SIZE)
+   {return;}
+
 if(inverted)
     { ssd_frame_buff[128*page + x] &= ~dot; }
 else
@@ -58,6 +61,8 @@ for(uint16_t j = page_s; j <= page_e; j++)
     // update frame buffer
     for(uint16_t i = x; i < x + w; i++)
         {
+        if(128*j + i >= SSD_BF_SIZE)
+            {continue;}
         if(inverted)
             { ssd_frame_buff[128*j + i] = ssd_frame_buff[128*j + i] & mask; }
         else
@@ -91,9 +96,11 @@ for(uint16_t j = page_s; j <= page_e; j++)
     // update frame buffer
     for(uint16_t i = x; i < x + img->w; i++)
         {
+        if(128*j + i >= SSD_BF_SIZE)
+            {continue;}
         chunk = get_chunk(img, x, y, i, j);
-
-	pos = 128*j + i;
+        
+	    pos = 128*j + i;
         ssd_frame_buff[pos] = ssd_frame_buff[pos] & mask;
 
         // use inverted mask here
@@ -102,7 +109,7 @@ for(uint16_t j = page_s; j <= page_e; j++)
         else
             { chunk =  chunk & ~mask; }
 
-	ssd_frame_buff[pos] = ssd_frame_buff[pos] | chunk;
+	    ssd_frame_buff[pos] = ssd_frame_buff[pos] | chunk;
         }
     }
 
