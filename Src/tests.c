@@ -37,7 +37,28 @@ void test_1(void){
 
        render_box(0, 15, DISPLAY_X_MAX, DISPLAY_Y_MAX - 15, 1 ); //очистка
        ssd1306_render_now();
+       int ms[3][2] = {{CH_1,CH_2},{12,76},{20,80}}; // {{канал}{координата напряжения}{координата ошибки}}
 
+       for(int c = 0; c < 2; c++){
+            relay_set(TM_142_RELAY_U0, ms[0][c], STATE_ON);//включить K7 первого канала
+            HAL_Delay(DELAY_1);//проверить паузу включения реле
+            adc_get_value_f(ms[0][c], TM_142_ADC_OPENCIRC, &tmp_f);//измерить напряжение
+            printf("тест 1, канал %d: %2.3fV, ",ms[0][c],tmp_f);
+            render_text( ms[1][c], 15, 0,0, "%2.3f", tmp_f);
+
+            if(tmp_f > 12.075F){//вывести ошибку в случае если U0 > 12.075 ошибка А, если U0 < 10 Б
+                    printf("ошибка: А\n");
+                    render_image(ms[2][c], 30, 0,0, &errors_img[0]); 
+                }else if(tmp_f < 10.000F){ 
+                    printf("ошибка: Б\n");
+                    render_image(ms[2][c], 30, 0,0, &errors_img[1]);      
+                }else { 
+                    printf("ок\n");
+                    render_image(ms[2][c], 25, 0,0, &success_img);
+                }
+        }
+
+/*   
        relay_set(TM_142_RELAY_U0, CH_1, STATE_ON);//включить K7 первого канала
        HAL_Delay(DELAY_1);//проверить паузу включения реле
        adc_get_value_f(CH_1, TM_142_ADC_OPENCIRC, &tmp_f);//измерить напряжение
@@ -71,6 +92,7 @@ void test_1(void){
           printf("ок\n");
           render_image(80, 25, 0,0, &success_img);
         }
+*/
 
     ssd1306_render_now();
     return;
