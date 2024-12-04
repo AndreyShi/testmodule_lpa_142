@@ -174,12 +174,12 @@ while(1){
   HAL_Delay(5000);
 }
 */
-
+/*
   relay_set(TM_142_RELAY_U0, CH_1, TM_142_U0_DISABLE);
   relay_set(TM_142_RELAY_U0, CH_2, TM_142_U0_DISABLE);
   while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { }
 
-/*
+
 while(1){
   dac_set_i(CH_1,1.001);//dac_set(CH_1, 221); // 1.001 mA agilent
   HAL_Delay(5000);
@@ -223,6 +223,12 @@ while(1){
     int ub = usb_cdc_task();
     if(ub == 1)
         {test_1();}
+    else if(ub == 2)
+        {test_2();}
+    else if(ub == -2)
+        {while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { ;}}
+    else if(ub == -1)
+        {while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { ;}}
 
     button_task();
     display_task();

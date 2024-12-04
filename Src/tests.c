@@ -11,6 +11,7 @@
 #include "ssd1306.h"
 #include <stdio.h>
 #include "display.h"
+#include "calibration.h"
 
 //--задержки перед измерениями АЦП
 #define DELAY_BOOT 1000 //1000ms
@@ -29,70 +30,36 @@
 #define LEVEL_8 0x3E, 0x4C, 0xCC, 0xCD  //0.2F
 
 float tmp_f;
-
+uint16_t tmp;
 /*
 Тест 1 проверка U0
 */
 void test_1(void){      
 
-       render_box(0, 15, DISPLAY_X_MAX, DISPLAY_Y_MAX - 15, 1 ); //очистка
-       ssd1306_render_now();
-       int ms[3][2] = {{CH_1,CH_2},{12,76},{20,80}}; // {{канал}{координата напряжения}{координата ошибки}}
+    render_box(0, 15, DISPLAY_X_MAX, DISPLAY_Y_MAX - 15, 1 ); //очистка
+    render_text(0,0,0,0, "%d", 1);
+    ssd1306_render_now();
+
+    int ms[3][2] = {{CH_1,CH_2},{12,76},{20,80}}; // {{канал}{x координата напряжения}{x координата ошибки}}
 
        for(int c = 0; c < 2; c++){
             relay_set(TM_142_RELAY_U0, ms[0][c], STATE_ON);//включить K7 первого канала
-            HAL_Delay(DELAY_1);//проверить паузу включения реле
+            HAL_Delay(DELAY_1);//пауза включения реле
             adc_get_value_f(ms[0][c], TM_142_ADC_OPENCIRC, &tmp_f);//измерить напряжение
             printf("тест 1, канал %d: %2.3fV, ",ms[0][c],tmp_f);
-            render_text( ms[1][c], 15, 0,0, "%2.3f", tmp_f);
+            render_text(ms[1][c],15,0,0, "%2.3f", tmp_f);
 
             if(tmp_f > 12.075F){//вывести ошибку в случае если U0 > 12.075 ошибка А, если U0 < 10 Б
                     printf("ошибка: А\n");
-                    render_image(ms[2][c], 30, 0,0, &errors_img[0]); 
+                    render_image(ms[2][c],30,0,0, &errors_img[0]); 
                 }else if(tmp_f < 10.000F){ 
                     printf("ошибка: Б\n");
-                    render_image(ms[2][c], 30, 0,0, &errors_img[1]);      
+                    render_image(ms[2][c],30,0,0, &errors_img[1]);      
                 }else { 
                     printf("ок\n");
-                    render_image(ms[2][c], 25, 0,0, &success_img);
+                    render_image(ms[2][c],25,0,0, &success_img);
                 }
         }
-
-/*   
-       relay_set(TM_142_RELAY_U0, CH_1, STATE_ON);//включить K7 первого канала
-       HAL_Delay(DELAY_1);//проверить паузу включения реле
-       adc_get_value_f(CH_1, TM_142_ADC_OPENCIRC, &tmp_f);//измерить напряжение
-       printf("тест 1, канал %d: %2.3fV, ",CH_1,tmp_f);
-       render_text( 12, 15, 0,0, "%2.3f", tmp_f);
-
-       if(tmp_f > 12.075F){//вывести ошибку в случае если U0 > 12.075 ошибка А, если U0 < 10 Б
-            printf("ошибка: А\n");
-	        render_image(20, 30, 0,0, &errors_img[0]); 
-        }else if(tmp_f < 10.000F){ 
-            printf("ошибка: Б\n");
-	        render_image(20, 30, 0,0, &errors_img[1]);      
-        }else { 
-            printf("ок\n");
-            render_image(20, 25, 0,0, &success_img);
-        }
-
-       relay_set(TM_142_RELAY_U0, CH_2, STATE_ON);//включить K7 второго канала
-       HAL_Delay(DELAY_1);//проверить паузу включения реле
-       adc_get_value_f(CH_2, TM_142_ADC_OPENCIRC, &tmp_f);//измерить напряжение
-       printf("тест 1, канал %d: %2.3fV, ",CH_2,tmp_f);
-       render_text( 76, 15, 0,0, "%2.3f", tmp_f);
-
-       if(tmp_f > 12.075F){ //вывести ошибку в случае если U0 > 12.075 ошибка А, если U0 < 10 Б
-          printf("ошибка: А\n");
-          render_image(80, 30, 0,0, &errors_img[0]);
-        }else if(tmp_f < 10.000F){ 
-          printf("ошибка: Б\n");
-          render_image(80, 30, 0,0, &errors_img[1]);
-        }else { 
-          printf("ок\n");
-          render_image(80, 25, 0,0, &success_img);
-        }
-*/
 
     ssd1306_render_now();
     return;
@@ -102,33 +69,37 @@ void test_1(void){
 Тест 2 проверка I0
 */
 void test_2(void){
-    //подключить аналоговый имитатор датчика (отключить К7 и К6) первый канал
-      relay_set(TM_142_RELAY_U0, CH_1, TM_142_U0_DISABLE);// K7
-      relay_set(TM_142_RELAY_SENSOR, CH_1, TM_142_SENSOR_ANA);//K6
-      dac_set(CH_1,4095);//на ЦАП выставить 4095
-      HAL_Delay(DELAY_1);//проверить паузу включения реле
-      adc_get_value_f(CH_1, TM_142_ADC_FEEDBACK, &tmp_f);//измерить АЦП ,если I0 < 7,5 mA, то ошибка Г, если I0 > 10 mA то ошибка B
-      printf("канал %d %2.3fmA\n",CH_1,tmp_f);
-      if(tmp_f < 7.5F)
-          { printf("канал %d ошибка Г\n",CH_1);}
-      else if(tmp_f > 10.0F)
-          { printf("канал %d ошибка В\n",CH_1);}
-      else
-          { printf("тест 2 канал %d пройден\n",CH_1);}
-    //подключить аналоговый имитатор датчика (отключить К7 и К6) второго канала
-      relay_set(TM_142_RELAY_U0, CH_2, TM_142_U0_DISABLE);// K7
-      relay_set(TM_142_RELAY_SENSOR, CH_2, TM_142_SENSOR_ANA);//K6
-      dac_set(CH_2,4095);//на ЦАП выставить 4095
-      HAL_Delay(DELAY_1);//проверить паузу включения реле
-      adc_get_value_f(CH_2, TM_142_ADC_FEEDBACK, &tmp_f);//измерить АЦП ,если I0 < 7,5 mA, то ошибка Г, если I0 > 10 mA то ошибка B
-      printf("канал %d %2.3fmA\n",CH_2,tmp_f);
-      if(tmp_f < 7.5F)
-          { printf("канал %d ошибка Г\n",CH_2);}
-      else if(tmp_f > 10.0F)
-          { printf("канал %d ошибка В\n",CH_2);}
-      else
-          { printf("тест 2 канал %d пройден\n",CH_2);}
 
+    render_box(0, 15, DISPLAY_X_MAX, DISPLAY_Y_MAX - 15, 1 ); //очистка
+    render_text(0,0,0,0, "%d", 2);
+    ssd1306_render_now();
+
+    int ms[3][2] = {{CH_1,CH_2},{12,76},{20,80}}; // {{канал}{x координата напряжения}{x координата ошибки}}
+
+    //подключить аналоговый имитатор датчика (отключить К7 и К6) первый канал
+    for(int c = 0; c < 2; c++){
+      relay_set(TM_142_RELAY_U0, ms[0][c], TM_142_U0_DISABLE);// K7
+      relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_ANA);//K6
+      dac_set(ms[0][c],4095);//на ЦАП выставить 4095
+      HAL_Delay(DELAY_1);//пауза включения реле
+      adc_get_value_f(ms[0][c], TM_142_ADC_FEEDBACK, &tmp_f);//измерить АЦП ,если I0 < 7,5 mA, то ошибка Г, если I0 > 10 mA то ошибка B
+      printf("тест 2, канал %d: %2.3fmA, ",ms[0][c],tmp_f);
+      render_text(ms[1][c],15,0,0, "%2.3f", tmp_f);
+      dac_set(ms[0][c],0); // ЦАП 0, (если цап на 4095, то ср кв напряжения в тест 1 0.009, если ЦАП 0 то ср кв 0.002)
+
+      if(tmp_f < 7.5F){ 
+            printf("ошибка: Г\n");
+            render_image(ms[2][c],30,0,0, &errors_img[3]); 
+        }else if(tmp_f > 10.0F){ 
+            printf("ошибка: В\n");
+            render_image(ms[2][c],30,0,0, &errors_img[2]); 
+        }else{ 
+            printf("ок\n");
+            render_image(ms[2][c],25,0,0, &success_img);
+        }
+    }
+
+    ssd1306_render_now();
     return;
 }
 

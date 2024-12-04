@@ -1869,10 +1869,10 @@ static const uint8_t error_p[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x7F, 0x7F, 0x7F,
 };/*}}}*/
 static const image_t errors_img[] = {/*{{{*/
-	{ 21, 23, true, error_a },
-	{ 17, 23, true, error_b },
-	{ 17, 23, true, error_c },
-	{ 14, 23, true, error_d },
+	{ 21, 23, true, error_a },//А
+	{ 17, 23, true, error_b },//Б
+	{ 17, 23, true, error_c },//В
+	{ 14, 23, true, error_d },//Г
 	{ 22, 28, true, error_e },
 	{ 15, 23, true, error_f },
 	{ 33, 23, true, error_g },

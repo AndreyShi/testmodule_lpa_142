@@ -335,14 +335,22 @@ int usb_cdc_task()
 {
     if(usb_recieve_ok == 0)
         { return 0;}
+    __disable_irq(); //работаем с буфером UserRxBufferFS изменяемым в прерывании
+    int cmd = 0;
     usb_recieve_ok = 0;
 
-    if(strcmp((const char*)UserRxBufferFS,"start test 1") == 0)
-        {return 1;}
-    else if(strcmp((const char*)UserRxBufferFS,"старт тест 1") == 0)
-        {return 1;}
+    if(strcmp((const char*)UserRxBufferFS,"старт тест 1") == 0)
+        {cmd = 1;}
+    else if(strcmp((const char*)UserRxBufferFS,"старт тест 2") == 0)
+        {cmd = 2;}
+    else if(strcmp((const char*)UserRxBufferFS,"откл 24") == 0)
+        {cmd = -1;}
+    else if(strcmp((const char*)UserRxBufferFS,"вкл 24") == 0)
+        {cmd = -2;}
 
-  return 0;
+    memset(UserRxBufferFS,0,APP_RX_DATA_SIZE);//обнуляем буфер (иначе накладываются предыдущие команды)
+  __enable_irq();//ждем следующую команду
+  return cmd;
 }
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
