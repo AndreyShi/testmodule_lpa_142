@@ -30,9 +30,15 @@
 #include "usbd_cdc.h"
 
 /* USER CODE BEGIN INCLUDE */
+typedef struct _usb_packet{
+  int cmd;
+  char ch;
+  float data;
+}usb_packet;
+
 uint8_t get_usb_trans_ok(void);
 uint8_t get_usb_com_open(void);
-int usb_cdc_task();
+usb_packet usb_cdc_task(void);
 /* USER CODE END INCLUDE */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY

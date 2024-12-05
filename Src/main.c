@@ -156,8 +156,8 @@ int main(void)
   /* calibration procedure {{{ */
   uint16_t tmp = 0;
  
-  relay_set(TM_142_RELAY_U0, CH_1, STATE_ON);
-  relay_set(TM_142_RELAY_U0, CH_2, STATE_ON);
+  //relay_set(TM_142_RELAY_U0, CH_1, STATE_ON);
+  //relay_set(TM_142_RELAY_U0, CH_2, STATE_ON);
 
   while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { }
 /*
@@ -194,12 +194,12 @@ while(1){
 }
 
 while(1){
-  dac_set(CH_2, 222); // 1.000 mA agilent
+  dac_set_i(CH_2, 1); // 1.000 mA agilent
   HAL_Delay(5000);
   adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);//225
   printf("ch2 dac 222  adc: %d %2.3fmA\n",tmp,calibrate_i0(tmp, CH_2));
   HAL_Delay(5000);
-  dac_set(CH_2, 3779); // 17.003 mA agilent
+  dac_set_i(CH_2, 15); // 17.003 mA agilent
   HAL_Delay(5000);
   adc_get_value(CH_2, TM_142_ADC_FEEDBACK, &tmp);//3776
   printf("ch2 dac 3779  adc: %d %2.3fmA\n",tmp,calibrate_i0(tmp, CH_2));
@@ -220,15 +220,20 @@ while(1){
 
   while (1)
   {
-    int ub = usb_cdc_task();
-    if(ub == 1)
+    usb_packet ub = usb_cdc_task();
+    if(ub.cmd == 1)
         {test_1();}
-    else if(ub == 2)
+    else if(ub.cmd == 2)
         {test_2();}
-    else if(ub == -2)
+    else if(ub.cmd == -2)
         {while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { ;}}
-    else if(ub == -1)
+    else if(ub.cmd == -1)
         {while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { ;}}
+    else if(ub.cmd == -3)
+        {
+          //printf("cmd: %d, ch: %d, data: %2.3f",ub.cmd,ub.ch,ub.data);
+          dac_set_i(ub.ch,ub.data);
+        }
 
     button_task();
     display_task();

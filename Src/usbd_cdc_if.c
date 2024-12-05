@@ -331,26 +331,32 @@ uint8_t get_usb_trans_ok(void)
 uint8_t get_usb_com_open(void)
 {return usb_com_open;}
 
-int usb_cdc_task()
+usb_packet usb_cdc_task(void)
 {
+    usb_packet pk = {0};
     if(usb_recieve_ok == 0)
-        { return 0;}
+        { return pk;}
     __disable_irq(); //работаем с буфером UserRxBufferFS изменяемым в прерывании
-    int cmd = 0;
+
     usb_recieve_ok = 0;
 
     if(strcmp((const char*)UserRxBufferFS,"старт тест 1") == 0)
-        {cmd = 1;}
+        {pk.cmd = 1;}
     else if(strcmp((const char*)UserRxBufferFS,"старт тест 2") == 0)
-        {cmd = 2;}
+        {pk.cmd = 2;}
     else if(strcmp((const char*)UserRxBufferFS,"откл 24") == 0)
-        {cmd = -1;}
+        {pk.cmd = -1;}
     else if(strcmp((const char*)UserRxBufferFS,"вкл 24") == 0)
-        {cmd = -2;}
+        {pk.cmd = -2;}
+    else if(strncmp((const char*)UserRxBufferFS,"ток",3) == 0){  //[строка:ток][пробел][канал][пробел][float данные]
+      pk.cmd = -3;
+      pk.ch = atoi((const char*)&UserRxBufferFS[7]);
+      pk.data = atof((const char*)&UserRxBufferFS[9]);
+    }
 
     memset(UserRxBufferFS,0,APP_RX_DATA_SIZE);//обнуляем буфер (иначе накладываются предыдущие команды)
   __enable_irq();//ждем следующую команду
-  return cmd;
+  return pk;
 }
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
