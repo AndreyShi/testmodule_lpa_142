@@ -20,14 +20,14 @@
 
 
 //---уровни используемые в предыдущем стенде
-#define LEVEL_1 0x00, 0x00, 0x00, 0x00  //0.0F
-#define LEVEL_2 0x3F, 0x00, 0x00, 0x00  //0.5F
-#define LEVEL_3 0x40, 0x00, 0x00, 0x00  //2.0F
-#define LEVEL_4 0x40, 0xCB, 0x33, 0x33  //6.35F
-#define LEVEL_5 0x40, 0xE0, 0x00, 0x00  //7.00F
-#define LEVEL_6 0x40, 0xA0, 0x00, 0x00  //5.00F
-#define LEVEL_7 0x3F, 0xA6, 0x66, 0x66  //1.3F
-#define LEVEL_8 0x3E, 0x4C, 0xCC, 0xCD  //0.2F
+#define LEVEL_1 0.1F  //0x00, 0x00, 0x00, 0x00  //0.0F
+#define LEVEL_2 0.4F  //0x3F, 0x00, 0x00, 0x00  //0.5F
+#define LEVEL_3 2.0F  //0x40, 0x00, 0x00, 0x00  //2.0F
+#define LEVEL_4 6.35F //0x40, 0xCB, 0x33, 0x33  //6.35F
+#define LEVEL_5 7.00F //0x40, 0xE0, 0x00, 0x00  //7.00F
+#define LEVEL_6 5.00F //0x40, 0xA0, 0x00, 0x00  //5.00F
+#define LEVEL_7 1.3F  //0x3F, 0xA6, 0x66, 0x66  //1.3F
+#define LEVEL_8 0.2F  //0x3E, 0x4C, 0xCC, 0xCD  //0.2F
 
 float tmp_f;
 uint16_t tmp;
@@ -107,21 +107,74 @@ void test_2(void){
 Тест 3.1
 */
 void test_3_1(void){
-    //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
-    relay_set(TM_142_RELAY_U0, CH_1, TM_142_U0_DISABLE);// K7
-    relay_set(TM_142_RELAY_SENSOR, CH_1, TM_142_SENSOR_ANA);//K6
-    //подключить входы барьера для режима «нижний ключ» (реле K2..K5).
-    relay_set(TM_142_RELAY_INPUT, CH_1, TM_142_BOT_SW);//K2K4
-    relay_set(TM_142_RELAY_ERROR, CH_1, TM_142_BOT_SW);//K3K5
-    //Установить режим работа барьера «нижний ключ», без инверсии.
-    //увеличиваем ток имитатора датчика от нуля до 0,4 мА 
-    dac_set_i(CH_1,0.1F);
-    HAL_Delay(DELAY_2);
-    state_t cur_state;
-    input_read(TM_142_INPUT_INPUT, CH_1, &cur_state);
-    printf("канал %d ток 0.4mA вход \"работа\": %d",CH_1,cur_state);
-    input_read(TM_142_INPUT_ERROR, CH_1, &cur_state);
-    printf("канал %d ток 0.4mA вход \"работа\": %d",CH_1,cur_state);
+
+    int ms[3][2] = {{CH_1,CH_2},{12,76},{20,80}}; // {{канал}{x координата состояний}{x координата ошибки}}
+
+    //----подготовка реле по обоим каналам----
+    for(int c = 0; c < 2; c++){
+        //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
+        relay_set(TM_142_RELAY_U0, ms[0][c], TM_142_U0_DISABLE);// K7
+        relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_ANA);//K6
+        //подключить входы барьера для режима «нижний ключ» (реле K2..K5).
+        relay_set(TM_142_RELAY_INPUT, ms[0][c], TM_142_BOT_SW);//K2K4
+        relay_set(TM_142_RELAY_ERROR, ms[0][c], TM_142_BOT_SW);//K3K5
+    }
+    //---------------------------------------
+    //---здесь установить конфигурацию барьера по UART
+    //---------------------------------------
+    float levels[] = {LEVEL_1,LEVEL_2,LEVEL_3,LEVEL_4,LEVEL_5,LEVEL_6,LEVEL_7,LEVEL_8};
+    for(int l = 0; l < sizeof(levels)/sizeof(float); l++){
+        for(int c = 0; c < 2; c++){ // c - канал
+            dac_set_i(ms[0][c],levels[l]);
+            HAL_Delay(DELAY_2);
+            state_t in_input,in_error;
+            input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
+            input_read(TM_142_INPUT_ERROR, ms[0][c], &in_error);
+
+            printf("канал %d ток %2.3f выход \"работа\": %d, \"ошибка\": %d ",ms[0][c],levels[l],in_input,in_error);
+            if(l == 0){ //0.1F
+                if(in_input == 0 && in_error == 1)
+                    { printf("ок\n");}
+                else
+                    { printf("ошибка Д\n");}
+            }else if(l == 1){ //0.4F
+                if(in_input == 0 && in_error == 0)
+                    { printf("ок\n");}
+                else
+                    { printf("ошибка Е\n");}
+            }else if(l == 2){ //2.0F
+                if(in_input == 1 && in_error == 0)
+                    { printf("ок\n");}
+                else
+                    { printf("ошибка Е\n");}
+            }else if(l == 3){ //6.35F
+                if(in_input == 1 && in_error == 1)
+                    { printf("ок\n");}
+                else
+                    { printf("ошибка Ж\n");}
+            }else if(l == 4){ //7.00F
+                if(in_input == 1 && in_error == 1)
+                    { printf("ок\n");}
+                else
+                    { printf("ошибка Ж\n");}
+            }else if(l == 5){ //5.00F
+                if(in_input == 1 && in_error == 0)
+                    { printf("ок\n");}
+                else
+                    { printf("ошибка Е\n");}
+            }else if(l == 6){ //1.3F
+                if(in_input == 0 && in_error == 0)
+                    { printf("ок\n");}
+                else
+                    { printf("ошибка Е\n");}
+            }else if(l == 7){
+                if(in_input == 0 && in_error == 1)
+                    { printf("ок\n");}
+                else
+                    { printf("ошибка Д\n");}
+            }
+        }
+    }
     return;
 }
 
