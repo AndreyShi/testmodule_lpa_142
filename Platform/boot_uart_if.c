@@ -15,7 +15,7 @@
 //#include "menu.h"
 #include "usart.h"
 
-//#include "lpa-142/Inc/modes.h"
+#include "modes.h"
 
 //--------------------------------------------------
 enum {/*{{{*/
