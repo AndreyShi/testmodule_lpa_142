@@ -344,7 +344,7 @@ usb_packet usb_cdc_task(void)
         {pk.cmd = 1;}
     else if(strcmp((const char*)UserRxBufferFS,"старт тест 2") == 0)
         {pk.cmd = 2;}
-    else if(strcmp((const char*)UserRxBufferFS,"откл 24") == 0)
+    else if(strcmp((const char*)UserRxBufferFS,"выкл 24") == 0)
         {pk.cmd = -1;}
     else if(strcmp((const char*)UserRxBufferFS,"вкл 24") == 0)
         {pk.cmd = -2;}
@@ -352,6 +352,10 @@ usb_packet usb_cdc_task(void)
       pk.cmd = -3;
       pk.ch = atoi((const char*)&UserRxBufferFS[7]);
       pk.data = atof((const char*)&UserRxBufferFS[9]);
+    }else if(strncmp((const char*)UserRxBufferFS,"цап",3) == 0){ //[строка:цап][пробел][канал][пробел][bin данные]
+      pk.cmd = -4;
+      pk.ch = atoi((const char*)&UserRxBufferFS[7]);
+      pk.dac_bin = atoi((const char*)&UserRxBufferFS[9]);
     }
 
     memset(UserRxBufferFS,0,APP_RX_DATA_SIZE);//обнуляем буфер (иначе накладываются предыдущие команды)

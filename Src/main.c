@@ -159,7 +159,7 @@ int main(void)
   //relay_set(TM_142_RELAY_U0, CH_1, STATE_ON);
   //relay_set(TM_142_RELAY_U0, CH_2, STATE_ON);
 
-  while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { }
+  //while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { }
 /*
 while(1){
   adc_get_value(CH_1, TM_142_ADC_OPENCIRC, &tmp);//max 14.015 3916  min 1.004 282
@@ -230,10 +230,9 @@ while(1){
     else if(ub.cmd == -1)
         {while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { ;}}
     else if(ub.cmd == -3)
-        {
-          //printf("cmd: %d, ch: %d, data: %2.3f",ub.cmd,ub.ch,ub.data);
-          dac_set_i(ub.ch,ub.data);
-        }
+        { dac_set_i(ub.ch,ub.data);}
+    else if(ub.cmd == -4)
+        { dac_set(ub.ch,ub.dac_bin);}
 
     button_task();
     display_task();

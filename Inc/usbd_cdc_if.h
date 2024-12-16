@@ -34,6 +34,7 @@ typedef struct _usb_packet{
   int cmd;
   char ch;
   float data;
+  uint16_t dac_bin;
 }usb_packet;
 
 uint8_t get_usb_trans_ok(void);
