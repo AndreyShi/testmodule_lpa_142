@@ -70,11 +70,14 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, BGND_enable_Pin|Ch2_in_control1_Pin|Ch2_in_control2_Pin|Ch2_err_control1_Pin
-                          |Ch2_err_control2_Pin|Ch2_sensor_type_Pin|Ch2_U0_enable_Pin|LPA_Power_Pin
-                          |Bus_Enable_Pin|boot_enable_Pin, GPIO_PIN_RESET);
+                          |Ch2_err_control2_Pin|Ch2_sensor_type_Pin|Ch2_U0_enable_Pin|Bus_Enable_Pin
+                          |boot_enable_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(bus_frame_out_GPIO_Port, bus_frame_out_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LPA_Power_GPIO_Port, LPA_Power_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pins : PEPin PEPin PEPin PEPin
                            PEPin PEPin */
