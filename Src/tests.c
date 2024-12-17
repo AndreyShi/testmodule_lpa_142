@@ -14,9 +14,10 @@
 #include "calibration.h"
 
 //--задержки перед измерениями АЦП
-#define DELAY_BOOT 1000 //1000ms
-#define DELAY_1    500 //500ms
-#define DELAY_2    400 //400ms
+#define DELAY_BOOT  1000 //1000ms
+#define DELAY_1     500  //500ms
+#define DELAY_2     400  //400ms
+#define DAC_TIMEOUT 1000 //1s
 
 
 //---уровни используемые в предыдущем стенде
@@ -81,7 +82,9 @@ void test_2(void){
       relay_set(TM_142_RELAY_U0, ms[0][c], TM_142_U0_DISABLE);// K7
       relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_ANA);//K6
       dac_set(ms[0][c],4095);//на ЦАП выставить 4095
-      HAL_Delay(DELAY_1);//пауза включения реле
+      //----------------
+      HAL_Delay(DAC_TIMEOUT);
+      //----------------
       adc_get_value_f(ms[0][c], TM_142_ADC_FEEDBACK, &tmp_f);//измерить АЦП ,если I0 < 7,5 mA, то ошибка Г, если I0 > 10 mA то ошибка B
       printf("тест 2, канал %d: %2.3fmA, ",ms[0][c],tmp_f);
       render_text(ms[1][c],15,0,0, "%2.3f", tmp_f);
@@ -101,6 +104,46 @@ void test_2(void){
 
     ssd1306_render_now();
     return;
+}
+
+/*
+автокалибровка ЦАПА
+*/
+void calibration_dacs(void){
+
+    uint16_t dac_p[2][2] = {{0x200,0x600},{0x200,0x600}};  // [канал][{min,max}]
+    float adc_p[2][2]    = {{0.0F ,0.0F },{0.0F ,0.0F }};  // [канал][{min,max}]
+    int ms[3][2]         = {{CH_1,CH_2},{12,76},{20,80}};  // {{канал}{x координата напряжения}{x координата ошибки}}
+    float k, b;
+
+    //---подготовка реле и ЦАПА --
+    for(int c = 0; c < 2; c++){
+      dac_set(ms[0][c],0);//на ЦАП выставить 0
+      relay_set(TM_142_RELAY_U0, ms[0][c], TM_142_U0_DISABLE);// K7
+      relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_ANA);//K6
+    }
+    //--------------------
+    HAL_Delay(DELAY_1);
+    //--------------------
+    for(int c = 0; c < 2; c++){    // 0 - 1 канал, 1 - 2 канал
+      for(int m = 0; m < 2; m++){  // min-0 max-1
+        dac_set(ms[0][c],dac_p[c][m]);
+        //-----------------
+        HAL_Delay(DAC_TIMEOUT);
+        //-----------------
+        adc_get_value_f(ms[0][c], TM_142_ADC_FEEDBACK, &adc_p[c][m]);
+      }
+    }
+
+    for(int c = 0; c < 2; c++){    // 0 - 1 канал, 1 - 2 канал
+        k = (dac_p[c][1] - dac_p[c][0]) / (adc_p[c][1] - adc_p[c][0]);
+        b = dac_p[c][0] - k*adc_p[c][0];
+        calibrations_dac[c][0] = k;
+        calibrations_dac[c][1] = b;
+    }
+
+    printf("цап 1 k: %f b: %f\n",calibrations_dac[0][0],calibrations_dac[0][1]);
+    printf("цап 2 k: %f b: %f\n",calibrations_dac[1][0],calibrations_dac[1][1]);
 }
 
 /*
@@ -127,7 +170,9 @@ void test_3_1(void){
     for(int l = 0; l < sizeof(levels)/sizeof(float); l++){
         for(int c = 0; c < 2; c++){ // c - канал
             dac_set_i(ms[0][c],levels[l]);
+            //-----------------
             HAL_Delay(DELAY_2);
+            //-----------------
             state_t in_input,in_error;
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
             input_read(TM_142_INPUT_ERROR, ms[0][c], &in_error);
@@ -202,7 +247,9 @@ void test_3_2(void){
     for(int l = 0; l < sizeof(levels)/sizeof(float); l++){
         for(int c = 0; c < 2; c++){ // c - канал
             dac_set_i(ms[0][c],levels[l]);
+            //-----------------
             HAL_Delay(DELAY_2);
+            //-----------------
             state_t in_input,in_error;
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
             input_read(TM_142_INPUT_ERROR, ms[0][c], &in_error);

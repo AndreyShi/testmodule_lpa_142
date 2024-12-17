@@ -340,9 +340,9 @@ usb_packet usb_cdc_task(void)
 
     usb_recieve_ok = 0;
 
-    if(strcmp((const char*)UserRxBufferFS,"старт тест 1") == 0)     //[строка:старт тест 1]
+    if(strcmp((const char*)UserRxBufferFS,"тест 1") == 0)           //[строка:тест 1]
         {pk.cmd = 1;}
-    else if(strcmp((const char*)UserRxBufferFS,"старт тест 2") == 0)//[строка:старт тест 2]
+    else if(strcmp((const char*)UserRxBufferFS,"тест 2") == 0)      //[строка:тест 2]
         {pk.cmd = 2;}
     else if(strcmp((const char*)UserRxBufferFS,"выкл 24") == 0)     //[строка:выкл 24]
         {pk.cmd = -1;}
@@ -356,6 +356,8 @@ usb_packet usb_cdc_task(void)
       pk.cmd = -4;
       pk.ch = atoi((const char*)&UserRxBufferFS[7]);
       pk.dac_bin = atoi((const char*)&UserRxBufferFS[9]);
+    }else if(strcmp((const char*)UserRxBufferFS,"калибровка цап") == 0){
+      pk.cmd = 3;
     }
 
     memset(UserRxBufferFS,0,APP_RX_DATA_SIZE);//обнуляем буфер (иначе накладываются предыдущие команды)

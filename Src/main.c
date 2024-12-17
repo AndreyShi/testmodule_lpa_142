@@ -225,6 +225,8 @@ while(1){
         {test_1();}
     else if(ub.cmd == 2)
         {test_2();}
+    else if(ub.cmd == 3)
+        {calibration_dacs();}
     else if(ub.cmd == -2)
         {while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { ;}}
     else if(ub.cmd == -1)
