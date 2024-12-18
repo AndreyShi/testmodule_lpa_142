@@ -37,9 +37,18 @@ return 0;
 //--------------------------------------------------
 uint8_t dac_set_i(enum _channels channel, float value)/*{{{*/
 {
-if(calibrate_dac(value, CH_1) > DAC_MAX ||
-   calibrate_dac(value, CH_2) > DAC_MAX)
+if (channel == CH_ALL){
+    if(calibrate_dac(value, CH_1) > DAC_MAX ||
+       calibrate_dac(value, CH_2) > DAC_MAX)
     { return 1; }
+}else if (channel == CH_1){
+    if(calibrate_dac(value, CH_1) > DAC_MAX)
+        {return 1;}
+}else if (channel == CH_2){
+    if(calibrate_dac(value, CH_2) > DAC_MAX)
+        {return 1;}
+}
+
 
 uint32_t val1;
 uint32_t val2;

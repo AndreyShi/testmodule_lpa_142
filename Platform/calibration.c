@@ -44,7 +44,7 @@ calibrations[] = {
 // K = (hex_max - hex_min) / (int_max - int_min)
 // b = hex_min - k * int_min
 //--------------------------------------------------                                            //0ch    1ch
-float calibrations_dac[2][2] = { {220.97308350, 1.79470825}, {222.32638550, -0.32638550} };//{ {K, b}, {K, b} }
+float calibrations_dac[2][2] = { {220.97308350, 1.79470825}, {222.765976, -0.899414} };//{ {K, b}, {K, b} }
 
 //--------------------------------------------------
 float calibrate_u0(uint16_t x, channels_t ch)/*{{{*/

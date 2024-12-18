@@ -142,8 +142,8 @@ void calibration_dacs(void){
         calibrations_dac[c][1] = b;
     }
 
-    printf("цап 1 k: %f b: %f\n",calibrations_dac[0][0],calibrations_dac[0][1]);
-    printf("цап 2 k: %f b: %f\n",calibrations_dac[1][0],calibrations_dac[1][1]);
+    printf("цап 1 ацп min: %fmA, ацп max: %fmA, k: %f b: %f\n",adc_p[0][0],adc_p[0][1],calibrations_dac[0][0],calibrations_dac[0][1]);
+    printf("цап 2 ацп min: %fmA, ацп max: %fmA, k: %f b: %f\n",adc_p[1][0],adc_p[1][1],calibrations_dac[1][0],calibrations_dac[1][1]);
 }
 
 /*

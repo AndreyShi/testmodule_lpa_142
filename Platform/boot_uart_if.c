@@ -101,9 +101,9 @@ DISABLE_BOOT;
 HAL_Delay(100);
 while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { }
 HAL_Delay(50);
-menu_task();
+//menu_task();
 HAL_Delay(50);
-menu_task();
+//menu_task();
 
 /* flush uart */
 __HAL_UART_CLEAR_PEFLAG(&boot_uart);
@@ -129,9 +129,9 @@ ENABLE_BOOT;
 HAL_Delay(100);
 while(relay_set(TM_142_RELAY_POWER, CH_1,  STATE_ON) == 0) { }
 HAL_Delay(50);
-menu_task();
+//menu_task();
 HAL_Delay(50);
-menu_task();
+//menu_task();
 
 /* flush uart */
 __HAL_UART_CLEAR_PEFLAG(&boot_uart);

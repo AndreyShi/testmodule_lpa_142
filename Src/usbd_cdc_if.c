@@ -340,24 +340,29 @@ usb_packet usb_cdc_task(void)
 
     usb_recieve_ok = 0;
 
-    if(strcmp((const char*)UserRxBufferFS,"тест 1") == 0)           //[строка:тест 1]
+    if(strcmp((const char*)UserRxBufferFS,"тест 1") == 0)                 //[строка:тест 1]
         {pk.cmd = 1;}
-    else if(strcmp((const char*)UserRxBufferFS,"тест 2") == 0)      //[строка:тест 2]
+    else if(strcmp((const char*)UserRxBufferFS,"тест 2") == 0)            //[строка:тест 2]
         {pk.cmd = 2;}
-    else if(strcmp((const char*)UserRxBufferFS,"выкл 24") == 0)     //[строка:выкл 24]
+    else if(strcmp((const char*)UserRxBufferFS,"выкл 24") == 0)           //[строка:выкл 24]
         {pk.cmd = -1;}
-    else if(strcmp((const char*)UserRxBufferFS,"вкл 24") == 0)      //[строка:вкл 24]
+    else if(strcmp((const char*)UserRxBufferFS,"вкл 24") == 0)            //[строка:вкл 24]
         {pk.cmd = -2;}
-    else if(strncmp((const char*)UserRxBufferFS,"ток",3) == 0){     //[строка:ток][пробел][int:канал][пробел][float:данные]
+    else if(strncmp((const char*)UserRxBufferFS,"ток",3) == 0){           //[строка:ток][пробел][int:канал][пробел][float:данные]
       pk.cmd = -3;
       pk.ch = atoi((const char*)&UserRxBufferFS[7]);
       pk.data = atof((const char*)&UserRxBufferFS[9]);
-    }else if(strncmp((const char*)UserRxBufferFS,"цап",3) == 0){    //[строка:цап][пробел][int:канал][пробел][bin:данные]
+    }else if(strncmp((const char*)UserRxBufferFS,"цап",3) == 0){          //[строка:цап][пробел][int:канал][пробел][bin:данные]
       pk.cmd = -4;
       pk.ch = atoi((const char*)&UserRxBufferFS[7]);
       pk.dac_bin = atoi((const char*)&UserRxBufferFS[9]);
-    }else if(strcmp((const char*)UserRxBufferFS,"калибровка цап") == 0){
+    }else if(strcmp((const char*)UserRxBufferFS,"калибровка цап") == 0){  //[строка:калибровка цап]
       pk.cmd = 3;
+    }else if(strncmp((const char*)UserRxBufferFS,"ацп ток",7) == 0){      //[строка:ацп ток][пробел][int:канал][пробел][bin:данные]
+      pk.cmd = -5;
+      pk.ch = atoi((const char*)&UserRxBufferFS[14]);
+    }else if(strcmp((const char*)UserRxBufferFS,"boot") == 0){            //[строка:boot]
+      pk.cmd = -6;
     }
 
     memset(UserRxBufferFS,0,APP_RX_DATA_SIZE);//обнуляем буфер (иначе накладываются предыдущие команды)

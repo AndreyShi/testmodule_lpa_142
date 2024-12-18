@@ -23,9 +23,7 @@
   },
   "targets": {
     "Debug": {
-      "excludeList": [
-        "Platform/boot_uart_if.c"
-      ],
+      "excludeList": [],
       "toolchain": "GCC",
       "compileConfig": {
         "cpuType": "Cortex-M4",

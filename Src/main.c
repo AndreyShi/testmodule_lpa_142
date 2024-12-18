@@ -45,6 +45,7 @@
 #include "resources.h"
 #include "display.h"
 #include "tests.h"
+#include "boot_uart_if.h"
 int _write(int file, char *ptr, int len);
 int id_stend142;
 
@@ -123,7 +124,7 @@ int main(void)
   MX_TIM8_Init();
   MX_TIM9_Init();
   MX_TIM12_Init();
-  //MX_USART2_UART_Init();
+  MX_USART2_UART_Init();
   //MX_USART3_UART_Init();
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
@@ -235,6 +236,12 @@ while(1){
         { dac_set_i(ub.ch,ub.data);}
     else if(ub.cmd == -4)
         { dac_set(ub.ch,ub.dac_bin);}
+    else if(ub.cmd == -5){
+      adc_get_value_f(ub.ch, TM_142_ADC_FEEDBACK, &tmp_f);
+      printf("ацп %d, ток:%fmA\n",ub.ch,tmp_f);
+    }else if(ub.cmd == -6){
+      printf("boot_update: %d\n",boot_update());
+    }
 
     button_task();
     display_task();
