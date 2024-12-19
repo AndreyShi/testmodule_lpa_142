@@ -47,8 +47,7 @@
 #include "tests.h"
 #include "boot_uart_if.h"
 int _write(int file, char *ptr, int len);
-int id_stend142;
-
+void usb_task(usb_packet* ub);
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -215,45 +214,14 @@ while(1){
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   uint32_t tmp_tm = 0;
-  float tmp_f = 0;
   uint32_t old_state = 0;
   int images = 0;
 
   while (1)
   {
-    usb_packet ub = usb_cdc_task();
-    if(       ub.cmd ==  1)
-        {test_1();}
-    else if(  ub.cmd ==  2)
-        {test_2();}
-    else if(  ub.cmd ==  3)
-        {calibration_dacs();}
-    else if(  ub.cmd ==  4)
-        {test_3_1();}
-    else if(  ub.cmd ==  5)
-        {test_3_2();}
-    else if(  ub.cmd ==  6)
-        {test_3_3();}
-    else if(  ub.cmd ==  7)
-        {test_3_4();}
-    else if(  ub.cmd ==  8)
-        {test_4_1();}
-    else if(  ub.cmd ==  9)
-        {test_4_2();}
-    else if(  ub.cmd == -2)
-        {while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { ;}}
-    else if(  ub.cmd == -1)
-        {while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { ;}}
-    else if(  ub.cmd == -3)
-        { dac_set_i(ub.ch,ub.data);}
-    else if(  ub.cmd == -4)
-        { dac_set(ub.ch,ub.dac_bin);}
-    else if(  ub.cmd == -5){
-      adc_get_value_f(ub.ch, TM_142_ADC_FEEDBACK, &tmp_f);
-      printf("ацп %d, ток:%fmA\n",ub.ch,tmp_f);
-    }else if( ub.cmd == -6){
-      printf("boot_update: %d\n",boot_update());
-    }
+    usb_packet ub = {.ch = 0,.cmd = 0,.dac_bin = 0,.data = 0.0F}; //инициализация пакета usb
+    usb_parse(&ub);
+    usb_task(&ub);
 
     button_task();
     display_task();
@@ -264,26 +232,6 @@ while(1){
     if(tmp_tm != htim3.Instance->CNT){
         printf("%d dir:%d\n",htim3.Instance->CNT,htim3.Instance->CR1 & 0x10);
         tmp_tm = htim3.Instance->CNT;
-        //state_t cur_state;
-        //input_read(TM_142_INPUT_INPUT, CH_1, &cur_state);
-        //printf("канал %d ток 0.4mA вход \"работа\": %d\n",CH_1,cur_state);
-        //input_read(TM_142_INPUT_ERROR, CH_1, &cur_state);
-        //printf("канал %d ток 0.4mA вход \"ошибка\": %d\n",CH_1,cur_state);
-
-        //input_read(TM_142_INPUT_INPUT, CH_2, &cur_state);
-        //printf("канал %d ток 0.4mA вход \"работа\": %d\n",CH_2,cur_state);
-        //input_read(TM_142_INPUT_ERROR, CH_2, &cur_state);
-        //printf("канал %d ток 0.4mA вход \"ошибка\": %d\n",CH_2,cur_state);
-    }
-
-    if(id_stend142 == 1){    
-      test_1();
-    }else if(id_stend142 == 2){
-      test_2();
-    }else if(id_stend142 == 3){ 
-      test_3_1();
-    }else if(id_stend142 == 41){
-      test_4_1();
     }
     /* USER CODE END WHILE */
 
@@ -338,6 +286,44 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void usb_task(usb_packet* ub)
+{
+  float tmp_f = 0;
+    if(       ub->cmd ==  0)
+        {return;}
+    else if(  ub->cmd ==  1)
+        {test_1();}
+    else if(  ub->cmd ==  2)
+        {test_2();}
+    else if(  ub->cmd ==  3)
+        {calibration_dacs();}
+    else if(  ub->cmd ==  4)
+        {test_3_1();}
+    else if(  ub->cmd ==  5)
+        {test_3_2();}
+    else if(  ub->cmd ==  6)
+        {test_3_3();}
+    else if(  ub->cmd ==  7)
+        {test_3_4();}
+    else if(  ub->cmd ==  8)
+        {test_4_1();}
+    else if(  ub->cmd ==  9)
+        {test_4_2();}
+    else if(  ub->cmd == -2)
+        {while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { ;}}
+    else if(  ub->cmd == -1)
+        {while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { ;}}
+    else if(  ub->cmd == -3)
+        { dac_set_i(ub->ch,ub->data);}
+    else if(  ub->cmd == -4)
+        { dac_set(ub->ch,ub->dac_bin);}
+    else if(  ub->cmd == -5){
+      adc_get_value_f(ub->ch, TM_142_ADC_FEEDBACK, &tmp_f);
+      printf("ацп %d, ток:%fmA\n",ub->ch,tmp_f);
+    }else if( ub->cmd == -6){
+      printf("boot_update: %d\n",boot_update());
+    }
+}
 /*
 Символ новый строки в определенных случаях теряется при выводе, к примеру:
 printf("Hello\n");   - символ новый строки "\n" потеряется
