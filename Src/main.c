@@ -222,21 +222,29 @@ while(1){
   while (1)
   {
     usb_packet ub = usb_cdc_task();
-    if(ub.cmd == 1)
+    if(       ub.cmd == 1)
         {test_1();}
-    else if(ub.cmd == 2)
+    else if(  ub.cmd == 2)
         {test_2();}
-    else if(ub.cmd == 3)
+    else if(  ub.cmd == 3)
         {calibration_dacs();}
-    else if(ub.cmd == -2)
+    else if(  ub.cmd == 4)
+        {test_3_1();}
+    else if(  ub.cmd == 5)
+        {test_3_2();}
+    else if(  ub.cmd == 6)
+        {test_3_3();}
+    else if(  ub.cmd == 7)
+        {test_3_4();}
+    else if( ub.cmd == -2)
         {while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { ;}}
-    else if(ub.cmd == -1)
+    else if( ub.cmd == -1)
         {while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { ;}}
-    else if(ub.cmd == -3)
+    else if( ub.cmd == -3)
         { dac_set_i(ub.ch,ub.data);}
-    else if(ub.cmd == -4)
+    else if( ub.cmd == -4)
         { dac_set(ub.ch,ub.dac_bin);}
-    else if(ub.cmd == -5){
+    else if( ub.cmd == -5){
       adc_get_value_f(ub.ch, TM_142_ADC_FEEDBACK, &tmp_f);
       printf("ацп %d, ток:%fmA\n",ub.ch,tmp_f);
     }else if(ub.cmd == -6){

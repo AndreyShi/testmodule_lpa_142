@@ -32,6 +32,13 @@
 
 float tmp_f;
 uint16_t tmp;
+int ms[3][2] = {{CH_1,CH_2},{12,76},{20,80}}; // {{канал}{x координата состояний}{x координата ошибки}}
+float levels[8] = {LEVEL_1,LEVEL_2,LEVEL_3,LEVEL_4,LEVEL_5,LEVEL_6,LEVEL_7,LEVEL_8};
+int se31[8][2] = {{0,1},{0,0},{1,0},{1,1},{1,1},{1,0},{0,0},{0,1}}; //{in_input,in_error}
+int se32[8][2] = {{1,0},{1,1},{0,1},{0,0},{0,0},{0,1},{1,1},{1,0}}; //{in_input,in_error}
+int se33[8][2] = {{1,0},{1,1},{0,1},{0,0},{0,0},{0,1},{1,1},{1,0}}; //{in_input,in_error}
+int se34[8][2] = {{0,1},{0,0},{1,0},{1,1},{1,1},{1,0},{0,0},{0,1}}; //{in_input,in_error}
+char* sr[8][1] = {{"Д\n"},{"Е\n"},{"Е\n"},{"Ж\n"},{"Ж\n"},{"Е\n"},{"Е\n"},{"Д\n"}};
 /*
 Тест 1 проверка U0
 */
@@ -40,8 +47,6 @@ void test_1(void){
     render_box(0, 15, DISPLAY_X_MAX, DISPLAY_Y_MAX - 15, 1 ); //очистка
     render_text(0,0,0,0, "%d", 1);
     ssd1306_render_now();
-
-    int ms[3][2] = {{CH_1,CH_2},{12,76},{20,80}}; // {{канал}{x координата напряжения}{x координата ошибки}}
 
        for(int c = 0; c < 2; c++){
             relay_set(TM_142_RELAY_U0, ms[0][c], STATE_ON);//включить K7 первого канала
@@ -74,8 +79,6 @@ void test_2(void){
     render_box(0, 15, DISPLAY_X_MAX, DISPLAY_Y_MAX - 15, 1 ); //очистка
     render_text(0,0,0,0, "%d", 2);
     ssd1306_render_now();
-
-    int ms[3][2] = {{CH_1,CH_2},{12,76},{20,80}}; // {{канал}{x координата напряжения}{x координата ошибки}}
 
     //подключить аналоговый имитатор датчика (отключить К7 и К6) первый канал
     for(int c = 0; c < 2; c++){
@@ -151,9 +154,6 @@ void calibration_dacs(void){
 нижний ключ
 */
 void test_3_1(void){
-
-    int ms[3][2] = {{CH_1,CH_2},{12,76},{20,80}}; // {{канал}{x координата состояний}{x координата ошибки}}
-
     //----подготовка реле по обоим каналам----
     for(int c = 0; c < 2; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
@@ -166,7 +166,6 @@ void test_3_1(void){
     //---------------------------------------
     //---здесь установить конфигурацию барьера по UART
     //---------------------------------------
-    float levels[] = {LEVEL_1,LEVEL_2,LEVEL_3,LEVEL_4,LEVEL_5,LEVEL_6,LEVEL_7,LEVEL_8};
     for(int l = 0; l < sizeof(levels)/sizeof(float); l++){
         for(int c = 0; c < 2; c++){ // c - канал
             dac_set_i(ms[0][c],levels[l]);
@@ -177,48 +176,12 @@ void test_3_1(void){
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
             input_read(TM_142_INPUT_ERROR, ms[0][c], &in_error);
 
-            printf("канал %d ток %d %2.3f выход \"работа\": %d, \"ошибка\": %d ",ms[0][c],l,levels[l],in_input,in_error);
-            if(l == 0){ //0.1F
-                if(in_input == 0 && in_error == 1)
-                    { printf("ок\n");}
-                else
-                    { printf("ошибка Д\n");}
-            }else if(l == 1){ //0.4F
-                if(in_input == 0 && in_error == 0)
-                    { printf("ок\n");}
-                else
-                    { printf("ошибка Е\n");}
-            }else if(l == 2){ //2.0F
-                if(in_input == 1 && in_error == 0)
-                    { printf("ок\n");}
-                else
-                    { printf("ошибка Е\n");}
-            }else if(l == 3){ //6.35F
-                if(in_input == 1 && in_error == 1)
-                    { printf("ок\n");}
-                else
-                    { printf("ошибка Ж\n");}
-            }else if(l == 4){ //7.00F
-                if(in_input == 1 && in_error == 1)
-                    { printf("ок\n");}
-                else
-                    { printf("ошибка Ж\n");}
-            }else if(l == 5){ //5.00F
-                if(in_input == 1 && in_error == 0)
-                    { printf("ок\n");}
-                else
-                    { printf("ошибка Е\n");}
-            }else if(l == 6){ //1.3F
-                if(in_input == 0 && in_error == 0)
-                    { printf("ок\n");}
-                else
-                    { printf("ошибка Е\n");}
-            }else if(l == 7){
-                if(in_input == 0 && in_error == 1)
-                    { printf("ок\n");}
-                else
-                    { printf("ошибка Д\n");}
-            }
+            printf("3.1 канал %d ток %d %2.3f выход \"работа\": %d, \"ошибка\": %d ",ms[0][c],l,levels[l],in_input,in_error);
+
+            if(in_input == se31[l][0] && in_error == se31[l][1])
+                { printf("ок\n");}
+            else
+                { printf(sr[l][0]);}
         }
     }
     return;
@@ -229,8 +192,6 @@ void test_3_1(void){
 нижний ключ инверсия
 */
 void test_3_2(void){
-    int ms[3][2] = {{CH_1,CH_2},{12,76},{20,80}}; // {{канал}{x координата состояний}{x координата ошибки}}
-
     //----подготовка реле по обоим каналам----
     for(int c = 0; c < 2; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
@@ -243,7 +204,6 @@ void test_3_2(void){
     //---------------------------------------
     //---здесь установить конфигурацию барьера по UART
     //---------------------------------------
-    float levels[] = {LEVEL_1,LEVEL_2,LEVEL_3,LEVEL_4,LEVEL_5,LEVEL_6,LEVEL_7,LEVEL_8};
     for(int l = 0; l < sizeof(levels)/sizeof(float); l++){
         for(int c = 0; c < 2; c++){ // c - канал
             dac_set_i(ms[0][c],levels[l]);
@@ -254,48 +214,86 @@ void test_3_2(void){
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
             input_read(TM_142_INPUT_ERROR, ms[0][c], &in_error);
 
-            printf("канал %d ток %d %2.3f выход \"работа\": %d, \"ошибка\": %d ",ms[0][c],l,levels[l],in_input,in_error);
-            if(l == 0){ //0.1F
-                if(in_input == 1 && in_error == 0)
-                    { printf("ок\n");}
-                else
-                    { printf("ошибка Д\n");}
-            }else if(l == 1){ //0.4F
-                if(in_input == 1 && in_error == 1)
-                    { printf("ок\n");}
-                else
-                    { printf("ошибка Е\n");}
-            }else if(l == 2){ //2.0F
-                if(in_input == 0 && in_error == 1)
-                    { printf("ок\n");}
-                else
-                    { printf("ошибка Е\n");}
-            }else if(l == 3){ //6.35F
-                if(in_input == 0 && in_error == 0)
-                    { printf("ок\n");}
-                else
-                    { printf("ошибка Ж\n");}
-            }else if(l == 4){ //7.00F
-                if(in_input == 0 && in_error == 0)
-                    { printf("ок\n");}
-                else
-                    { printf("ошибка Ж\n");}
-            }else if(l == 5){ //5.00F
-                if(in_input == 0 && in_error == 1)
-                    { printf("ок\n");}
-                else
-                    { printf("ошибка Е\n");}
-            }else if(l == 6){ //1.3F
-                if(in_input == 1 && in_error == 1)
-                    { printf("ок\n");}
-                else
-                    { printf("ошибка Е\n");}
-            }else if(l == 7){
-                if(in_input == 1 && in_error == 0)
-                    { printf("ок\n");}
-                else
-                    { printf("ошибка Д\n");}
-            }
+            printf("3.2 канал %d ток %d %2.3f выход \"работа\": %d, \"ошибка\": %d ",ms[0][c],l,levels[l],in_input,in_error);
+
+            if(in_input == se32[l][0] && in_error == se32[l][1])
+                { printf("ок\n");}
+            else
+                { printf(sr[l][0]);}
+        }
+    }
+    return;
+}
+/*
+тест 3.3 
+верхний ключ
+*/
+void test_3_3(void){
+    //----подготовка реле по обоим каналам----
+    for(int c = 0; c < 2; c++){
+        //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
+        relay_set(TM_142_RELAY_U0, ms[0][c], TM_142_U0_DISABLE);// K7
+        relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_ANA);//K6
+        //подключить входы барьера для режима «нижний ключ» (реле K2..K5).
+        relay_set(TM_142_RELAY_INPUT, ms[0][c], TM_142_TOP_SW);//K2K4
+        relay_set(TM_142_RELAY_ERROR, ms[0][c], TM_142_TOP_SW);//K3K5
+    }
+    //---------------------------------------
+    //---здесь установить конфигурацию барьера по UART
+    //---------------------------------------
+    for(int l = 0; l < sizeof(levels)/sizeof(float); l++){
+        for(int c = 0; c < 2; c++){ // c - канал
+            dac_set_i(ms[0][c],levels[l]);
+            //-----------------
+            HAL_Delay(DELAY_2);
+            //-----------------
+            state_t in_input,in_error;
+            input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
+            input_read(TM_142_INPUT_ERROR, ms[0][c], &in_error);
+
+            printf("3.3 канал %d ток %d %2.3f выход \"работа\": %d, \"ошибка\": %d ",ms[0][c],l,levels[l],in_input,in_error);
+
+            if(in_input == se33[l][0] && in_error == se33[l][1])
+                { printf("ок\n");}
+            else
+                { printf(sr[l][0]);}
+        }
+    }
+    return;
+}
+/*
+тест 3.4
+верхний ключ инверсия
+*/
+void test_3_4(void){
+    //----подготовка реле по обоим каналам----
+    for(int c = 0; c < 2; c++){
+        //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
+        relay_set(TM_142_RELAY_U0, ms[0][c], TM_142_U0_DISABLE);// K7
+        relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_ANA);//K6
+        //подключить входы барьера для режима «нижний ключ» (реле K2..K5).
+        relay_set(TM_142_RELAY_INPUT, ms[0][c], TM_142_TOP_SW);//K2K4
+        relay_set(TM_142_RELAY_ERROR, ms[0][c], TM_142_TOP_SW);//K3K5
+    }
+    //---------------------------------------
+    //---здесь установить конфигурацию барьера по UART
+    //---------------------------------------
+    for(int l = 0; l < sizeof(levels)/sizeof(float); l++){
+        for(int c = 0; c < 2; c++){ // c - канал
+            dac_set_i(ms[0][c],levels[l]);
+            //-----------------
+            HAL_Delay(DELAY_2);
+            //-----------------
+            state_t in_input,in_error;
+            input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
+            input_read(TM_142_INPUT_ERROR, ms[0][c], &in_error);
+
+            printf("3.4 канал %d ток %d %2.3f выход \"работа\": %d, \"ошибка\": %d ",ms[0][c],l,levels[l],in_input,in_error);
+
+            if(in_input == se34[l][0] && in_error == se34[l][1])
+                { printf("ок\n");}
+            else
+                { printf(sr[l][0]);}
         }
     }
     return;
