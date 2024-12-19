@@ -157,8 +157,9 @@ void calibration_dacs(void){
         calibrations_dac[c][1] = b;
     }
 
-    printf("цап 1 ацп min: %fmA, ацп max: %fmA, k: %f b: %f\n",adc_p[0][0],adc_p[0][1],calibrations_dac[0][0],calibrations_dac[0][1]);
-    printf("цап 2 ацп min: %fmA, ацп max: %fmA, k: %f b: %f\n",adc_p[1][0],adc_p[1][1],calibrations_dac[1][0],calibrations_dac[1][1]);
+    for(int c = 0; c < 2; c++){
+        printf("цап %d ацп min: %fmA, ацп max: %fmA, k: %f b: %f\n",c + 1,adc_p[c][0],adc_p[c][1],calibrations_dac[c][0],calibrations_dac[c][1]);
+    }
 }
 
 /*
@@ -330,16 +331,14 @@ void test_4_1(void){
     for(int c = 0; c < 2; c++)
         { tim_get_delay(ms[0][c], &data[c]);}
 
-    printf("4.1 канал 1, задержка: %d ", data[0]);
-    if(data[0] > 360)
-        { printf("Н\n");}
-    else
-        { printf("ok\n");}
-    printf("4.1 канал 2, задержка: %d ", data[1]);
-    if(data[1] > 360)
-        { printf("Н\n");}
-    else
-        { printf("ok\n");}
+    for(int c = 0; c < 2; c++)
+    {
+        printf("4.1 канал %d, задержка: %d ",c + 1, data[c]);
+        if(data[c] > 360)
+            { printf("Н\n");}
+        else
+            { printf("ok\n");}
+    }
     return;
 }
 
@@ -362,15 +361,13 @@ void test_4_2(void){
     for(int c = 0; c < 2; c++)
         { tim_get_delay(ms[0][c], &data[c]);}
         
-    printf("4.2 канал 1, задержка: %d ", data[0]);
-    if(data[0] > 360)
-        { printf("Н\n");}
-    else
-        { printf("ok\n");}
-    printf("4.2 канал 2, задержка: %d ", data[1]);
-    if(data[1] > 360)
-        { printf("Н\n");}
-    else
-        { printf("ok\n");}
+    for(int c = 0; c < 2; c++)
+    {
+        printf("4.2 канал %d, задержка: %d ",c + 1, data[c]);
+        if(data[c] > 360)
+            { printf("Н\n");}
+        else
+            { printf("ok\n");}
+    }
     return;
 }
