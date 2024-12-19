@@ -20,6 +20,7 @@ static uint16_t tim_max(uint8_t buf_num);
 //--------------------------------------------------
 /*
 one tick is 1/72000000 = 0.000000014 Sec
+текущая частота импульсов 18 KHz 10 импульсов
 */
 enum _tim_error tim_get_delay(enum _channels channel, uint16_t *val)/*{{{*/
 {
@@ -27,12 +28,11 @@ uint8_t ch;
 TIM_HandleTypeDef *gen_tim;
 TIM_HandleTypeDef *mes_tim;
 
-if(channel == CH_1)/*{{{*/  //проверить первый канал не работает
+if(channel == CH_1)/*{{{*/  
     {
     ch = 0;
     //                   ref 
     gen_tim = &htim9; // PE5 PE6
-    //                    |   |
     //                    V   V
     mes_tim = &htim1; // PE9 PE11
     }
@@ -41,7 +41,6 @@ else if(channel == CH_2)
     ch = 1;
     //                   ref
     gen_tim = &htim12;// PB14 PB15
-    //                    |    |
     //                    V    V
     mes_tim = &htim8; // PC6  PC7
     }

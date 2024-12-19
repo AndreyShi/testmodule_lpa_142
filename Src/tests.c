@@ -323,13 +323,23 @@ void test_4_1(void){
         relay_set(TM_142_RELAY_ERROR,  ms[0][c], TM_142_BOT_SW);//K3K5
     }
     //-----------------
+    set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_BOT | DIRECT_OUT | DIRECT_ERR);
+    //-----------------
     HAL_Delay(DELAY_2);
     //-----------------
     for(int c = 0; c < 2; c++)
         { tim_get_delay(ms[0][c], &data[c]);}
 
-    printf("4.1 канал 1, задержка: %d", data[0]);
-    printf("4.1 канал 2, задержка: %d", data[1]);
+    printf("4.1 канал 1, задержка: %d ", data[0]);
+    if(data[0] > 360)
+        { printf("Н\n");}
+    else
+        { printf("ok\n");}
+    printf("4.1 канал 2, задержка: %d ", data[1]);
+    if(data[1] > 360)
+        { printf("Н\n");}
+    else
+        { printf("ok\n");}
     return;
 }
 
@@ -345,12 +355,22 @@ void test_4_2(void){
         relay_set(TM_142_RELAY_ERROR,  ms[0][c], TM_142_TOP_SW);//K3K5
     }
     //-----------------
+    set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_TOP | DIRECT_OUT | DIRECT_ERR);
+    //-----------------
     HAL_Delay(DELAY_2);
     //-----------------
     for(int c = 0; c < 2; c++)
         { tim_get_delay(ms[0][c], &data[c]);}
         
-    printf("4.2 канал 1, задержка: %d", data[0]);
-    printf("4.2 канал 2, задержка: %d", data[1]);
+    printf("4.2 канал 1, задержка: %d ", data[0]);
+    if(data[0] > 360)
+        { printf("Н\n");}
+    else
+        { printf("ok\n");}
+    printf("4.2 канал 2, задержка: %d ", data[1]);
+    if(data[1] > 360)
+        { printf("Н\n");}
+    else
+        { printf("ok\n");}
     return;
 }
