@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include "display.h"
 #include "calibration.h"
+#include "modes.h"
+#include "boot_uart_if.h"
 
 //--задержки перед измерениями АЦП
 #define DELAY_BOOT  1000 //1000ms
@@ -49,8 +51,13 @@ void test_1(void){
     ssd1306_render_now();
 
        for(int c = 0; c < 2; c++){
-            relay_set(TM_142_RELAY_U0, ms[0][c], STATE_ON);//включить K7 первого канала
-            HAL_Delay(DELAY_1);//пауза включения реле
+            relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_ENABLE); //K7 
+            //relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_ANA);//K6 по схеме пропускается
+       }
+       //-----------------
+       HAL_Delay(DELAY_1);//пауза включения реле
+       //-----------------
+       for(int c = 0; c < 2; c++){
             adc_get_value_f(ms[0][c], TM_142_ADC_OPENCIRC, &tmp_f);//измерить напряжение
             printf("тест 1, канал %d: %2.3fV, ",ms[0][c],tmp_f);
             render_text(ms[1][c],15,0,0, "%2.3f", tmp_f);
@@ -80,10 +87,15 @@ void test_2(void){
     render_text(0,0,0,0, "%d", 2);
     ssd1306_render_now();
 
-    //подключить аналоговый имитатор датчика (отключить К7 и К6) первый канал
+    //------подключить аналоговый имитатор датчика (отключить К7 и К6)
     for(int c = 0; c < 2; c++){
-      relay_set(TM_142_RELAY_U0, ms[0][c], TM_142_U0_DISABLE);// K7
+      relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_DISABLE);//K7
       relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_ANA);//K6
+    }
+    //----------------------------------------------------------------------------
+    HAL_Delay(DELAY_1);//пауза включения реле
+    //-----------------
+    for(int c = 0; c < 2; c++){
       dac_set(ms[0][c],4095);//на ЦАП выставить 4095
       //----------------
       HAL_Delay(DAC_TIMEOUT);
@@ -122,7 +134,7 @@ void calibration_dacs(void){
     //---подготовка реле и ЦАПА --
     for(int c = 0; c < 2; c++){
       dac_set(ms[0][c],0);//на ЦАП выставить 0
-      relay_set(TM_142_RELAY_U0, ms[0][c], TM_142_U0_DISABLE);// K7
+      relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_DISABLE);// K7
       relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_ANA);//K6
     }
     //--------------------
@@ -157,14 +169,14 @@ void test_3_1(void){
     //----подготовка реле по обоим каналам----
     for(int c = 0; c < 2; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
-        relay_set(TM_142_RELAY_U0, ms[0][c], TM_142_U0_DISABLE);// K7
+        relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_DISABLE);// K7
         relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_ANA);//K6
         //подключить входы барьера для режима «нижний ключ» (реле K2..K5).
-        relay_set(TM_142_RELAY_INPUT, ms[0][c], TM_142_BOT_SW);//K2K4
-        relay_set(TM_142_RELAY_ERROR, ms[0][c], TM_142_BOT_SW);//K3K5
+        relay_set(TM_142_RELAY_INPUT,  ms[0][c], TM_142_BOT_SW);//K2K4
+        relay_set(TM_142_RELAY_ERROR,  ms[0][c], TM_142_BOT_SW);//K3K5
     }
     //---------------------------------------
-    //---здесь установить конфигурацию барьера по UART
+    set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_BOT | DIRECT_OUT | DIRECT_ERR);//---здесь установить конфигурацию барьера по UART
     //---------------------------------------
     for(int l = 0; l < sizeof(levels)/sizeof(float); l++){
         for(int c = 0; c < 2; c++){ // c - канал
@@ -195,14 +207,14 @@ void test_3_2(void){
     //----подготовка реле по обоим каналам----
     for(int c = 0; c < 2; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
-        relay_set(TM_142_RELAY_U0, ms[0][c], TM_142_U0_DISABLE);// K7
+        relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_DISABLE);// K7
         relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_ANA);//K6
         //подключить входы барьера для режима «нижний ключ» (реле K2..K5).
-        relay_set(TM_142_RELAY_INPUT, ms[0][c], TM_142_BOT_SW);//K2K4
-        relay_set(TM_142_RELAY_ERROR, ms[0][c], TM_142_BOT_SW);//K3K5
+        relay_set(TM_142_RELAY_INPUT,  ms[0][c], TM_142_BOT_SW);//K2K4
+        relay_set(TM_142_RELAY_ERROR,  ms[0][c], TM_142_BOT_SW);//K3K5
     }
     //---------------------------------------
-    //---здесь установить конфигурацию барьера по UART
+    set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_BOT | INVERTED_OUT | INVERTED_ERR);//---здесь установить конфигурацию барьера по UART
     //---------------------------------------
     for(int l = 0; l < sizeof(levels)/sizeof(float); l++){
         for(int c = 0; c < 2; c++){ // c - канал
@@ -232,14 +244,14 @@ void test_3_3(void){
     //----подготовка реле по обоим каналам----
     for(int c = 0; c < 2; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
-        relay_set(TM_142_RELAY_U0, ms[0][c], TM_142_U0_DISABLE);// K7
+        relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_DISABLE);// K7
         relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_ANA);//K6
         //подключить входы барьера для режима «нижний ключ» (реле K2..K5).
-        relay_set(TM_142_RELAY_INPUT, ms[0][c], TM_142_TOP_SW);//K2K4
-        relay_set(TM_142_RELAY_ERROR, ms[0][c], TM_142_TOP_SW);//K3K5
+        relay_set(TM_142_RELAY_INPUT,  ms[0][c], TM_142_TOP_SW);//K2K4
+        relay_set(TM_142_RELAY_ERROR,  ms[0][c], TM_142_TOP_SW);//K3K5
     }
     //---------------------------------------
-    //---здесь установить конфигурацию барьера по UART
+    set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_TOP | DIRECT_OUT | DIRECT_ERR);//---здесь установить конфигурацию барьера по UART
     //---------------------------------------
     for(int l = 0; l < sizeof(levels)/sizeof(float); l++){
         for(int c = 0; c < 2; c++){ // c - канал
@@ -269,14 +281,14 @@ void test_3_4(void){
     //----подготовка реле по обоим каналам----
     for(int c = 0; c < 2; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
-        relay_set(TM_142_RELAY_U0, ms[0][c], TM_142_U0_DISABLE);// K7
+        relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_DISABLE);// K7
         relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_ANA);//K6
         //подключить входы барьера для режима «нижний ключ» (реле K2..K5).
-        relay_set(TM_142_RELAY_INPUT, ms[0][c], TM_142_TOP_SW);//K2K4
-        relay_set(TM_142_RELAY_ERROR, ms[0][c], TM_142_TOP_SW);//K3K5
+        relay_set(TM_142_RELAY_INPUT,  ms[0][c], TM_142_TOP_SW);//K2K4
+        relay_set(TM_142_RELAY_ERROR,  ms[0][c], TM_142_TOP_SW);//K3K5
     }
     //---------------------------------------
-    //---здесь установить конфигурацию барьера по UART
+    set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_TOP | INVERTED_OUT | INVERTED_ERR);//---здесь установить конфигурацию барьера по UART
     //---------------------------------------
     for(int l = 0; l < sizeof(levels)/sizeof(float); l++){
         for(int c = 0; c < 2; c++){ // c - канал
@@ -300,8 +312,45 @@ void test_3_4(void){
 }
 
 void test_4_1(void){
-    uint16_t data = 0;
-    tim_get_delay(CH_1, &data);
-    __asm("nop");
+    uint16_t data[2] = {0};
+    //----подготовка реле по обоим каналам----
+    for(int c = 0; c < 2; c++){
+        //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
+        relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_DISABLE);// K7
+        relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_DIG);//K6
+        //подключить входы барьера для режима «нижний ключ» (реле K2..K5).
+        relay_set(TM_142_RELAY_INPUT,  ms[0][c], TM_142_BOT_SW);//K2K4
+        relay_set(TM_142_RELAY_ERROR,  ms[0][c], TM_142_BOT_SW);//K3K5
+    }
+    //-----------------
+    HAL_Delay(DELAY_2);
+    //-----------------
+    for(int c = 0; c < 2; c++)
+        { tim_get_delay(ms[0][c], &data[c]);}
+
+    printf("4.1 канал 1, задержка: %d", data[0]);
+    printf("4.1 канал 2, задержка: %d", data[1]);
+    return;
+}
+
+void test_4_2(void){
+    uint16_t data[2] = {0};
+    //----подготовка реле по обоим каналам----
+    for(int c = 0; c < 2; c++){
+        //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
+        relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_DISABLE);// K7
+        relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_DIG);//K6
+        //подключить входы барьера для режима «нижний ключ» (реле K2..K5).
+        relay_set(TM_142_RELAY_INPUT,  ms[0][c], TM_142_TOP_SW);//K2K4
+        relay_set(TM_142_RELAY_ERROR,  ms[0][c], TM_142_TOP_SW);//K3K5
+    }
+    //-----------------
+    HAL_Delay(DELAY_2);
+    //-----------------
+    for(int c = 0; c < 2; c++)
+        { tim_get_delay(ms[0][c], &data[c]);}
+        
+    printf("4.2 канал 1, задержка: %d", data[0]);
+    printf("4.2 канал 2, задержка: %d", data[1]);
     return;
 }

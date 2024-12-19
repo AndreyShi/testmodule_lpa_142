@@ -27,28 +27,34 @@ uint8_t ch;
 TIM_HandleTypeDef *gen_tim;
 TIM_HandleTypeDef *mes_tim;
 
-if(channel == CH_1)/*{{{*/
+if(channel == CH_1)/*{{{*/  //проверить первый канал не работает
     {
     ch = 0;
-    gen_tim = &htim9;
-    mes_tim = &htim1;
+    //                   ref 
+    gen_tim = &htim9; // PE5 PE6
+    //                    |   |
+    //                    V   V
+    mes_tim = &htim1; // PE9 PE11
     }
 else if(channel == CH_2)
     {
     ch = 1;
-    gen_tim = &htim12;
-    mes_tim = &htim8;
+    //                   ref
+    gen_tim = &htim12;// PB14 PB15
+    //                    |    |
+    //                    V    V
+    mes_tim = &htim8; // PC6  PC7
     }
 else
     { return TIM_CHAN; }
 /*}}}*/
 cursor[ch] = 0; // compensate for interrupt being too slow
 
-HAL_TIM_IC_Start_DMA(mes_tim, TIM_CHANNEL_1, (uint32_t *)tim_ref[ch], TIM_PERIODS);
-HAL_TIM_IC_Start_IT(mes_tim, TIM_CHANNEL_2);
+HAL_TIM_IC_Start_DMA(mes_tim, TIM_CHANNEL_1, (uint32_t *)tim_ref[ch], TIM_PERIODS); // измеритель частоты эталонной 
+HAL_TIM_IC_Start_IT(mes_tim, TIM_CHANNEL_2);                                        // измеритель частоты через барьер
 
-TIM_CCxChannelCmd(gen_tim->Instance, TIM_CHANNEL_1, TIM_CCx_ENABLE);
-HAL_TIM_OC_Start (gen_tim, TIM_CHANNEL_2);
+TIM_CCxChannelCmd(gen_tim->Instance, TIM_CHANNEL_1, TIM_CCx_ENABLE);                // генератор частоты эталонной 
+HAL_TIM_OC_Start (gen_tim, TIM_CHANNEL_2);                                          // генеретор частоты через барьер
 
 HAL_Delay(5);
 
@@ -79,7 +85,7 @@ for(uint8_t i=2; i<TIM_PERIODS - 2; i++)
         {tmp = tim_ref[buf_num][i+1] - tim[buf_num][i];}
 
     if(max[1] < tmp)
-	{ max[1] = tmp; }
+	    { max[1] = tmp; }
     }
 
 if(max[0] < max[1])

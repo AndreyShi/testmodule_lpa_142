@@ -352,6 +352,10 @@ usb_packet usb_cdc_task(void)
         {pk.cmd =  6;} 
     else if(strcmp((const char*)UserRxBufferFS,  "тест 34") == 0)           //[строка:тест 34]
         {pk.cmd =  7;} 
+    else if(strcmp((const char*)UserRxBufferFS,  "тест 41") == 0)           //[строка:тест 41]
+        {pk.cmd =  8;}
+    else if(strcmp((const char*)UserRxBufferFS,  "тест 42") == 0)           //[строка:тест 42]
+        {pk.cmd =  9;}
     else if(strcmp((const char*)UserRxBufferFS,  "выкл 24") == 0)           //[строка:выкл 24]
         {pk.cmd = -1;}
     else if(strcmp((const char*)UserRxBufferFS,  "вкл 24") == 0)            //[строка:вкл 24]

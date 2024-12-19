@@ -853,8 +853,8 @@ return 0;
 //--------------------------------------------------
 bool set_lpa_mode(uint8_t mode)/*{{{*/
 {
-if( !boot_uart_ready )
-    { return true; }
+//if( !boot_uart_ready )  //пока отключил
+//    { return true; }
 
 if(HAL_UART_GetState(&boot_uart) != HAL_UART_STATE_READY)
     { return false; }
