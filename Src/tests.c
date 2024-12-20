@@ -44,20 +44,20 @@ char* sr[8][1] = {{"Д\n"},{"Е\n"},{"Е\n"},{"Ж\n"},{"Ж\n"},{"Е\n"},{"Е\n"}
 /*
 Тест 1 проверка U0
 */
-void test_1(void){      
+void test_1(int cm){      
 
     render_box(0, 15, DISPLAY_X_MAX, DISPLAY_Y_MAX - 15, 1 ); //очистка
     render_text(0,0,0,0, "%d", 1);
     ssd1306_render_now();
 
-       for(int c = 0; c < 2; c++){
+       for(int c = 0; c < cm; c++){
             relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_ENABLE); //K7 
             //relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_ANA);//K6 по схеме пропускается
        }
        //-----------------
        HAL_Delay(DELAY_1);//пауза включения реле
        //-----------------
-       for(int c = 0; c < 2; c++){
+       for(int c = 0; c < cm; c++){
             adc_get_value_f(ms[0][c], TM_142_ADC_OPENCIRC, &tmp_f);//измерить напряжение
             printf("тест 1, канал %d: %2.3fV, ",ms[0][c],tmp_f);
             render_text(ms[1][c],15,0,0, "%2.3f", tmp_f);
@@ -81,21 +81,21 @@ void test_1(void){
 /*
 Тест 2 проверка I0
 */
-void test_2(void){
+void test_2(int cm){
 
     render_box(0, 15, DISPLAY_X_MAX, DISPLAY_Y_MAX - 15, 1 ); //очистка
     render_text(0,0,0,0, "%d", 2);
     ssd1306_render_now();
 
     //------подключить аналоговый имитатор датчика (отключить К7 и К6)
-    for(int c = 0; c < 2; c++){
+    for(int c = 0; c < cm; c++){
       relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_DISABLE);//K7
       relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_ANA);//K6
     }
     //----------------------------------------------------------------------------
     HAL_Delay(DELAY_1);//пауза включения реле
     //-----------------
-    for(int c = 0; c < 2; c++){
+    for(int c = 0; c < cm; c++){
       dac_set(ms[0][c],4095);//на ЦАП выставить 4095
       //----------------
       HAL_Delay(DAC_TIMEOUT);
@@ -124,7 +124,7 @@ void test_2(void){
 /*
 автокалибровка ЦАПА
 */
-void calibration_dacs(void){
+void calibration_dacs(int cm){
 
     uint16_t dac_p[2][2] = {{0x200,0x600},{0x200,0x600}};  // [канал][{min,max}]
     float adc_p[2][2]    = {{0.0F ,0.0F },{0.0F ,0.0F }};  // [канал][{min,max}]
@@ -132,7 +132,7 @@ void calibration_dacs(void){
     float k, b;
 
     //---подготовка реле и ЦАПА --
-    for(int c = 0; c < 2; c++){
+    for(int c = 0; c < cm; c++){
       dac_set(ms[0][c],0);//на ЦАП выставить 0
       relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_DISABLE);// K7
       relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_ANA);//K6
@@ -140,7 +140,7 @@ void calibration_dacs(void){
     //--------------------
     HAL_Delay(DELAY_1);
     //--------------------
-    for(int c = 0; c < 2; c++){    // 0 - 1 канал, 1 - 2 канал
+    for(int c = 0; c < cm; c++){    // 0 - 1 канал, 1 - 2 канал
       for(int m = 0; m < 2; m++){  // min-0 max-1
         dac_set(ms[0][c],dac_p[c][m]);
         //-----------------
@@ -150,15 +150,15 @@ void calibration_dacs(void){
       }
     }
 
-    for(int c = 0; c < 2; c++){    // 0 - 1 канал, 1 - 2 канал
+    for(int c = 0; c < cm; c++){    // 0 - 1 канал, 1 - 2 канал
         k = (dac_p[c][1] - dac_p[c][0]) / (adc_p[c][1] - adc_p[c][0]);
         b = dac_p[c][0] - k*adc_p[c][0];
         calibrations_dac[c][0] = k;
         calibrations_dac[c][1] = b;
     }
 
-    for(int c = 0; c < 2; c++){
-        printf("цап %d ацп min: %fmA, ацп max: %fmA, k: %f b: %f\n",c + 1,adc_p[c][0],adc_p[c][1],calibrations_dac[c][0],calibrations_dac[c][1]);
+    for(int c = 0; c < cm; c++){
+        printf("цап %d ацп min: %fmA, ацп max: %fmA, k: %f b: %f\n",ms[0][c],adc_p[c][0],adc_p[c][1],calibrations_dac[c][0],calibrations_dac[c][1]);
     }
 }
 
@@ -166,9 +166,9 @@ void calibration_dacs(void){
 Тест 3.1
 нижний ключ
 */
-void test_3_1(void){
-    //----подготовка реле по обоим каналам----
-    for(int c = 0; c < 2; c++){
+void test_3_1(int cm){
+    //----подготовка реле -------------------
+    for(int c = 0; c < cm; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
         relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_DISABLE);// K7
         relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_ANA);//K6
@@ -180,7 +180,7 @@ void test_3_1(void){
     set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_BOT | DIRECT_OUT | DIRECT_ERR);//---здесь установить конфигурацию барьера по UART
     //---------------------------------------
     for(int l = 0; l < sizeof(levels)/sizeof(float); l++){
-        for(int c = 0; c < 2; c++){ // c - канал
+        for(int c = 0; c < cm; c++){ // c - канал
             dac_set_i(ms[0][c],levels[l]);
             //-----------------
             HAL_Delay(DELAY_2);
@@ -204,9 +204,9 @@ void test_3_1(void){
 Тест 3.2
 нижний ключ инверсия
 */
-void test_3_2(void){
-    //----подготовка реле по обоим каналам----
-    for(int c = 0; c < 2; c++){
+void test_3_2(int cm){
+    //----подготовка реле -------------------
+    for(int c = 0; c < cm; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
         relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_DISABLE);// K7
         relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_ANA);//K6
@@ -218,7 +218,7 @@ void test_3_2(void){
     set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_BOT | INVERTED_OUT | INVERTED_ERR);//---здесь установить конфигурацию барьера по UART
     //---------------------------------------
     for(int l = 0; l < sizeof(levels)/sizeof(float); l++){
-        for(int c = 0; c < 2; c++){ // c - канал
+        for(int c = 0; c < cm; c++){ // c - канал
             dac_set_i(ms[0][c],levels[l]);
             //-----------------
             HAL_Delay(DELAY_2);
@@ -241,9 +241,9 @@ void test_3_2(void){
 тест 3.3 
 верхний ключ
 */
-void test_3_3(void){
-    //----подготовка реле по обоим каналам----
-    for(int c = 0; c < 2; c++){
+void test_3_3(int cm){
+    //----подготовка реле -------------------
+    for(int c = 0; c < cm; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
         relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_DISABLE);// K7
         relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_ANA);//K6
@@ -255,7 +255,7 @@ void test_3_3(void){
     set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_TOP | DIRECT_OUT | DIRECT_ERR);//---здесь установить конфигурацию барьера по UART
     //---------------------------------------
     for(int l = 0; l < sizeof(levels)/sizeof(float); l++){
-        for(int c = 0; c < 2; c++){ // c - канал
+        for(int c = 0; c < cm; c++){ // c - канал
             dac_set_i(ms[0][c],levels[l]);
             //-----------------
             HAL_Delay(DELAY_2);
@@ -278,9 +278,9 @@ void test_3_3(void){
 тест 3.4
 верхний ключ инверсия
 */
-void test_3_4(void){
-    //----подготовка реле по обоим каналам----
-    for(int c = 0; c < 2; c++){
+void test_3_4(int cm){
+    //----подготовка реле -------------------
+    for(int c = 0; c < cm; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
         relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_DISABLE);// K7
         relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_ANA);//K6
@@ -292,7 +292,7 @@ void test_3_4(void){
     set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_TOP | INVERTED_OUT | INVERTED_ERR);//---здесь установить конфигурацию барьера по UART
     //---------------------------------------
     for(int l = 0; l < sizeof(levels)/sizeof(float); l++){
-        for(int c = 0; c < 2; c++){ // c - канал
+        for(int c = 0; c < cm; c++){ // c - канал
             dac_set_i(ms[0][c],levels[l]);
             //-----------------
             HAL_Delay(DELAY_2);
@@ -312,10 +312,10 @@ void test_3_4(void){
     return;
 }
 
-void test_4_1(void){
+void test_4_1(int cm){
     uint16_t data[2] = {0};
-    //----подготовка реле по обоим каналам----
-    for(int c = 0; c < 2; c++){
+    //----подготовка реле --------------
+    for(int c = 0; c < cm; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
         relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_DISABLE);// K7
         relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_DIG);//K6
@@ -328,12 +328,12 @@ void test_4_1(void){
     //-----------------
     HAL_Delay(DELAY_2);
     //-----------------
-    for(int c = 0; c < 2; c++)
+    for(int c = 0; c < cm; c++)
         { tim_get_delay(ms[0][c], &data[c]);}
 
-    for(int c = 0; c < 2; c++)
+    for(int c = 0; c < cm; c++)
     {
-        printf("4.1 канал %d, задержка: %d ",c + 1, data[c]);
+        printf("4.1 канал %d, задержка: %d ",ms[0][c], data[c]);
         if(data[c] > 360)
             { printf("Н\n");}
         else
@@ -342,10 +342,10 @@ void test_4_1(void){
     return;
 }
 
-void test_4_2(void){
+void test_4_2(int cm){
     uint16_t data[2] = {0};
-    //----подготовка реле по обоим каналам----
-    for(int c = 0; c < 2; c++){
+    //----подготовка реле ----------------
+    for(int c = 0; c < cm; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
         relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_DISABLE);// K7
         relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_DIG);//K6
@@ -358,12 +358,12 @@ void test_4_2(void){
     //-----------------
     HAL_Delay(DELAY_2);
     //-----------------
-    for(int c = 0; c < 2; c++)
+    for(int c = 0; c < cm; c++)
         { tim_get_delay(ms[0][c], &data[c]);}
         
-    for(int c = 0; c < 2; c++)
+    for(int c = 0; c < cm; c++)
     {
-        printf("4.2 канал %d, задержка: %d ",c + 1, data[c]);
+        printf("4.2 канал %d, задержка: %d ",ms[0][c], data[c]);
         if(data[c] > 360)
             { printf("Н\n");}
         else

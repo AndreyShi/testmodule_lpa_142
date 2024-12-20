@@ -292,23 +292,23 @@ void usb_task(usb_packet* ub)
     if(       ub->cmd ==  0)
         {return;}
     else if(  ub->cmd ==  1)
-        {test_1();}
+        {test_1(2);}
     else if(  ub->cmd ==  2)
-        {test_2();}
+        {test_2(2);}
     else if(  ub->cmd ==  3)
-        {calibration_dacs();}
+        {calibration_dacs(2);}
     else if(  ub->cmd ==  4)
-        {test_3_1();}
+        {test_3_1(2);}
     else if(  ub->cmd ==  5)
-        {test_3_2();}
+        {test_3_2(2);}
     else if(  ub->cmd ==  6)
-        {test_3_3();}
+        {test_3_3(2);}
     else if(  ub->cmd ==  7)
-        {test_3_4();}
+        {test_3_4(2);}
     else if(  ub->cmd ==  8)
-        {test_4_1();}
+        {test_4_1(2);}
     else if(  ub->cmd ==  9)
-        {test_4_2();}
+        {test_4_2(2);}
     else if(  ub->cmd == -2)
         {while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { ;}}
     else if(  ub->cmd == -1)
