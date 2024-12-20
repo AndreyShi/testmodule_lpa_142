@@ -355,6 +355,8 @@ void usb_parse(usb_packet* pk)
         {pk->cmd =  8;}
     else if(strcmp((const char*)UserRxBufferFS,  "тест 42") == 0)           //[строка:тест 42]
         {pk->cmd =  9;}
+    else if(strcmp((const char*)UserRxBufferFS,  "старт")== 0)              //[строка:старт]
+        {pk->cmd =  10;}
     else if(strcmp((const char*)UserRxBufferFS,  "выкл 24") == 0)           //[строка:выкл 24]
         {pk->cmd = -1;}
     else if(strcmp((const char*)UserRxBufferFS,  "вкл 24") == 0)            //[строка:вкл 24]

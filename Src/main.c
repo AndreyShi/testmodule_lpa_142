@@ -309,6 +309,16 @@ void usb_task(usb_packet* ub)
         {test_4_1(2);}
     else if(  ub->cmd ==  9)
         {test_4_2(2);}
+    else if(  ub->cmd == 10)
+    {
+      void (*cur_test[])(int) = {test_1, test_2, calibration_dacs, test_3_1, test_3_2, test_3_3, test_3_4, test_4_1, test_4_2};
+      int l = sizeof(cur_test)/sizeof(cur_test[0]);
+
+       for(int op = 0; op < l; op++){ 
+            cur_test[op](2);
+            printf("\n");
+        }
+    }
     else if(  ub->cmd == -2)
         {while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { ;}}
     else if(  ub->cmd == -1)
