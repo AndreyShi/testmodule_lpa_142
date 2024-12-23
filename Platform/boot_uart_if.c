@@ -16,7 +16,7 @@
 #include "usart.h"
 
 #include "modes.h"
-
+#include <stdio.h>
 //--------------------------------------------------
 enum {/*{{{*/
     BOOT_0,
@@ -113,6 +113,8 @@ boot_uart.Instance->DR = DEFAULT_MODE;
 while(1)
     {
     cmd = boot_uart.Instance->DR;
+	if(cmd != 0)
+	{printf("uart return: %d\n",cmd);}
     if(cmd == 'O' || cmd == 'E')
 	{
 	exit_bootloader();
@@ -122,7 +124,7 @@ while(1)
     if(HAL_GetTick() - addr >= 5*timeout)
 	{ break; }
     };
-
+//return 0;
 /* need firmware upload, go into bootloader */
 while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { }
 ENABLE_BOOT;
@@ -313,7 +315,7 @@ return true;
 //--------------------------------------------------
 uint8_t boot_update_nb(void)/*{{{*/
 {
-const uint32_t  boot_timeout = 1000;
+const uint32_t  boot_timeout =1000;
 const uint32_t erase_timeout = 2000;
 const uint32_t  recv_timeout = 1000;
 

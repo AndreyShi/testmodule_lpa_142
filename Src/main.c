@@ -46,6 +46,7 @@
 #include "display.h"
 #include "tests.h"
 #include "boot_uart_if.h"
+#include "render.h"
 int _write(int file, char *ptr, int len);
 void usb_task(usb_packet* ub);
 /* USER CODE END Includes */
@@ -130,7 +131,7 @@ int main(void)
   dac_start();
   ssd1306_init();
   button_init();
-
+  boot_init();
 
     /* initialize module state */
   relay_set(TM_142_RELAY_U0, CH_1, TM_142_U0_DISABLE);// K7
@@ -219,7 +220,7 @@ while(1){
 
   while (1)
   {
-    usb_packet ub = {.ch = 0,.cmd = 0,.dac_bin = 0,.data = 0.0F}; //инициализация пакета usb
+    usb_packet ub = {.ch = 0,.cmd = 0,.dac_bin = 0,.data_f = 0.0F}; //инициализация пакета usb
     usb_parse(&ub);
     usb_task(&ub);
 
@@ -310,21 +311,13 @@ void usb_task(usb_packet* ub)
     else if(  ub->cmd ==  9)
         {test_4_2(2);}
     else if(  ub->cmd == 10)
-    {
-      void (*cur_test[])(int) = {test_1, test_2, calibration_dacs, test_3_1, test_3_2, test_3_3, test_3_4, test_4_1, test_4_2};
-      int l = sizeof(cur_test)/sizeof(cur_test[0]);
-
-       for(int op = 0; op < l; op++){ 
-            cur_test[op](2);
-            printf("\n");
-        }
-    }
+        {all_test(2);}
     else if(  ub->cmd == -2)
         {while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { ;}}
     else if(  ub->cmd == -1)
         {while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { ;}}
     else if(  ub->cmd == -3)
-        { dac_set_i(ub->ch,ub->data);}
+        { dac_set_i(ub->ch,ub->data_f);}
     else if(  ub->cmd == -4)
         { dac_set(ub->ch,ub->dac_bin);}
     else if(  ub->cmd == -5){
@@ -332,6 +325,17 @@ void usb_task(usb_packet* ub)
       printf("ацп %d, ток:%fmA\n",ub->ch,tmp_f);
     }else if( ub->cmd == -6){
       printf("boot_update: %d\n",boot_update());
+    }else if( ub->cmd == -7){
+      while(1){
+        uint8_t nb = boot_update_nb();
+        if(nb)
+            {
+              printf("boot_update_nb: %d",nb);
+              break;
+            }
+      }
+    }else if( ub->cmd == -8){
+      render_image(0,30,0,1, &errors_img[ub->dt]); 
     }
 }
 /*

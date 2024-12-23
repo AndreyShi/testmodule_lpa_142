@@ -11,3 +11,4 @@ void test_3_3(int cm);
 void test_3_4(int cm);
 void test_4_1(int cm);
 void test_4_2(int cm);
+void all_test(int cm);

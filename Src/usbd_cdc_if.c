@@ -364,7 +364,7 @@ void usb_parse(usb_packet* pk)
     else if(strncmp((const char*)UserRxBufferFS, "ток",3) == 0){            //[строка:ток][пробел][int:канал][пробел][float:данные]
          pk->cmd = -3;
          pk->ch = atoi((const char*)&UserRxBufferFS[7]);
-         pk->data = atof((const char*)&UserRxBufferFS[9]);
+         pk->data_f = atof((const char*)&UserRxBufferFS[9]);
     }else if(strncmp((const char*)UserRxBufferFS,"цап",3) == 0){            //[строка:цап][пробел][int:канал][пробел][bin:данные]
          pk->cmd = -4;
          pk->ch = atoi((const char*)&UserRxBufferFS[7]);
@@ -376,6 +376,11 @@ void usb_parse(usb_packet* pk)
          pk->ch = atoi((const char*)&UserRxBufferFS[14]);
     }else if(strcmp((const char*)UserRxBufferFS, "boot") == 0){             //[строка:boot]
          pk->cmd = -6;
+    }else if(strcmp((const char*)UserRxBufferFS, "boot_nb") == 0){          //[строка:boot_nb]
+         pk->cmd = -7;
+    }else if(strncmp((const char*)UserRxBufferFS,"pic",3) == 0){
+         pk->cmd = -8;
+         pk->dt = atoi((const char*)&UserRxBufferFS[4]);
     }
 
     memset(UserRxBufferFS,0,APP_RX_DATA_SIZE);//обнуляем буфер (иначе накладываются предыдущие команды)

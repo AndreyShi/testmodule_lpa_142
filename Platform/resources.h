@@ -1869,21 +1869,21 @@ static const uint8_t error_p[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x7F, 0x7F, 0x7F,
 };/*}}}*/
 static const image_t errors_img[] = {/*{{{*/
-	{ 21, 23, true, error_a },//А
-	{ 17, 23, true, error_b },//Б
-	{ 17, 23, true, error_c },//В
-	{ 14, 23, true, error_d },//Г
-	{ 22, 28, true, error_e },
-	{ 15, 23, true, error_f },
-	{ 33, 23, true, error_g },
-	{ 16, 23, true, error_h },
-	{ 17, 23, true, error_i },
-	{ 19, 23, true, error_k },
-	{ 20, 23, true, error_l },
-	{ 21, 23, true, error_m },
-	{ 18, 23, true, error_n },
-	{ 22, 23, true, error_o },
-	{ 18, 23, true, error_p },
+	{ 21, 23, true, error_a },//А 0
+ 	{ 17, 23, true, error_b },//Б 1
+	{ 17, 23, true, error_c },//В 2
+	{ 14, 23, true, error_d },//Г 3
+	{ 22, 28, true, error_e },//Д 4
+	{ 15, 23, true, error_f },//Е 5
+	{ 33, 23, true, error_g },//Ж 6
+	{ 16, 23, true, error_h },//З 7
+	{ 17, 23, true, error_i },//И 8
+	{ 19, 23, true, error_k },//К 9
+	{ 20, 23, true, error_l },//Л 10
+	{ 21, 23, true, error_m },//М 11
+	{ 18, 23, true, error_n },//Н 12
+	{ 22, 23, true, error_o },//О 13
+	{ 18, 23, true, error_p },//П 14
 };/*}}}*/
 
 // failed test number numbers

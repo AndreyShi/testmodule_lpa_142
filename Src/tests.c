@@ -46,9 +46,9 @@ char* sr[8][1] = {{"Д\n"},{"Е\n"},{"Е\n"},{"Ж\n"},{"Ж\n"},{"Е\n"},{"Е\n"}
 */
 void test_1(int cm){      
 
-    render_box(0, 15, DISPLAY_X_MAX, DISPLAY_Y_MAX - 15, 1 ); //очистка
-    render_text(0,0,0,0, "%d", 1);
-    ssd1306_render_now();
+    //render_box(0, 15, DISPLAY_X_MAX, DISPLAY_Y_MAX - 15, 1 ); //очистка
+    //render_text(0,0,0,0, "%d", 1);
+    //ssd1306_render_now();
 
        for(int c = 0; c < cm; c++){
             relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_ENABLE); //K7 
@@ -60,21 +60,21 @@ void test_1(int cm){
        for(int c = 0; c < cm; c++){
             adc_get_value_f(ms[0][c], TM_142_ADC_OPENCIRC, &tmp_f);//измерить напряжение
             printf("тест 1, канал %d: %2.3fV, ",ms[0][c],tmp_f);
-            render_text(ms[1][c],15,0,0, "%2.3f", tmp_f);
+            //render_text(ms[1][c],15,0,0, "%2.3f", tmp_f);
 
             if(tmp_f > 12.075F){//вывести ошибку в случае если U0 > 12.075 ошибка А, если U0 < 10 Б
                     printf("ошибка: А\n");
-                    render_image(ms[2][c],30,0,0, &errors_img[0]); 
+                    //render_image(ms[2][c],30,0,0, &errors_img[0]); 
                 }else if(tmp_f < 10.000F){ 
                     printf("ошибка: Б\n");
-                    render_image(ms[2][c],30,0,0, &errors_img[1]);      
+                    //render_image(ms[2][c],30,0,0, &errors_img[1]);      
                 }else { 
                     printf("ок\n");
-                    render_image(ms[2][c],25,0,0, &success_img);
+                    //render_image(ms[2][c],25,0,0, &success_img);
                 }
         }
 
-    ssd1306_render_now();
+    //ssd1306_render_now();
     return;
 }
 
@@ -83,9 +83,9 @@ void test_1(int cm){
 */
 void test_2(int cm){
 
-    render_box(0, 15, DISPLAY_X_MAX, DISPLAY_Y_MAX - 15, 1 ); //очистка
-    render_text(0,0,0,0, "%d", 2);
-    ssd1306_render_now();
+    //render_box(0, 15, DISPLAY_X_MAX, DISPLAY_Y_MAX - 15, 1 ); //очистка
+    //render_text(0,0,0,0, "%d", 2);
+    //ssd1306_render_now();
 
     //------подключить аналоговый имитатор датчика (отключить К7 и К6)
     for(int c = 0; c < cm; c++){
@@ -102,22 +102,22 @@ void test_2(int cm){
       //----------------
       adc_get_value_f(ms[0][c], TM_142_ADC_FEEDBACK, &tmp_f);//измерить АЦП ,если I0 < 7,5 mA, то ошибка Г, если I0 > 10 mA то ошибка B
       printf("тест 2, канал %d: %2.3fmA, ",ms[0][c],tmp_f);
-      render_text(ms[1][c],15,0,0, "%2.3f", tmp_f);
+      //render_text(ms[1][c],15,0,0, "%2.3f", tmp_f);
       dac_set(ms[0][c],0); // ЦАП 0, (если цап на 4095, то ср кв напряжения в тест 1 0.009, если ЦАП 0 то ср кв 0.002)
 
       if(tmp_f < 7.5F){ 
             printf("ошибка: Г\n");
-            render_image(ms[2][c],30,0,0, &errors_img[3]); 
+            //render_image(ms[2][c],30,0,0, &errors_img[3]); 
         }else if(tmp_f > 10.0F){ 
             printf("ошибка: В\n");
-            render_image(ms[2][c],30,0,0, &errors_img[2]); 
+            //render_image(ms[2][c],30,0,0, &errors_img[2]); 
         }else{ 
             printf("ок\n");
-            render_image(ms[2][c],25,0,0, &success_img);
+            //render_image(ms[2][c],25,0,0, &success_img);
         }
     }
 
-    ssd1306_render_now();
+    //ssd1306_render_now();
     return;
 }
 
@@ -370,4 +370,67 @@ void test_4_2(int cm){
             { printf("ok\n");}
     }
     return;
+}
+
+void all_test(int cm){
+    void (*cur_test[])(int) = {test_1, test_2, calibration_dacs, test_3_1, test_3_2, test_3_3, test_3_4, test_4_1, test_4_2};
+    int l = sizeof(cur_test)/sizeof(cur_test[0]);
+
+    script_stage_img.data = script_stage_data[1];
+    render_image(0, 0, false,1, &script_stage_img);
+    //-----fw update----
+    //boot_update(); не работает
+    //------------------
+
+    for(int op = 0; op < l; op++){
+        script_stage_img.data = script_stage_data[op + 2];
+        render_image(0, 0, false,0, &script_stage_img);
+
+        /* display channels count */
+        if(cm == 1)
+            { channels_img.data = channels_data[0]; }
+        else if(cm == 2)
+            { channels_img.data = channels_data[1]; }
+        render_image(1, 2, false,1, &channels_img); 
+        cur_test[op](cm);
+        //---if error
+#ifdef DEBUG1
+                bg_img.data = bg_data[BG_FAILED];
+            render_image(0, 0, false, &bg_img);
+
+            /* display channels count */
+            if(engine_channels() == 1)
+                { channels_img.data = channels_data[0]; }
+            else
+                { channels_img.data = channels_data[1]; }
+            render_image(1, 2, false, &channels_img);
+
+            /* display error code */
+            err_img = &(errors_img[engine_error_code()]);
+            render_image(32 - (err_img->w/2), 30, false, err_img);
+
+            /* display stage number */
+            tmp = -1;
+            if(menu->cur < 2)
+                { /* a no-go */ }
+            else if(menu->cur < 4)
+                { tmp = menu->cur - 2; }
+            else if(menu->cur > 4)
+                { tmp = menu->cur - 3; }
+
+            if(failed_stages[tmp].has_digit)
+                { render_image(failed_stages[tmp].dig_x, failed_stages[tmp].dig_y, false, &(err_numbers_img[failed_stages[tmp].digit])); }
+            if(failed_stages[tmp].has_letter)
+                { render_image(failed_stages[tmp].ltr_x, failed_stages[tmp].ltr_y, false, &(err_letters_img[failed_stages[tmp].letter])); }
+
+            /* display failed channel number */
+            if(engine_failed_channel() == 1)
+                { render_image(111, 44, false, &(err_numbers_img[0])); }
+            else
+                { render_image(110, 44, false, &(err_numbers_img[1])); }
+            break;
+#endif
+        //---
+        printf("\n");
+        }
 }
