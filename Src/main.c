@@ -47,6 +47,7 @@
 #include "tests.h"
 #include "boot_uart_if.h"
 #include "render.h"
+#include "lpa.h"
 int _write(int file, char *ptr, int len);
 void usb_task(usb_packet* ub);
 /* USER CODE END Includes */
