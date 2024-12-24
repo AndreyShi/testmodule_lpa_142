@@ -306,7 +306,7 @@ void usb_task(usb_packet* ub)
     else if(  ub->cmd ==  2)
         {test_2(ch_gl);}
     else if(  ub->cmd ==  3)
-        {calibration_dacs(2);}
+        {calibration_dacs(ch_gl);}
     else if(  ub->cmd ==  4)
         {test_3_1(ch_gl);}
     else if(  ub->cmd ==  5)
@@ -361,10 +361,12 @@ UPD: проверка выполнена
 int _write(int file, char *ptr, int len)
 {
     (void)file;
+    extern const uint8_t usb_trans_ok;
+    extern const uint8_t usb_com_open;
   //DBG_PIN_SET;
   CDC_Transmit_FS((uint8_t *)ptr, len);
   uint32_t ticks = HAL_GetTick();
-  while(get_usb_com_open() && !get_usb_trans_ok()){
+  while(usb_com_open && !usb_trans_ok){
     if(HAL_GetTick() - ticks > 5)
         {break;}
   }

@@ -38,8 +38,6 @@ typedef struct _usb_packet{
   int dt;
 }usb_packet;
 
-uint8_t get_usb_trans_ok(void);
-uint8_t get_usb_com_open(void);
 void usb_parse(usb_packet* pk);
 /* USER CODE END INCLUDE */
 

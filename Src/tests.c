@@ -44,11 +44,7 @@ char* sr[8][1] = {{"Д\n"},{"Е\n"},{"Е\n"},{"Ж\n"},{"Ж\n"},{"Е\n"},{"Е\n"}
 /*
 Тест 1 проверка U0
 */
-void test_1(int cm){      
-
-    //render_box(0, 15, DISPLAY_X_MAX, DISPLAY_Y_MAX - 15, 1 ); //очистка
-    //render_text(0,0,0,0, "%d", 1);
-    //ssd1306_render_now();
+void test_1(const int cm){      
 
        for(int c = 0; c < cm; c++){
             relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_ENABLE); //K7 
@@ -60,32 +56,22 @@ void test_1(int cm){
        for(int c = 0; c < cm; c++){
             adc_get_value_f(ms[0][c], TM_142_ADC_OPENCIRC, &tmp_f);//измерить напряжение
             printf("тест 1, канал %d: %2.3fV, ",ms[0][c],tmp_f);
-            //render_text(ms[1][c],15,0,0, "%2.3f", tmp_f);
 
             if(tmp_f > 12.075F){//вывести ошибку в случае если U0 > 12.075 ошибка А, если U0 < 10 Б
                     printf("ошибка: А\n");
-                    //render_image(ms[2][c],30,0,0, &errors_img[0]); 
                 }else if(tmp_f < 10.000F){ 
-                    printf("ошибка: Б\n");
-                    //render_image(ms[2][c],30,0,0, &errors_img[1]);      
+                    printf("ошибка: Б\n");   
                 }else { 
                     printf("ок\n");
-                    //render_image(ms[2][c],25,0,0, &success_img);
                 }
         }
-
-    //ssd1306_render_now();
     return;
 }
 
 /*
 Тест 2 проверка I0
 */
-void test_2(int cm){
-
-    //render_box(0, 15, DISPLAY_X_MAX, DISPLAY_Y_MAX - 15, 1 ); //очистка
-    //render_text(0,0,0,0, "%d", 2);
-    //ssd1306_render_now();
+void test_2(const int cm){
 
     //------подключить аналоговый имитатор датчика (отключить К7 и К6)
     for(int c = 0; c < cm; c++){
@@ -102,29 +88,23 @@ void test_2(int cm){
       //----------------
       adc_get_value_f(ms[0][c], TM_142_ADC_FEEDBACK, &tmp_f);//измерить АЦП ,если I0 < 7,5 mA, то ошибка Г, если I0 > 10 mA то ошибка B
       printf("тест 2, канал %d: %2.3fmA, ",ms[0][c],tmp_f);
-      //render_text(ms[1][c],15,0,0, "%2.3f", tmp_f);
       dac_set(ms[0][c],0); // ЦАП 0, (если цап на 4095, то ср кв напряжения в тест 1 0.009, если ЦАП 0 то ср кв 0.002)
 
       if(tmp_f < 7.5F){ 
             printf("ошибка: Г\n");
-            //render_image(ms[2][c],30,0,0, &errors_img[3]); 
         }else if(tmp_f > 10.0F){ 
             printf("ошибка: В\n");
-            //render_image(ms[2][c],30,0,0, &errors_img[2]); 
         }else{ 
             printf("ок\n");
-            //render_image(ms[2][c],25,0,0, &success_img);
         }
     }
-
-    //ssd1306_render_now();
     return;
 }
 
 /*
 автокалибровка ЦАПА
 */
-void calibration_dacs(int cm){
+void calibration_dacs(const int cm){
 
     uint16_t dac_p[2][2] = {{0x200,0x600},{0x200,0x600}};  // [канал][{min,max}]
     float adc_p[2][2]    = {{0.0F ,0.0F },{0.0F ,0.0F }};  // [канал][{min,max}]
@@ -166,7 +146,7 @@ void calibration_dacs(int cm){
 Тест 3.1
 нижний ключ
 */
-void test_3_1(int cm){
+void test_3_1(const int cm){
     //----подготовка реле -------------------
     for(int c = 0; c < cm; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
@@ -204,7 +184,7 @@ void test_3_1(int cm){
 Тест 3.2
 нижний ключ инверсия
 */
-void test_3_2(int cm){
+void test_3_2(const int cm){
     //----подготовка реле -------------------
     for(int c = 0; c < cm; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
@@ -241,7 +221,7 @@ void test_3_2(int cm){
 тест 3.3 
 верхний ключ
 */
-void test_3_3(int cm){
+void test_3_3(const int cm){
     //----подготовка реле -------------------
     for(int c = 0; c < cm; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
@@ -278,7 +258,7 @@ void test_3_3(int cm){
 тест 3.4
 верхний ключ инверсия
 */
-void test_3_4(int cm){
+void test_3_4(const int cm){
     //----подготовка реле -------------------
     for(int c = 0; c < cm; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
@@ -312,7 +292,7 @@ void test_3_4(int cm){
     return;
 }
 
-void test_4_1(int cm){
+void test_4_1(const int cm){
     uint16_t data[2] = {0};
     //----подготовка реле --------------
     for(int c = 0; c < cm; c++){
@@ -342,7 +322,7 @@ void test_4_1(int cm){
     return;
 }
 
-void test_4_2(int cm){
+void test_4_2(const int cm){
     uint16_t data[2] = {0};
     //----подготовка реле ----------------
     for(int c = 0; c < cm; c++){
@@ -372,8 +352,8 @@ void test_4_2(int cm){
     return;
 }
 
-void all_test(int cm){
-    void (*cur_test[])(int) = {test_1, test_2, calibration_dacs, test_3_1, test_3_2, test_3_3, test_3_4, test_4_1, test_4_2};
+void all_test(const int cm){
+    void (*cur_test[])(const int) = {test_1, test_2, calibration_dacs, test_3_1, test_3_2, test_3_3, test_3_4, test_4_1, test_4_2};
     int l = sizeof(cur_test)/sizeof(cur_test[0]);
 
     script_stage_img.data = script_stage_data[1];

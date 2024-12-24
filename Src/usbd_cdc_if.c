@@ -22,8 +22,8 @@
 #include "usbd_cdc_if.h"
 
 /* USER CODE BEGIN INCLUDE */
-static uint8_t usb_trans_ok;
-static uint8_t usb_com_open;
+uint8_t usb_trans_ok;
+uint8_t usb_com_open;
 static uint8_t usb_recieve_ok;
 /* USER CODE END INCLUDE */
 
@@ -325,11 +325,6 @@ static int8_t CDC_TransmitCplt_FS(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
 }
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
-uint8_t get_usb_trans_ok(void)
-{return usb_trans_ok;}
-
-uint8_t get_usb_com_open(void)
-{return usb_com_open;}
 
 void usb_parse(usb_packet* pk)
 {

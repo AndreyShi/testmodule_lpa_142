@@ -36,7 +36,14 @@ void MX_USART2_UART_Init(void)
 {
 
   /* USER CODE BEGIN USART2_Init 0 */
-
+  /*for DFU применить настройки
+  The configuration is set by the ROM code ([13]) with the following settings:
+    •baudrate = 115200 baud
+    •8-bit data
+    •EVEN parity
+    •1 start bit
+    •1 stop bit 
+   */ 
   /* USER CODE END USART2_Init 0 */
 
   /* USER CODE BEGIN USART2_Init 1 */

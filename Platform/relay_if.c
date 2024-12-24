@@ -42,7 +42,7 @@
 
 //--------------------------------------------------
 static uint32_t power_phase;
-static uint8_t lpa_power;
+uint8_t lpa_power;
 //--------------------------------------------------
 void relay_init(void)/*{{{*/
 {
@@ -195,6 +195,4 @@ switch(relay)
 return 255;
 }/*}}}*/
 
-uint8_t get_lpa_power(void)
-{return lpa_power;}
 //--------------------------------------------------
