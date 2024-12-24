@@ -15,13 +15,30 @@ image_t hex_dig_img      = {   7, 10,  true, 0 };
 
 
 //------переменные "защелки" для одиночного вывода на дисплей-----
-static uint8_t disp_usb_com_open;
-static uint8_t disp_lpa_power;
+static uint8_t disp_usb_com_open = 255;
+static uint8_t disp_lpa_power    = 255;
+static uint8_t disp_ch_gl        = 255;
 //----------------------------------------------------------------
-
+//------переменные только для чтения из других модулей------------
+//extern const uint8_t usb_com_open;
+//extern const uint8_t lpa_power;
+extern const int ch_gl; // read only in display.c
+//----------------------------------------------------------------
 
 void display_task(){
     bool render_now = false;
+
+    if(disp_ch_gl != ch_gl){
+
+        if(ch_gl == 1)
+            { bg_img.data = bg_data[BG_ONE]; }
+        else if (ch_gl == 2)
+            { bg_img.data = bg_data[BG_TWO]; }
+
+        render_image(0, 0, false,0, &bg_img);
+        render_now = true;
+        disp_ch_gl = ch_gl;
+    }
 
     if(disp_usb_com_open != get_usb_com_open()){
        if(get_usb_com_open())

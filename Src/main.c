@@ -50,6 +50,8 @@
 #include "lpa.h"
 int _write(int file, char *ptr, int len);
 void usb_task(usb_packet* ub);
+int stend_state = 0; // начальный экран выбор каналов
+int ch_gl       = 2; // 2 - два канала,  1 - канал
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -234,6 +236,12 @@ while(1){
     if(tmp_tm != htim3.Instance->CNT){
         printf("%d dir:%d\n",htim3.Instance->CNT,htim3.Instance->CR1 & 0x10);
         tmp_tm = htim3.Instance->CNT;
+        if (stend_state == 0){
+            if(ch_gl == 2)
+               {ch_gl = 1;}
+            else if(ch_gl == 1)
+               {ch_gl = 2;}
+        }
     }
     /* USER CODE END WHILE */
 
@@ -294,25 +302,25 @@ void usb_task(usb_packet* ub)
     if(       ub->cmd ==  0)
         {return;}
     else if(  ub->cmd ==  1)
-        {test_1(2);}
+        {test_1(ch_gl);}
     else if(  ub->cmd ==  2)
-        {test_2(2);}
+        {test_2(ch_gl);}
     else if(  ub->cmd ==  3)
         {calibration_dacs(2);}
     else if(  ub->cmd ==  4)
-        {test_3_1(2);}
+        {test_3_1(ch_gl);}
     else if(  ub->cmd ==  5)
-        {test_3_2(2);}
+        {test_3_2(ch_gl);}
     else if(  ub->cmd ==  6)
-        {test_3_3(2);}
+        {test_3_3(ch_gl);}
     else if(  ub->cmd ==  7)
-        {test_3_4(2);}
+        {test_3_4(ch_gl);}
     else if(  ub->cmd ==  8)
-        {test_4_1(2);}
+        {test_4_1(ch_gl);}
     else if(  ub->cmd ==  9)
-        {test_4_2(2);}
+        {test_4_2(ch_gl);}
     else if(  ub->cmd == 10)
-        {all_test(2);}
+        {all_test(ch_gl);}
     else if(  ub->cmd == -2)
         {while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { ;}}
     else if(  ub->cmd == -1)
