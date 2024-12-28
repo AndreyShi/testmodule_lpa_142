@@ -20,7 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_cdc_if.h"
-
+#include "gpio_if.h"
 /* USER CODE BEGIN INCLUDE */
 uint8_t usb_trans_ok;
 uint8_t usb_com_open;
@@ -376,6 +376,10 @@ void usb_parse(usb_packet* pk)
     }else if(strncmp((const char*)UserRxBufferFS,"pic",3) == 0){
          pk->cmd = -8;
          pk->dt = atoi((const char*)&UserRxBufferFS[4]);
+    }else if(strcmp((const char*)UserRxBufferFS,"boot pin on") == 0){
+      ENABLE_BOOT;
+    }else if(strcmp((const char*)UserRxBufferFS,"boot pin off") == 0){
+      DISABLE_BOOT;  
     }
 
     memset(UserRxBufferFS,0,APP_RX_DATA_SIZE);//обнуляем буфер (иначе накладываются предыдущие команды)

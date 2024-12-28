@@ -24,7 +24,11 @@ extern const uint8_t usb_com_open;
 extern const uint8_t lpa_power;
 extern const int     ch_gl; 
 //----------------------------------------------------------------
-
+/*
+TO DO лист
+25.12.2024 9:42 - рендер bg_img, а потом рендер usb_img + power_img 
+создает на картинке артифакты, надо разобраться с render image
+*/
 void display_task(){
     bool render_now = false;
 
@@ -35,7 +39,7 @@ void display_task(){
         else if (ch_gl == 2)
             { bg_img.data = bg_data[BG_TWO]; }
 
-        render_image(0, 0, false,0, &bg_img);
+        render_image(0, 5, false,0, &bg_img);
         render_now = true;
         disp_ch_gl = ch_gl;//защелка
     }
