@@ -61,8 +61,8 @@ int main(){
   FILE* fp = fopen("cg.bin", "r"); //подставить название bin файла скаченного с барьера, размер файла долженбыть 0x7000 (0x1C00 * 4)
   int i = 0;
   uint32_t crc32_start = -1; 
-  for(int t = 0; t < 2;t++){  // здесь поставить размер 0x1C00
-      for(int g = 0; g < 4;g++){
+  for(int t = 0; t < sizeof(pBuffer_c)/sizeof(uint32_t) - 1;t++){  // здесь поставить размер 0x1C00
+      for(int g = 0; g < sizeof(uint32_t);g++){
          int c = fgetc(fp);
          if(c == EOF)
             {break;}
