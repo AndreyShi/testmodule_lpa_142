@@ -57,11 +57,12 @@ int main(){
 
   uint8_t pBuffer_c[] = {0x00,0x00,0x02,0x20, 0xE5,0x66,0x00,0x08, 0x8E,0x09,0x6F,0x07}; //первые два слова crc32: 0x76f098e 0
   //uint8_t pBuffer_c[12] = {0};
-  uint8_t pChun[4] = {0};
+
   FILE* fp = fopen("cg.bin", "r"); //подставить название bin файла скаченного с барьера, размер файла долженбыть 0x7000 (0x1C00 * 4)
   int i = 0;
   uint32_t crc32_start = -1; 
   for(int t = 0; t < sizeof(pBuffer_c)/sizeof(uint32_t) - 1;t++){  // здесь поставить размер 0x1C00
+      uint8_t pChun[4] = {0xff,0xff,0xff,0xff};
       for(int g = 0; g < sizeof(uint32_t);g++){
          int c = fgetc(fp);
          if(c == EOF)
