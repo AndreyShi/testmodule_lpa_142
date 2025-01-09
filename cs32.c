@@ -57,16 +57,24 @@ int main(){
 
   uint8_t pBuffer_c[] = {0x00,0x00,0x02,0x20, 0xE5,0x66,0x00,0x08, 0x8E,0x09,0x6F,0x07}; //первые два слова crc32: 0x76f098e 0
   //uint8_t pBuffer_c[12] = {0};
-
-  FILE* fp = fopen("cg.bin", "r"); //подставить название bin файла скаченного с барьера, размер файла долженбыть 0x7000 (0x1C00 * 4)
+  //On Microsoft Windows, binary files should be opened in binary mode ("rb"), not text mode ("r").
+  //cg2.bin слепок памяти прошивки lpa-142.hex crc равно b61c08f6
+  FILE* fp = fopen("cg2.bin", "rb"); //подставить название bin файла скаченного с барьера, размер файла долженбыть 0x7000 (0x1C00 * 4)
   int i = 0;
   uint32_t crc32_start = -1; 
-  for(int t = 0; t < sizeof(pBuffer_c)/sizeof(uint32_t) - 1;t++){  // здесь поставить размер 0x1C00
+  /*
+  для скачанной прошивки в цикле ставим размер 0x1C00 - 1 (последние четыре байта не учитываются при рассчете crc32 которую потом запишем в конец)
+  и потом результат записываем в конец что бы программа на МК посчитала в итоге ноль она уже будет считать размер crc 0x1C00
+  */
+  for(int t = 0; t < 0x1C00 - 1;t++){   //sizeof(pBuffer_c)/sizeof(uint32_t) - 0
       uint8_t pChun[4] = {0xff,0xff,0xff,0xff};
       for(int g = 0; g < sizeof(uint32_t);g++){
          int c = fgetc(fp);
          if(c == EOF)
-            {break;}
+            {
+               printf("t:%d g:%d EOF catch\n",t,g);
+               break;
+            }
          pChun[g] = (uint8_t)c;
       }
       crc32_start = crc32_formula_normal_STM32(crc32_start,4,&pChun[0]);   
