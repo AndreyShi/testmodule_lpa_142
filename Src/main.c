@@ -48,6 +48,7 @@
 #include "boot_uart_if.h"
 #include "render.h"
 #include "lpa.h"
+#include "modes.h"
 int _write(int file, char *ptr, int len);
 void usb_task(usb_packet* ub);
 int stend_state = 0; // начальный экран выбор каналов
@@ -345,6 +346,14 @@ void usb_task(usb_packet* ub)
       }
     }else if( ub->cmd == -8){
       render_image(0,30,0,1, &errors_img[ub->dt]); 
+    }else if( ub->cmd == -9){
+      char res  = 0;
+      if(ub->dt == 0)
+          { res = set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_BOT | DIRECT_OUT | DIRECT_ERR);}
+      else if(ub->dt == 1)
+          { res = set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_BOT | INVERTED_OUT | INVERTED_ERR);}
+
+      printf("set_lpa_mode %d: %d",ub->dt,res);
     }
 }
 /*

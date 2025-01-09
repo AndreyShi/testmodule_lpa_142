@@ -380,6 +380,9 @@ void usb_parse(usb_packet* pk)
       ENABLE_BOOT;
     }else if(strcmp((const char*)UserRxBufferFS,"boot pin off") == 0){
       DISABLE_BOOT;  
+    }else if(strncmp((const char*)UserRxBufferFS,"lpa mode",8) == 0){       //[строка:lpa mode][пробел][int:mode]
+         pk->cmd = -9;
+         pk->dt = atoi((const char*)&UserRxBufferFS[9]);
     }
 
     memset(UserRxBufferFS,0,APP_RX_DATA_SIZE);//обнуляем буфер (иначе накладываются предыдущие команды)
