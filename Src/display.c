@@ -28,6 +28,8 @@ extern const int     ch_gl;
 TO DO лист
 25.12.2024 9:42 - рендер bg_img, а потом рендер usb_img + power_img 
 создает на картинке артифакты, надо разобраться с render image
+09.01.2025 15:48 - снова протестировал рендер usb_img + power_img 
+поверх bg_img, артефактов нету, куда исчезли?
 */
 void display_task(){
     bool render_now = false;
@@ -39,9 +41,11 @@ void display_task(){
         else if (ch_gl == 2)
             { bg_img.data = bg_data[BG_TWO]; }
 
-        render_image(0, 5, false,0, &bg_img);
+        render_image(0, 0, false,0, &bg_img);
         render_now = true;
-        disp_ch_gl = ch_gl;//защелка
+        disp_ch_gl = ch_gl;     //защелка
+        disp_usb_com_open = 255;//добавляем поверх usb_img
+        disp_lpa_power = 255;   //добавляем поверх power_img
     }
 
     if(disp_usb_com_open != usb_com_open){
