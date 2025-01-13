@@ -49,6 +49,7 @@
 #include "render.h"
 #include "lpa.h"
 #include "modes.h"
+#include "firmware.h"
 int _write(int file, char *ptr, int len);
 void usb_task(usb_packet* ub);
 int stend_state = 0; // начальный экран выбор каналов
@@ -136,6 +137,7 @@ int main(void)
   ssd1306_init();
   button_init();
   boot_init();
+  firmware_init();
 
     /* initialize module state */
   relay_set(TM_142_RELAY_U0, CH_1, TM_142_U0_DISABLE);// K7

@@ -163,26 +163,21 @@ switch(relay)
     case TM_142_RELAY_POWER:
 	if(state == STATE_ON)
 	    {
-	    if(power_phase == 0)
-		{
-		GND_ENABLE;
-		power_phase = HAL_GetTick();
-		return 0; // not done yet
-		}
-	    else if(HAL_GetTick() - power_phase >= 100)
-		{
-		PWR_ENABLE;
-		power_phase = 0;
-		lpa_power = 1;
-		} // done for now
-	    else
-		{ return 0; }
-	    }
-	else
-	    {
-	    PWR_DISABLE;
-	    GND_DISABLE;
-		lpa_power = 0;
+			if(power_phase == 0){
+				GND_ENABLE;
+				power_phase = HAL_GetTick();
+				return 0; // not done yet
+			}else if(HAL_GetTick() - power_phase >= 100){
+				PWR_ENABLE;
+				power_phase = 0;
+				lpa_power = 1;
+			} // done for now
+			else
+			    { return 0; }
+	    }else{
+			PWR_DISABLE;
+			GND_DISABLE;
+			lpa_power = 0;
 	    }
 
 	//update_lpa_power(state);

@@ -100,11 +100,7 @@ while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { }
 DISABLE_BOOT;
 HAL_Delay(100);
 while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { }
-HAL_Delay(50);
-//menu_task();
-HAL_Delay(50);
-//menu_task();
-
+HAL_Delay(100); //ждем пока стартует ПО изделия
 /* flush uart */
 __HAL_UART_CLEAR_PEFLAG(&boot_uart);
 
@@ -112,28 +108,29 @@ addr = HAL_GetTick();
 boot_uart.Instance->DR = DEFAULT_MODE;
 while(1)
     {
-    cmd = boot_uart.Instance->DR;
-	if(cmd != 0)
-	{printf("uart return: %d\n",cmd);}
-    if(cmd == 'O' || cmd == 'E')
-	{
-	exit_bootloader();
-	return true;
-	} // no need in firmware upgrade
+		cmd = boot_uart.Instance->DR;
+		if(cmd != 0)
+			{printf("uart return: %d is symbol: \'%c\'\n",cmd,cmd);}
+		if(cmd == 'O' || cmd == 'E')
+		{
+			exit_bootloader();
+			return true;
+		} // no need in firmware upgrade
 
-    if(HAL_GetTick() - addr >= 5*timeout)
-	{ break; }
+		if(HAL_GetTick() - addr >= 9*timeout) //увеличил с 5 до 9 при отключении питания стенда требуется больше задержка
+		{ break; }
     };
 //return 0;
-/* need firmware upload, go into bootloader */
+/*
+переключение на скорость 115200 и databits 8 похоже не требуется в DFU работает автоопределение,
+нужно это проверять
+*/
+printf("/* need firmware upload, go into bootloader */\n");
 while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { }
 ENABLE_BOOT;
 HAL_Delay(100);
 while(relay_set(TM_142_RELAY_POWER, CH_1,  STATE_ON) == 0) { }
-HAL_Delay(50);
-//menu_task();
-HAL_Delay(50);
-//menu_task();
+HAL_Delay(100);//ждем пока стартует загрузчик STM
 
 /* flush uart */
 __HAL_UART_CLEAR_PEFLAG(&boot_uart);
@@ -159,8 +156,10 @@ else
     if(buff_in[0] != REPLY_NACK)
 	{ return false; }
     }
+printf("uart return: %d\n",buff_in[0]);
+
 /*}}}*/
-/* step 0. get supported commands {{{ */
+printf("/* step 0. get supported commands {{{ */\n");
 cmd = BOOT_GET;
 buff_out[0] = cmd;
 buff_out[1] = ~cmd;
@@ -171,21 +170,22 @@ if(HAL_UART_Receive(&boot_uart, buff_in,  1, timeout) != HAL_OK)
 
 if(buff_in[0] != REPLY_ACK)
     { return false; }
-
+//printf("uart return: %d\n",buff_in[0]);
 if(HAL_UART_Receive(&boot_uart, buff_in,  1, timeout) != HAL_OK)
     { return false; }
-
+//printf("uart return: %d\n",buff_in[0]);//0B
 HAL_UART_Receive_DMA(&boot_uart, buff_in, buff_in[0] + 1);
 HAL_Delay(100);
-
+//printf("uart return: %d\n",buff_in[0]);//31 00 01 02 11 21 31 44 63 73 82 92
 if(HAL_UART_Receive(&boot_uart, buff_in,  1, timeout) != HAL_OK)
     { return false; }
-
+printf("uart return: %d\n",buff_in[0]);
 if(buff_in[0] != REPLY_ACK)
     { return false; }
+//return 1;
 /*}}}*/
 /* update firmware */
-/* step 1. erase {{{ */
+printf("/* step 1. erase {{{ */\n");
 cmd = BOOT_ERASE_EX;
 buff_out[0] = cmd;
 buff_out[1] = ~cmd;
@@ -194,9 +194,10 @@ HAL_UART_Transmit_DMA(&boot_uart, buff_out, 2);
 if(HAL_UART_Receive(&boot_uart, buff_in,  1, timeout) != HAL_OK)
     { return false; }
 
-/* simple case, just erase and done with it {{{ */
+
 if(buff_in[0] == REPLY_ACK)
     { 
+    printf(" simple case, just erase and done with it {{{\n");
     buff_out[0] = 0xFF;
     buff_out[1] = 0xFF;
     buff_out[2] = 0x00;
@@ -208,9 +209,10 @@ if(buff_in[0] == REPLY_ACK)
     if(buff_in[0] != REPLY_ACK)
 	{ return false; }
     } /*}}}*/
-/* read protection active, just disable it and reinit bootloader {{{ */
+
 else if(buff_in[0] == REPLY_NACK)
     {
+	printf("/* read protection active, just disable it and reinit bootloader {{{ */\n");
     cmd = BOOT_READ_UNPROT;
     buff_out[0] = cmd;
     buff_out[1] = ~cmd;
@@ -240,7 +242,7 @@ else if(buff_in[0] == REPLY_NACK)
 	{ return false; }
     }/*}}}*/
 /*}}}*/
-/* step 2. write {{{ */
+printf("/* step 2. write {{{ */\n");
 for(uint32_t fw = 0; fw<TM_142_LPA_FW_SIZE; fw += 256)
     {
     led_tgl(TM_142_LED_GREEN);
@@ -290,7 +292,7 @@ for(uint32_t fw = 0; fw<TM_142_LPA_FW_SIZE; fw += 256)
 	{ break; }
     }
 /*}}}*/
-/* step 3. read protect {{{ */
+printf("/* step 3. read protect {{{ */\n");
 cmd = BOOT_READ_PROT;
 buff_out[0] = cmd;
 buff_out[1] = ~cmd;

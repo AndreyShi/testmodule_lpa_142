@@ -5,7 +5,8 @@
 
 #include "app_config.h"
 #include "firmware.h"
-
+#define VER122
+#ifdef VER122
 //--------------------------------------------------
 __attribute__(( section(".firmwareSection") ))
 static const uint8_t lpa_firmware[TM_142_LPA_FW_SIZE] = {/* {{{ */
@@ -2058,6 +2059,7 @@ static const uint8_t lpa_firmware[TM_142_LPA_FW_SIZE] = {/* {{{ */
     0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
     0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x01,0x02,0x02,0x00
 };/* }}} */
+#endif
 uint8_t active_firmware[TM_142_LPA_FW_SIZE]; 
 //--------------------------------------------------
 void firmware_init(void)
