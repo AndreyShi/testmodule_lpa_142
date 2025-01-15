@@ -351,7 +351,9 @@ void test_4_2(const int cm){
     }
     return;
 }
-
+/*
+const int cm - кол-во каналов 1 - 1 канал, 2- 2 канала
+*/
 void all_test(const int cm){
     void (*cur_test[])(const int) = {test_1, test_2, calibration_dacs, test_3_1, test_3_2, test_3_3, test_3_4, test_4_1, test_4_2};
     int l = sizeof(cur_test)/sizeof(cur_test[0]);
@@ -359,7 +361,7 @@ void all_test(const int cm){
     script_stage_img.data = script_stage_data[1];
     render_image(0, 0, false,1, &script_stage_img);
     //-----fw update----
-    //boot_update(); не работает
+    boot_update(); 
     //------------------
 
     for(int op = 0; op < l; op++){
