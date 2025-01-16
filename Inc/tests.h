@@ -25,11 +25,12 @@
 #define break_off 0
 
 typedef struct error_lpa142stend{
+    uint8_t stage;
     uint8_t flag    [CH];  // yes or no 0 or 1
-    char    type_er [CH];  // 'a','b','c','d','e'
+    uint8_t type_er [CH];  // 0 - А, 1 - Б, 2 - В, 3 - Г, 4 - Д,...
 }error_lpa;
 
-void set_error(error_lpa* er_p, uint8_t ch, char type_er);
+void set_error(error_lpa* er_p, uint8_t ch, uint8_t type_er);
 
 error_lpa test_1(const int cm, char break_if_error);
 error_lpa test_2(const int cm, char break_if_error);

@@ -32,6 +32,25 @@
 #define LEVEL_7 1.3F  //0x3F, 0xA6, 0x66, 0x66  //1.3F
 #define LEVEL_8 0.2F  //0x3E, 0x4C, 0xCC, 0xCD  //0.2F
 
+//---------------------------------
+//таблица соответствий ошибок русского алфавита  и английского
+//---------------------------------
+#define _a 0  //А
+#define _b 1  //Б
+#define _c 2  //В
+#define _d 3  //Г
+#define _e 4  //Д
+#define _f 5  //Е
+#define _g 6  //Ж
+#define _h 7  //З
+#define _i 8  //И
+#define _k 9  //К
+#define _l 10 //Л
+#define _m 11 //М
+#define _n 12 //Н
+#define _o 13 //О
+#define _p 14 //П
+
 float tmp_f;
 uint16_t tmp;
 int ms[3][2] = {{CH_1,CH_2},{12,76},{20,80}}; // {{канал}{x координата состояний}{x координата ошибки}}
@@ -41,14 +60,15 @@ int se32[8][2] = {{1,0},{1,1},{0,1},{0,0},{0,0},{0,1},{1,1},{1,0}}; //{in_input,
 int se33[8][2] = {{1,0},{1,1},{0,1},{0,0},{0,0},{0,1},{1,1},{1,0}}; //{in_input,in_error}
 int se34[8][2] = {{0,1},{0,0},{1,0},{1,1},{1,1},{1,0},{0,0},{0,1}}; //{in_input,in_error}
 char* sr  [8][1] = {{"Д\n"},{"Е\n"},{"Е\n"},{"Ж\n"},{"Ж\n"},{"Е\n"},{"Е\n"},{"Д\n"}};
-char sr_a [8]    = { 'e'   , 'f'   , 'f'   , 'g'   , 'g'   , 'f'   , 'f'   , 'e'};
+uint8_t sr_a [8] = {  _e   ,  _f   ,  _f   ,  _g   ,  _g   ,  _f   ,  _f   ,  _e};
 //char* sr_a[8][1] = {{"e\n"},{"f\n"},{"f\n"},{"g\n"},{"g\n"},{"f\n"},{"f\n"},{"e\n"}};
+
+//--------------------
+//текущий вывод на экран
+//--------------------
 uint8_t stages;
-//---------------------------------------------------------
-//A Б В Г Д Е Ж З И К Л М Н О П - ошибки выводимые на экран
-//a b c d e f g h i k l m n o p - соотвествующие им буквы в английском алфавите
-//---------------------------------------------------------
-void set_error(error_lpa* er_p, uint8_t ch, char type_er){
+
+void set_error(error_lpa* er_p, uint8_t ch, uint8_t type_er){
 
     if(ch >= CH)
         {
@@ -67,7 +87,7 @@ void set_error(error_lpa* er_p, uint8_t ch, char type_er){
 */
 error_lpa test_1(const int cm, char break_if_error){      
 
-       error_lpa r = {0};
+       error_lpa r = {.stage = 0,.flag = {0},.type_er = {0}};
 
        for(int c = 0; c < cm; c++){
             relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_ENABLE); //K7 
@@ -82,12 +102,12 @@ error_lpa test_1(const int cm, char break_if_error){
 
             if(tmp_f > 12.075F){//вывести ошибку в случае если U0 > 12.075 ошибка А, если U0 < 10 Б
                     printf("ошибка: А\n");
-                    set_error(&r,c,'a');
+                    set_error(&r,c,_a);
                     if(break_if_error == 1)
                        {break;}
                 }else if(tmp_f < 10.000F){ 
                     printf("ошибка: Б\n");
-                    set_error(&r,c,'b');
+                    set_error(&r,c,_b);
                     if(break_if_error == 1)
                        {break;}   
                 }else { 
@@ -102,7 +122,7 @@ error_lpa test_1(const int cm, char break_if_error){
 */
 error_lpa test_2(const int cm, char break_if_error){
 
-    error_lpa r = {0};
+    error_lpa r = {.stage = 1,.flag = {0},.type_er = {0}};
 
     //------подключить аналоговый имитатор датчика (отключить К7 и К6)
     for(int c = 0; c < cm; c++){
@@ -123,12 +143,12 @@ error_lpa test_2(const int cm, char break_if_error){
 
       if(tmp_f < 7.500F){ 
             printf("ошибка: Г\n");
-            set_error(&r,c,'d');
+            set_error(&r,c,_d);
             if(break_if_error == 1)
                {break;}
         }else if(tmp_f > 10.000F){ 
             printf("ошибка: В\n");
-            set_error(&r,c,'c');
+            set_error(&r,c,_c);
             if(break_if_error == 1)
                {break;}
         }else{ 
@@ -143,7 +163,7 @@ error_lpa test_2(const int cm, char break_if_error){
 */
 error_lpa calibration_dacs(const int cm, char break_if_error){
 
-    error_lpa r = {0};
+    error_lpa r = {.stage = 2,.flag = {0},.type_er = {0}};
 
     uint16_t dac_p[2][2] = {{0x200,0x600},{0x200,0x600}};  // [канал][{min,max}]
     float adc_p[2][2]    = {{0.0F ,0.0F },{0.0F ,0.0F }};  // [канал][{min,max}]
@@ -189,7 +209,7 @@ error_lpa calibration_dacs(const int cm, char break_if_error){
 */
 error_lpa test_3_1(const int cm, char break_if_error){
 
-    error_lpa r = {0};
+    error_lpa r = {.stage = 3,.flag = {0},.type_er = {0}};
     //----подготовка реле -------------------
     for(int c = 0; c < cm; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
@@ -234,7 +254,7 @@ error_lpa test_3_1(const int cm, char break_if_error){
 */
 error_lpa test_3_2(const int cm, char break_if_error){
 
-    error_lpa r = {0};
+    error_lpa r = {.stage = 4,.flag = {0},.type_er = {0}};
     //----подготовка реле -------------------
     for(int c = 0; c < cm; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
@@ -278,7 +298,7 @@ error_lpa test_3_2(const int cm, char break_if_error){
 */
 error_lpa test_3_3(const int cm, char break_if_error){
 
-    error_lpa r = {0};
+    error_lpa r = {.stage = 5,.flag = {0},.type_er = {0}};
     //----подготовка реле -------------------
     for(int c = 0; c < cm; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
@@ -322,7 +342,7 @@ error_lpa test_3_3(const int cm, char break_if_error){
 */
 error_lpa test_3_4(const int cm, char break_if_error){
 
-    error_lpa r = {0};
+    error_lpa r = {.stage = 6,.flag = {0},.type_er = {0}};
     //----подготовка реле -------------------
     for(int c = 0; c < cm; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
@@ -363,7 +383,7 @@ error_lpa test_3_4(const int cm, char break_if_error){
 
 error_lpa test_4_1(const int cm, char break_if_error){
 
-    error_lpa r = {0};
+    error_lpa r = {.stage = 7,.flag = {0},.type_er = {0}};
     uint16_t data[2] = {0};
     //----подготовка реле --------------
     for(int c = 0; c < cm; c++){
@@ -388,7 +408,7 @@ error_lpa test_4_1(const int cm, char break_if_error){
         if(data[c] > 360)
             { 
                 printf("Н\n");
-                set_error(&r, c, 'n');
+                set_error(&r, c, _n);
                 if(break_if_error == 1)
                     {break;}
             }
@@ -400,7 +420,7 @@ error_lpa test_4_1(const int cm, char break_if_error){
 
 error_lpa test_4_2(const int cm, char break_if_error){
 
-    error_lpa r = {0};
+    error_lpa r = {.stage = 8,.flag = {0},.type_er = {0}};
     uint16_t data[2] = {0};
     //----подготовка реле ----------------
     for(int c = 0; c < cm; c++){
@@ -425,7 +445,7 @@ error_lpa test_4_2(const int cm, char break_if_error){
         if(data[c] > 360)
             { 
                 printf("Н\n");
-                set_error(&r, c, 'n');
+                set_error(&r, c, _n);
                 if(break_if_error == 1)
                     {break;}
             }
@@ -488,15 +508,14 @@ void all_test_with_display(const int cm, char break_if_error){
         er[op] = cur_test[op](cm,break_if_error);
         //вывод ошибки и выход
         if(break_if_error == 1){ 
-            if(er[op].flag[ch0] == 1 || er[op].flag[ch1] == 1)
-                {
+            if(er[op].flag[ch0] == 1 || er[op].flag[ch1] == 1){
                     stages = 11;
                     display_task((void*)&er[op]);
                     return;
                 }
         }
     }
-    //вывод первой по счету ошибки и выход
+    //вывод первого по счету теста с ошибки и выход
     for(int op = 0; op < l; op++){
         if(er[op].flag[ch0] == 1 || er[op].flag[ch1] == 1){
             stages = 11;
@@ -505,7 +524,7 @@ void all_test_with_display(const int cm, char break_if_error){
         }
     }
 
-    //если ошибок нет вывод "галочки"
+    //если ошибок нет, вывод "галочки"
     stages = 12;
     display_task(0);
 }
