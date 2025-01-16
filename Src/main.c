@@ -305,25 +305,25 @@ void usb_task(usb_packet* ub)
     if(       ub->cmd ==  0)
         {return;}
     else if(  ub->cmd ==  1)
-        {test_1(ch_gl);}
+        {test_1(ch_gl,          break_off);}
     else if(  ub->cmd ==  2)
-        {test_2(ch_gl);}
+        {test_2(ch_gl,          break_off);}
     else if(  ub->cmd ==  3)
-        {calibration_dacs(ch_gl);}
+        {calibration_dacs(ch_gl,break_off);}
     else if(  ub->cmd ==  4)
-        {test_3_1(ch_gl);}
+        {test_3_1(ch_gl,        break_off);}
     else if(  ub->cmd ==  5)
-        {test_3_2(ch_gl);}
+        {test_3_2(ch_gl,        break_off);}
     else if(  ub->cmd ==  6)
-        {test_3_3(ch_gl);}
+        {test_3_3(ch_gl,        break_off);}
     else if(  ub->cmd ==  7)
-        {test_3_4(ch_gl);}
+        {test_3_4(ch_gl,        break_off);}
     else if(  ub->cmd ==  8)
-        {test_4_1(ch_gl);}
+        {test_4_1(ch_gl,        break_off);}
     else if(  ub->cmd ==  9)
-        {test_4_2(ch_gl);}
+        {test_4_2(ch_gl,        break_off);}
     else if(  ub->cmd == 10)
-        {all_test(ch_gl);}
+        {all_test(ch_gl,        break_off);}
     else if(  ub->cmd == -2)
         {while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { ;}}
     else if(  ub->cmd == -1)

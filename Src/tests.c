@@ -40,11 +40,34 @@ int se31[8][2] = {{0,1},{0,0},{1,0},{1,1},{1,1},{1,0},{0,0},{0,1}}; //{in_input,
 int se32[8][2] = {{1,0},{1,1},{0,1},{0,0},{0,0},{0,1},{1,1},{1,0}}; //{in_input,in_error}
 int se33[8][2] = {{1,0},{1,1},{0,1},{0,0},{0,0},{0,1},{1,1},{1,0}}; //{in_input,in_error}
 int se34[8][2] = {{0,1},{0,0},{1,0},{1,1},{1,1},{1,0},{0,0},{0,1}}; //{in_input,in_error}
-char* sr[8][1] = {{"Д\n"},{"Е\n"},{"Е\n"},{"Ж\n"},{"Ж\n"},{"Е\n"},{"Е\n"},{"Д\n"}};
+char* sr  [8][1] = {{"Д\n"},{"Е\n"},{"Е\n"},{"Ж\n"},{"Ж\n"},{"Е\n"},{"Е\n"},{"Д\n"}};
+char sr_a [8]    = { 'e'   , 'f'   , 'f'   , 'g'   , 'g'   , 'f'   , 'f'   , 'e'};
+//char* sr_a[8][1] = {{"e\n"},{"f\n"},{"f\n"},{"g\n"},{"g\n"},{"f\n"},{"f\n"},{"e\n"}};
+
+//---------------------------------------------------------
+//A Б В Г Д Е Ж З И К Л М Н О П - ошибки выводимые на экран
+//a b c d e f g h i k l m n o p - соотвествующие им буквы в английском алфавите
+//---------------------------------------------------------
+void set_error(error_lpa* er_p, uint8_t ch, char type_er){
+
+    if(ch >= CH)
+        {
+            printf("\nerror: ch >= CH \n\n");
+            return;
+        }
+
+    er_p->flag    [ch] = 1;
+    er_p->type_er [ch] = type_er;
+    return;
+}
+
+
 /*
 Тест 1 проверка U0
 */
-void test_1(const int cm){      
+error_lpa test_1(const int cm, char break_if_error){      
+
+       error_lpa r = {0};
 
        for(int c = 0; c < cm; c++){
             relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_ENABLE); //K7 
@@ -59,19 +82,27 @@ void test_1(const int cm){
 
             if(tmp_f > 12.075F){//вывести ошибку в случае если U0 > 12.075 ошибка А, если U0 < 10 Б
                     printf("ошибка: А\n");
+                    set_error(&r,c,'a');
+                    if(break_if_error == 1)
+                       {break;}
                 }else if(tmp_f < 10.000F){ 
-                    printf("ошибка: Б\n");   
+                    printf("ошибка: Б\n");
+                    set_error(&r,c,'b');
+                    if(break_if_error == 1)
+                       {break;}   
                 }else { 
                     printf("ок\n");
                 }
         }
-    return;
+    return r;
 }
 
 /*
 Тест 2 проверка I0
 */
-void test_2(const int cm){
+error_lpa test_2(const int cm, char break_if_error){
+
+    error_lpa r = {0};
 
     //------подключить аналоговый имитатор датчика (отключить К7 и К6)
     for(int c = 0; c < cm; c++){
@@ -90,21 +121,29 @@ void test_2(const int cm){
       printf("тест 2, канал %d: %2.3fmA, ",ms[0][c],tmp_f);
       dac_set(ms[0][c],0); // ЦАП 0, (если цап на 4095, то ср кв напряжения в тест 1 0.009, если ЦАП 0 то ср кв 0.002)
 
-      if(tmp_f < 7.5F){ 
+      if(tmp_f < 7.500F){ 
             printf("ошибка: Г\n");
-        }else if(tmp_f > 10.0F){ 
+            set_error(&r,c,'d');
+            if(break_if_error == 1)
+               {break;}
+        }else if(tmp_f > 10.000F){ 
             printf("ошибка: В\n");
+            set_error(&r,c,'c');
+            if(break_if_error == 1)
+               {break;}
         }else{ 
             printf("ок\n");
         }
     }
-    return;
+    return r;
 }
 
 /*
 автокалибровка ЦАПА
 */
-void calibration_dacs(const int cm){
+error_lpa calibration_dacs(const int cm, char break_if_error){
+
+    error_lpa r = {0};
 
     uint16_t dac_p[2][2] = {{0x200,0x600},{0x200,0x600}};  // [канал][{min,max}]
     float adc_p[2][2]    = {{0.0F ,0.0F },{0.0F ,0.0F }};  // [канал][{min,max}]
@@ -140,13 +179,17 @@ void calibration_dacs(const int cm){
     for(int c = 0; c < cm; c++){
         printf("цап %d ацп min: %fmA, ацп max: %fmA, k: %f b: %f\n",ms[0][c],adc_p[c][0],adc_p[c][1],calibrations_dac[c][0],calibrations_dac[c][1]);
     }
+
+    return r;
 }
 
 /*
 Тест 3.1
 нижний ключ
 */
-void test_3_1(const int cm){
+error_lpa test_3_1(const int cm, char break_if_error){
+
+    error_lpa r = {0};
     //----подготовка реле -------------------
     for(int c = 0; c < cm; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
@@ -174,17 +217,24 @@ void test_3_1(const int cm){
             if(in_input == se31[l][0] && in_error == se31[l][1])
                 { printf("ок\n");}
             else
-                { printf(sr[l][0]);}
+                { 
+                    printf(sr[l][0]);
+                    set_error(&r, c, sr_a[l]);
+                    if(break_if_error == 1)
+                        {break;}
+                }
         }
     }
-    return;
+    return r;
 }
 
 /*
 Тест 3.2
 нижний ключ инверсия
 */
-void test_3_2(const int cm){
+error_lpa test_3_2(const int cm, char break_if_error){
+
+    error_lpa r = {0};
     //----подготовка реле -------------------
     for(int c = 0; c < cm; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
@@ -212,16 +262,23 @@ void test_3_2(const int cm){
             if(in_input == se32[l][0] && in_error == se32[l][1])
                 { printf("ок\n");}
             else
-                { printf(sr[l][0]);}
+                { 
+                    printf(sr[l][0]);
+                    set_error(&r, c, sr_a[l]);
+                    if(break_if_error == 1)
+                        {break;}
+                }
         }
     }
-    return;
+    return r;
 }
 /*
 тест 3.3 
 верхний ключ
 */
-void test_3_3(const int cm){
+error_lpa test_3_3(const int cm, char break_if_error){
+
+    error_lpa r = {0};
     //----подготовка реле -------------------
     for(int c = 0; c < cm; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
@@ -249,16 +306,23 @@ void test_3_3(const int cm){
             if(in_input == se33[l][0] && in_error == se33[l][1])
                 { printf("ок\n");}
             else
-                { printf(sr[l][0]);}
+                { 
+                    printf(sr[l][0]);
+                    set_error(&r, c, sr_a[l]);
+                    if(break_if_error == 1)
+                        {break;}
+                }
         }
     }
-    return;
+    return r;
 }
 /*
 тест 3.4
 верхний ключ инверсия
 */
-void test_3_4(const int cm){
+error_lpa test_3_4(const int cm, char break_if_error){
+
+    error_lpa r = {0};
     //----подготовка реле -------------------
     for(int c = 0; c < cm; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
@@ -286,13 +350,20 @@ void test_3_4(const int cm){
             if(in_input == se34[l][0] && in_error == se34[l][1])
                 { printf("ок\n");}
             else
-                { printf(sr[l][0]);}
+                { 
+                    printf(sr[l][0]);
+                    set_error(&r, c, sr_a[l]);
+                    if(break_if_error == 1)
+                        {break;}
+                }
         }
     }
-    return;
+    return r;
 }
 
-void test_4_1(const int cm){
+error_lpa test_4_1(const int cm, char break_if_error){
+
+    error_lpa r = {0};
     uint16_t data[2] = {0};
     //----подготовка реле --------------
     for(int c = 0; c < cm; c++){
@@ -315,14 +386,21 @@ void test_4_1(const int cm){
     {
         printf("4.1 канал %d, задержка: %d ",ms[0][c], data[c]);
         if(data[c] > 360)
-            { printf("Н\n");}
+            { 
+                printf("Н\n");
+                set_error(&r, c, 'n');
+                if(break_if_error == 1)
+                    {break;}
+            }
         else
             { printf("ok\n");}
     }
-    return;
+    return r;
 }
 
-void test_4_2(const int cm){
+error_lpa test_4_2(const int cm, char break_if_error){
+
+    error_lpa r = {0};
     uint16_t data[2] = {0};
     //----подготовка реле ----------------
     for(int c = 0; c < cm; c++){
@@ -345,36 +423,76 @@ void test_4_2(const int cm){
     {
         printf("4.2 канал %d, задержка: %d ",ms[0][c], data[c]);
         if(data[c] > 360)
-            { printf("Н\n");}
+            { 
+                printf("Н\n");
+                set_error(&r, c, 'n');
+                if(break_if_error == 1)
+                    {break;}
+            }
         else
             { printf("ok\n");}
     }
-    return;
+    return r;
 }
 /*
+info: прошивка + все тесты в цикле, вывод только в консоль
 const int cm - кол-во каналов 1 - 1 канал, 2- 2 канала
+char break_if_error - 0 - не останавливаемся по ошибке, 1 - остановка по ошибке включена
 */
-void all_test(const int cm){
-    void (*cur_test[])(const int) = {test_1, test_2, calibration_dacs, test_3_1, test_3_2, test_3_3, test_3_4, test_4_1, test_4_2};
-    int l = sizeof(cur_test)/sizeof(cur_test[0]);
+void all_test(const int cm, char break_if_error){
 
-    script_stage_img.data = script_stage_data[1];
-    render_image(0, 0, false,1, &script_stage_img);
+    error_lpa (*cur_test[])(const int,char) = {test_1, test_2, calibration_dacs, test_3_1, test_3_2, test_3_3, test_3_4, test_4_1, test_4_2};
+    const int l = sizeof(cur_test)/sizeof(cur_test[0]);
+    error_lpa er[9] = {0};
+    __asm("nop");
+    //-----fw update----
+    if(boot_update() == 0){
+        printf("\nboot_update() вернул FALSE!\n\n");
+        return;
+    }
+    //------------------
+    if(break_if_error == 1)
+        { printf("\nрежим \"break_if_error\" включен!\n\n");}
+
+    for(int op = 0; op < l; op++){
+        er[op] = cur_test[op](cm,break_if_error);
+        if(break_if_error == 1){
+            if(er[op].flag[ch0] == 1 || er[op].flag[ch1] == 1){
+                __asm("nop");
+                printf("\nошибка в тесте, стоп!\n\n");
+                return;
+            }
+        }
+        printf("\n");
+    }
+    printf("\nтест завершен!\n");
+    return;
+}
+
+void all_test_with_display(const int cm, char break_if_error){
+
+    error_lpa (*cur_test[])(const int,char) = {test_1, test_2, calibration_dacs, test_3_1, test_3_2, test_3_3, test_3_4, test_4_1, test_4_2};
+    const int l = sizeof(cur_test)/sizeof(cur_test[0]);
+    error_lpa er[l];// = {0,0,0,0,0,0,0,0,0};
+    //script_stage_img.data = script_stage_data[1];
+    //render_image(0, 0, false,1, &script_stage_img);
     //-----fw update----
     boot_update(); 
     //------------------
 
     for(int op = 0; op < l; op++){
-        script_stage_img.data = script_stage_data[op + 2];
-        render_image(0, 0, false,0, &script_stage_img);
+        //script_stage_img.data = script_stage_data[op + 2];
+        //render_image(0, 0, false,0, &script_stage_img);
 
         /* display channels count */
-        if(cm == 1)
-            { channels_img.data = channels_data[0]; }
-        else if(cm == 2)
-            { channels_img.data = channels_data[1]; }
-        render_image(1, 2, false,1, &channels_img); 
-        cur_test[op](cm);
+        //if(cm == 1)
+        //    { channels_img.data = channels_data[0]; }
+        //else if(cm == 2)
+        //    { channels_img.data = channels_data[1]; }
+        //render_image(1, 2, false,1, &channels_img); 
+        er[op] = cur_test[op](cm,break_if_error);
+        if(er[op].flag[0] == 1 || er[op].flag[1] == 1)
+            {break;}
         //---if error
 #ifdef DEBUG1
                 bg_img.data = bg_data[BG_FAILED];
