@@ -231,7 +231,7 @@ while(1){
     usb_task(&ub);
 
     button_task();
-    display_task();
+    display_task(0);
     if(old_state != state){
         printf("button_state: %d\n",state);
         old_state = state;

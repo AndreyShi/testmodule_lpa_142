@@ -43,7 +43,7 @@ int se34[8][2] = {{0,1},{0,0},{1,0},{1,1},{1,1},{1,0},{0,0},{0,1}}; //{in_input,
 char* sr  [8][1] = {{"Д\n"},{"Е\n"},{"Е\n"},{"Ж\n"},{"Ж\n"},{"Е\n"},{"Е\n"},{"Д\n"}};
 char sr_a [8]    = { 'e'   , 'f'   , 'f'   , 'g'   , 'g'   , 'f'   , 'f'   , 'e'};
 //char* sr_a[8][1] = {{"e\n"},{"f\n"},{"f\n"},{"g\n"},{"g\n"},{"f\n"},{"f\n"},{"e\n"}};
-
+uint8_t stages;
 //---------------------------------------------------------
 //A Б В Г Д Е Ж З И К Л М Н О П - ошибки выводимые на экран
 //a b c d e f g h i k l m n o p - соотвествующие им буквы в английском алфавите
@@ -473,64 +473,39 @@ void all_test_with_display(const int cm, char break_if_error){
 
     error_lpa (*cur_test[])(const int,char) = {test_1, test_2, calibration_dacs, test_3_1, test_3_2, test_3_3, test_3_4, test_4_1, test_4_2};
     const int l = sizeof(cur_test)/sizeof(cur_test[0]);
-    error_lpa er[l];// = {0,0,0,0,0,0,0,0,0};
-    //script_stage_img.data = script_stage_data[1];
-    //render_image(0, 0, false,1, &script_stage_img);
+    error_lpa er[9] = {0};
+
+    stages = 1;
+    display_task(0);
     //-----fw update----
     boot_update(); 
     //------------------
 
     for(int op = 0; op < l; op++){
-        //script_stage_img.data = script_stage_data[op + 2];
-        //render_image(0, 0, false,0, &script_stage_img);
+        stages = 2 + op;
+        display_task(0);
 
-        /* display channels count */
-        //if(cm == 1)
-        //    { channels_img.data = channels_data[0]; }
-        //else if(cm == 2)
-        //    { channels_img.data = channels_data[1]; }
-        //render_image(1, 2, false,1, &channels_img); 
         er[op] = cur_test[op](cm,break_if_error);
-        if(er[op].flag[0] == 1 || er[op].flag[1] == 1)
-            {break;}
-        //---if error
-#ifdef DEBUG1
-                bg_img.data = bg_data[BG_FAILED];
-            render_image(0, 0, false, &bg_img);
-
-            /* display channels count */
-            if(engine_channels() == 1)
-                { channels_img.data = channels_data[0]; }
-            else
-                { channels_img.data = channels_data[1]; }
-            render_image(1, 2, false, &channels_img);
-
-            /* display error code */
-            err_img = &(errors_img[engine_error_code()]);
-            render_image(32 - (err_img->w/2), 30, false, err_img);
-
-            /* display stage number */
-            tmp = -1;
-            if(menu->cur < 2)
-                { /* a no-go */ }
-            else if(menu->cur < 4)
-                { tmp = menu->cur - 2; }
-            else if(menu->cur > 4)
-                { tmp = menu->cur - 3; }
-
-            if(failed_stages[tmp].has_digit)
-                { render_image(failed_stages[tmp].dig_x, failed_stages[tmp].dig_y, false, &(err_numbers_img[failed_stages[tmp].digit])); }
-            if(failed_stages[tmp].has_letter)
-                { render_image(failed_stages[tmp].ltr_x, failed_stages[tmp].ltr_y, false, &(err_letters_img[failed_stages[tmp].letter])); }
-
-            /* display failed channel number */
-            if(engine_failed_channel() == 1)
-                { render_image(111, 44, false, &(err_numbers_img[0])); }
-            else
-                { render_image(110, 44, false, &(err_numbers_img[1])); }
-            break;
-#endif
-        //---
-        printf("\n");
+        //вывод ошибки и выход
+        if(break_if_error == 1){ 
+            if(er[op].flag[ch0] == 1 || er[op].flag[ch1] == 1)
+                {
+                    stages = 11;
+                    display_task((void*)&er[op]);
+                    return;
+                }
         }
+    }
+    //вывод первой по счету ошибки и выход
+    for(int op = 0; op < l; op++){
+        if(er[op].flag[ch0] == 1 || er[op].flag[ch1] == 1){
+            stages = 11;
+            display_task((void*)&er[op]);
+            return;
+        }
+    }
+
+    //если ошибок нет вывод "галочки"
+    stages = 12;
+    display_task(0);
 }
