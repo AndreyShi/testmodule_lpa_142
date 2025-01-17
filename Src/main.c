@@ -52,7 +52,6 @@
 #include "firmware.h"
 int _write(int file, char *ptr, int len);
 void usb_task(usb_packet* ub);
-int stend_state = 0; // начальный экран выбор каналов
 int ch_gl       = 2; // 2 - два канала,  1 - канал
 /* USER CODE END Includes */
 
@@ -229,17 +228,33 @@ while(1){
     usb_packet ub = {.ch = 0,.cmd = 0,.dac_bin = 0,.data_f = 0.0F}; //инициализация пакета usb
     usb_parse(&ub);
     usb_task(&ub);
-
-    button_task();
+    /*
+    TO DO: измерить время выполнения button_task(),
+    оценить ее использование в прерывании SysTick,
+    попробовать использовать в SysTick
+    */
+    button_task(); 
     display_task(0);
     if(old_state != state){
         printf("button_state: %d\n",state);
+        if(state == BTN_HOLD_1){
+          if(btn_context == 0){
+              btn_context = 1;
+              all_test_with_display(ch_gl, break_off);//blocking stream
+              btn_context = 2;
+          }else if(btn_context == 1){ //we'll never get here while test
+
+          }else if(btn_context == 2){ // finish testing
+              btn_context = 0;
+              show_vibor_kanalov();
+          }
+        }
         old_state = state;
     }
     if(tmp_tm != htim3.Instance->CNT){
         printf("%d dir:%d\n",htim3.Instance->CNT,htim3.Instance->CR1 & 0x10);
         tmp_tm = htim3.Instance->CNT;
-        if (stend_state == 0){
+        if (btn_context == 0){
             if(ch_gl == 2)
                {ch_gl = 1;}
             else if(ch_gl == 1)

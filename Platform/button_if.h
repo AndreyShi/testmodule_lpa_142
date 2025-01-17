@@ -25,6 +25,7 @@ enum _button_state {/*{{{*/
     BTN_RELEASE_DEBOUNCE,
 };
 extern enum _button_state state;
+extern int btn_context;
 //--------------------------------------------------
 #ifdef __cplusplus
 extern "C" {

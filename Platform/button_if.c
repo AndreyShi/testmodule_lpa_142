@@ -17,7 +17,7 @@ enum _button_state state;
 /*}}}*/
 //--------------------------------------------------
 static btn_flags flags[3];
-
+int btn_context;
 //--------------------------------------------------
 void button_init()/*{{{*/
 {

@@ -9,3 +9,4 @@
 #include <stdint.h>
 
 void display_task(void* some_data);
+void show_vibor_kanalov(void);

@@ -80,8 +80,7 @@ void display_task(void* some_data){
 
           script_stage_img.data = script_stage_data[stages];
           render_image(0, 0, false,0, &script_stage_img);
-          /* display channels count */
-          display_channels_count();
+          display_channels_count();/* display channels count */
 
       }else if(stages == 11 && some_data != 0){ //show errors
 
@@ -100,8 +99,7 @@ void display_task(void* some_data){
 
             bg_img.data = bg_data[BG_FAILED];
             render_image(0, 0, false,0, &bg_img);
-            /* display channels count */
-            display_channels_count();
+            display_channels_count();/* display channels count */
             /* display error code */
             err_img = &(errors_img[err_p->type_er[err_ch]]);
             render_image(32 - (err_img->w/2), 30, false,0, err_img);
@@ -117,16 +115,13 @@ void display_task(void* some_data){
                 { render_image(110, 44, false,0, &(err_numbers_img[1])); }
 
       }else if(stages == 12){ //show success
-            render_image(45, 17, false,0, &success_img);
-            /* display channels count */
-            display_channels_count();
+            render_image(45, 17, false,0, &success_img);        
+            display_channels_count();/* display channels count */
       }
       
       disp_stages = stages;   //защелка
-      if(stages != 11 ){ // обновляем только когда нет ошибок
-        disp_usb_com_open = 255;//добавляем поверх usb_img
-        disp_lpa_power = 255;   //добавляем поверх power_img
-      }
+      disp_usb_com_open = 255;//добавляем поверх usb_img
+      disp_lpa_power = 255;   //добавляем поверх power_img
       render_now = true;
     }
 
@@ -175,4 +170,11 @@ void display_channels_count(void){
     else if(ch_gl == 2)
         { channels_img.data = channels_data[1]; }
     render_image(1, 2, false,0, &channels_img); 
+}
+/*
+обновляет переменную-защелку которая в следующем вызове функции display_task() обновит экран
+и покажет выбор каналов
+*/
+void show_vibor_kanalov(void){
+    disp_ch_gl = 255;
 }
