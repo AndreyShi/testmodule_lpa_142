@@ -39,6 +39,7 @@ typedef struct _usb_packet{
 }usb_packet;
 
 void usb_parse(usb_packet* pk);
+void usb_task(usb_packet* ub);
 /* USER CODE END INCLUDE */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY

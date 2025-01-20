@@ -141,7 +141,7 @@ error_lpa test_2(const int cm, char break_if_error){
       printf("тест 2, канал %d: %2.3fmA, ",ms[0][c],tmp_f);
       dac_set(ms[0][c],0); // ЦАП 0, (если цап на 4095, то ср кв напряжения в тест 1 0.009, если ЦАП 0 то ср кв 0.002)
 
-      if(tmp_f < 7.500F){ 
+      if(tmp_f < 7.000F){ 
             printf("ошибка: Г\n");
             set_error(&r,c,_d);
             if(break_if_error == 1)
@@ -407,7 +407,7 @@ error_lpa test_4_1(const int cm, char break_if_error){
         printf("4.1 канал %d, задержка: %d ",ms[0][c], data[c]);
         if(data[c] > 360)
             { 
-                printf("Н\n");
+                printf("Н\n"); //иногда вылезает ошибка с задержкой 1912, надо разбираться
                 set_error(&r, c, _n);
                 if(break_if_error == 1)
                     {break;}
@@ -444,8 +444,8 @@ error_lpa test_4_2(const int cm, char break_if_error){
         printf("4.2 канал %d, задержка: %d ",ms[0][c], data[c]);
         if(data[c] > 360)
             { 
-                printf("Н\n");
-                set_error(&r, c, _n);
+                printf("П\n");
+                set_error(&r, c, _p);
                 if(break_if_error == 1)
                     {break;}
             }
@@ -464,6 +464,7 @@ void all_test(const int cm, char break_if_error){
     error_lpa (*cur_test[])(const int,char) = {test_1, test_2, calibration_dacs, test_3_1, test_3_2, test_3_3, test_3_4, test_4_1, test_4_2};
     const int l = sizeof(cur_test)/sizeof(cur_test[0]);
     error_lpa er[9] = {0};
+
     __asm("nop");
     //-----fw update----
     if(boot_update() == 0){
@@ -478,14 +479,18 @@ void all_test(const int cm, char break_if_error){
         er[op] = cur_test[op](cm,break_if_error);
         if(break_if_error == 1){
             if(er[op].flag[ch0] == 1 || er[op].flag[ch1] == 1){
-                __asm("nop");
-                printf("\nошибка в тесте, стоп!\n\n");
-                return;
+                    printf("\nошибка в тесте, стоп!\n\n");
+                    break;
             }
         }
         printf("\n");
     }
+
     printf("\nтест завершен!\n");
+
+    //----relay init---
+    relay_init();
+    //-----------------
     return;
 }
 
@@ -494,6 +499,7 @@ void all_test_with_display(const int cm, char break_if_error){
     error_lpa (*cur_test[])(const int,char) = {test_1, test_2, calibration_dacs, test_3_1, test_3_2, test_3_3, test_3_4, test_4_1, test_4_2};
     const int l = sizeof(cur_test)/sizeof(cur_test[0]);
     error_lpa er[9] = {0};
+    char flag = 0;
 
     stages = 1;
     display_task(0);
@@ -506,25 +512,30 @@ void all_test_with_display(const int cm, char break_if_error){
         display_task(0);
 
         er[op] = cur_test[op](cm,break_if_error);
-        //вывод ошибки и выход
+
         if(break_if_error == 1){ 
-            if(er[op].flag[ch0] == 1 || er[op].flag[ch1] == 1){
-                    stages = 11;
-                    display_task((void*)&er[op]);
-                    return;
-                }
+            if(er[op].flag[ch0] == 1 || er[op].flag[ch1] == 1)
+                { break;}        //break
         }
     }
-    //вывод первого по счету теста с ошибки и выход
+    //вывод первого по счету теста с ошибки
     for(int op = 0; op < l; op++){
         if(er[op].flag[ch0] == 1 || er[op].flag[ch1] == 1){
             stages = 11;
             display_task((void*)&er[op]);
-            return;
+            flag = 1;
+            break;
         }
     }
 
     //если ошибок нет, вывод "галочки"
-    stages = 12;
-    display_task(0);
+    if(flag == 0){
+        stages = 12;
+        display_task(0);
+    }
+
+    //----relay init---
+    relay_init();
+    //-----------------
+    return;
 }

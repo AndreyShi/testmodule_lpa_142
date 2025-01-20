@@ -58,8 +58,9 @@ IN_BOT_SW_CH2;
 ERR_BOT_SW_CH1;
 ERR_BOT_SW_CH2;
 
-PWR_DISABLE;
-GND_DISABLE;
+//PWR_DISABLE;
+//GND_DISABLE;
+while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { ;}
 
 power_phase = 0;
 }/*}}}*/

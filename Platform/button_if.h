@@ -26,6 +26,7 @@ enum _button_state {/*{{{*/
 };
 extern enum _button_state state;
 extern int btn_context;
+extern int ch_gl; 
 //--------------------------------------------------
 #ifdef __cplusplus
 extern "C" {

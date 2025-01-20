@@ -51,7 +51,6 @@
 #include "modes.h"
 #include "firmware.h"
 int _write(int file, char *ptr, int len);
-void usb_task(usb_packet* ub);
 int ch_gl       = 2; // 2 - два канала,  1 - канал
 /* USER CODE END Includes */
 
@@ -228,12 +227,8 @@ while(1){
     usb_packet ub = {.ch = 0,.cmd = 0,.dac_bin = 0,.data_f = 0.0F}; //инициализация пакета usb
     usb_parse(&ub);
     usb_task(&ub);
-    /*
-    TO DO: измерить время выполнения button_task(),
-    оценить ее использование в прерывании SysTick,
-    попробовать использовать в SysTick
-    */
-    button_task(); 
+
+    //button_task(); //ушло в Systick
     display_task(0);
     if(old_state != state){
         printf("button_state: %d\n",state);
@@ -314,65 +309,7 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void usb_task(usb_packet* ub)
-{
-  float tmp_f = 0;
-    if(       ub->cmd ==  0)
-        {return;}
-    else if(  ub->cmd ==  1)
-        {test_1(ch_gl,          break_off);}
-    else if(  ub->cmd ==  2)
-        {test_2(ch_gl,          break_off);}
-    else if(  ub->cmd ==  3)
-        {calibration_dacs(ch_gl,break_off);}
-    else if(  ub->cmd ==  4)
-        {test_3_1(ch_gl,        break_off);}
-    else if(  ub->cmd ==  5)
-        {test_3_2(ch_gl,        break_off);}
-    else if(  ub->cmd ==  6)
-        {test_3_3(ch_gl,        break_off);}
-    else if(  ub->cmd ==  7)
-        {test_3_4(ch_gl,        break_off);}
-    else if(  ub->cmd ==  8)
-        {test_4_1(ch_gl,        break_off);}
-    else if(  ub->cmd ==  9)
-        {test_4_2(ch_gl,        break_off);}
-    else if(  ub->cmd == 10)
-        {all_test(ch_gl,        break_off);}
-    else if(  ub->cmd == -2)
-        {while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { ;}}
-    else if(  ub->cmd == -1)
-        {while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { ;}}
-    else if(  ub->cmd == -3)
-        { dac_set_i(ub->ch,ub->data_f);}
-    else if(  ub->cmd == -4)
-        { dac_set(ub->ch,ub->dac_bin);}
-    else if(  ub->cmd == -5){
-      adc_get_value_f(ub->ch, TM_142_ADC_FEEDBACK, &tmp_f);
-      printf("ацп %d, ток:%fmA\n",ub->ch,tmp_f);
-    }else if( ub->cmd == -6){
-      printf("boot_update: %d\n",boot_update());
-    }else if( ub->cmd == -7){
-      while(1){
-        uint8_t nb = boot_update_nb();
-        if(nb)
-            {
-              printf("boot_update_nb: %d",nb);
-              break;
-            }
-      }
-    }else if( ub->cmd == -8){
-      render_image(0,30,0,1, &errors_img[ub->dt]); 
-    }else if( ub->cmd == -9){
-      char res  = 0;
-      if(ub->dt == 0)
-          { res = set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_BOT | DIRECT_OUT | DIRECT_ERR);}
-      else if(ub->dt == 1)
-          { res = set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_BOT | INVERTED_OUT | INVERTED_ERR);}
 
-      printf("set_lpa_mode %d: %d",ub->dt,res);
-    }
-}
 /*
 Символ новый строки в определенных случаях теряется при выводе, к примеру:
 printf("Hello\n");   - символ новый строки "\n" потеряется

@@ -115,6 +115,7 @@ void display_task(void* some_data){
                 { render_image(110, 44, false,0, &(err_numbers_img[1])); }
 
       }else if(stages == 12){ //show success
+            render_box(0, 17, 128, success_img.h, true);//очистить
             render_image(45, 17, false,0, &success_img);        
             display_channels_count();/* display channels count */
       }

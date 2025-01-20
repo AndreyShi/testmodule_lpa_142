@@ -20,8 +20,18 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_cdc_if.h"
-#include "gpio_if.h"
 /* USER CODE BEGIN INCLUDE */
+#include "gpio_if.h"
+#include "tests.h"
+#include "adc_if.h"
+#include "app_export.h"
+#include "relay_if.h"
+#include "boot_uart_if.h"
+#include "render.h"
+#include "modes.h"
+#include "button_if.h"
+#include "resources.h"
+#include "dac_if.h"
 uint8_t usb_trans_ok;
 uint8_t usb_com_open;
 static uint8_t usb_recieve_ok;
@@ -383,12 +393,88 @@ void usb_parse(usb_packet* pk)
     }else if(strncmp((const char*)UserRxBufferFS,"lpa mode",8) == 0){       //[строка:lpa mode][пробел][int:mode]
          pk->cmd = -9;
          pk->dt = atoi((const char*)&UserRxBufferFS[9]);
+    }else if(strncmp((const char*)UserRxBufferFS,"K6 on",5) == 0){
+       pk->cmd = -10;
+       pk->dt = atoi((const char*)&UserRxBufferFS[6]);
+    }else if(strncmp((const char*)UserRxBufferFS,"K6 off",6) == 0){
+       pk->cmd = -11;
+       pk->dt = atoi((const char*)&UserRxBufferFS[7]);
+    }else if(strcmp((const char*)UserRxBufferFS, "relay init") == 0){
+      pk->cmd = -12;
     }
 
     memset(UserRxBufferFS,0,APP_RX_DATA_SIZE);//обнуляем буфер (иначе накладываются предыдущие команды)
   __enable_irq();//ждем следующую команду
   return;
 }
+
+void usb_task(usb_packet* ub)
+{
+  float tmp_f = 0;
+    if(       ub->cmd ==  0)
+        {return;}
+    else if(  ub->cmd ==  1)
+        {test_1(ch_gl,          break_off);}
+    else if(  ub->cmd ==  2)
+        {test_2(ch_gl,          break_off);}
+    else if(  ub->cmd ==  3)
+        {calibration_dacs(ch_gl,break_off);}
+    else if(  ub->cmd ==  4)
+        {test_3_1(ch_gl,        break_off);}
+    else if(  ub->cmd ==  5)
+        {test_3_2(ch_gl,        break_off);}
+    else if(  ub->cmd ==  6)
+        {test_3_3(ch_gl,        break_off);}
+    else if(  ub->cmd ==  7)
+        {test_3_4(ch_gl,        break_off);}
+    else if(  ub->cmd ==  8)
+        {test_4_1(ch_gl,        break_off);}
+    else if(  ub->cmd ==  9)
+        {test_4_2(ch_gl,        break_off);}
+    else if(  ub->cmd == 10)
+        {all_test(ch_gl,        break_off);}
+    else if(  ub->cmd == -2)
+        {while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { ;}}
+    else if(  ub->cmd == -1)
+        {while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { ;}}
+    else if(  ub->cmd == -3)
+        { dac_set_i(ub->ch,ub->data_f);}
+    else if(  ub->cmd == -4)
+        { dac_set(ub->ch,ub->dac_bin);}
+    else if(  ub->cmd == -5){
+      adc_get_value_f(ub->ch, TM_142_ADC_FEEDBACK, &tmp_f);
+      printf("ацп %d, ток:%fmA\n",ub->ch,tmp_f);
+    }else if( ub->cmd == -6){
+      printf("boot_update: %d\n",boot_update());
+    }else if( ub->cmd == -7){
+      while(1){
+        uint8_t nb = boot_update_nb();
+        if(nb)
+            {
+              printf("boot_update_nb: %d",nb);
+              break;
+            }
+      }
+    }else if( ub->cmd == -8){
+      render_image(0,30,0,1, &errors_img[ub->dt]); 
+    }else if( ub->cmd == -9){
+      char res  = 0;
+      if(ub->dt == 0)
+          { res = set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_BOT | DIRECT_OUT | DIRECT_ERR);}
+      else if(ub->dt == 1)
+          { res = set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_BOT | INVERTED_OUT | INVERTED_ERR);}
+
+      printf("set_lpa_mode %d: %d",ub->dt,res);
+    }else if( ub->cmd == -10){ //K6 on
+       relay_set(TM_142_RELAY_SENSOR, ub->dt, TM_142_SENSOR_DIG);//K6
+    }else if( ub->cmd == -11){ //K6 off
+       relay_set(TM_142_RELAY_SENSOR, ub->dt, TM_142_SENSOR_ANA);//K6
+    }else if( ub->cmd == -12){
+      relay_init();
+    }
+}
+
+
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
 /**
