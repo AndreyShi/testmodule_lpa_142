@@ -399,6 +399,8 @@ error_lpa test_4_1(const int cm, char break_if_error){
     //-----------------
     HAL_Delay(DELAY_2);
     //-----------------
+    tim_get_delay(ms[0][0], &data[0]); //sometimes we get error 1912 ticks on 1 channel, this test before main tests, avoid problem
+
     for(int c = 0; c < cm; c++)
         { tim_get_delay(ms[0][c], &data[c]);}
 
