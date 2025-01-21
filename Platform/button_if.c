@@ -133,8 +133,13 @@ int btn_task(){
         if(state == BTN_HOLD_1){
           if(btn_context == 0){
               btn_context = 1;
-              all_test_with_display(ch_gl, break_off);//blocking stream
-              btn_context = 2;
+              int res = all_test_with_display(ch_gl, break_off);//blocking stream
+			  if(res == 0)
+                  {btn_context = 2;}
+			  else if (res == 1){
+				btn_context = 0;
+                show_vibor_kanalov();
+			  }
           }elif(btn_context == 1){ //we'll get here while test
 
           }elif(btn_context == 2){ // finish testing
@@ -145,6 +150,13 @@ int btn_task(){
         old_state = state;
     }
 	return 0;
+}
+
+int btn_is_hold(void){
+	int res = 0;
+	if(state == BTN_HOLD_1)
+	    {res = 1;}
+	return res;
 }
 //--------------------------------------------------
 btn_flags button_state(button_id_t btn)/*{{{*/

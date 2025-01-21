@@ -42,4 +42,4 @@ error_lpa test_3d(const int cm, char break_if_error);
 error_lpa test_4a(const int cm, char break_if_error);
 error_lpa test_4b(const int cm, char break_if_error);
 void all_test(const int cm, char break_if_error);
-void all_test_with_display(const int cm, char break_if_error);
+int all_test_with_display(const int cm, char break_if_error);

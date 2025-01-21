@@ -497,7 +497,7 @@ void all_test(const int cm, char break_if_error){
     return;
 }
 
-void all_test_with_display(const int cm, char break_if_error){
+int all_test_with_display(const int cm, char break_if_error){
 
     error_lpa (*cur_test[])(const int,char) = {test_1, test_2, calibration_dacs, test_3a, test_3b, test_3c, test_3d, test_4a, test_4b};
     const int l = sizeof(cur_test)/sizeof(cur_test[0]);
@@ -506,6 +506,8 @@ void all_test_with_display(const int cm, char break_if_error){
 
     stages = 1;
     display_task(0);
+    if(btn_is_hold())
+        { return 1;}
     //-----fw update----
     boot_update(); 
     //------------------
@@ -513,7 +515,8 @@ void all_test_with_display(const int cm, char break_if_error){
     for(int op = 0; op < l; op++){
         stages = 2 + op;
         display_task(0);
-
+        if(btn_is_hold())
+            { return 1;}
         er[op] = cur_test[op](cm,break_if_error);
 
         if(break_if_error == 1){ 
@@ -540,5 +543,5 @@ void all_test_with_display(const int cm, char break_if_error){
     //----relay init---
     relay_init();
     //-----------------
-    return;
+    return 0;
 }
