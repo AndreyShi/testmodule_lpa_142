@@ -420,17 +420,17 @@ void usb_task(usb_packet* ub)
     else if(  ub->cmd ==  3)
         {calibration_dacs(ch_gl,break_off);}
     else if(  ub->cmd ==  4)
-        {test_3_1(ch_gl,        break_off);}
+        {test_3a(ch_gl,        break_off);}
     else if(  ub->cmd ==  5)
-        {test_3_2(ch_gl,        break_off);}
+        {test_3b(ch_gl,        break_off);}
     else if(  ub->cmd ==  6)
-        {test_3_3(ch_gl,        break_off);}
+        {test_3c(ch_gl,        break_off);}
     else if(  ub->cmd ==  7)
-        {test_3_4(ch_gl,        break_off);}
+        {test_3d(ch_gl,        break_off);}
     else if(  ub->cmd ==  8)
-        {test_4_1(ch_gl,        break_off);}
+        {test_4a(ch_gl,        break_off);}
     else if(  ub->cmd ==  9)
-        {test_4_2(ch_gl,        break_off);}
+        {test_4b(ch_gl,        break_off);}
     else if(  ub->cmd == 10)
         {all_test(ch_gl,        break_off);}
     else if(  ub->cmd == -2)

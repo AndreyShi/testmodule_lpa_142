@@ -219,7 +219,6 @@ while(1){
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   uint32_t tmp_tm = 0;
-  uint32_t old_state = 0;
   int images = 0;
 
   while (1)
@@ -228,24 +227,10 @@ while(1){
     usb_parse(&ub);
     usb_task(&ub);
 
-    //button_task(); //ушло в Systick
+    //btn_processing(); //ушло в Systick
+    btn_task();
     display_task(0);
-    if(old_state != state){
-        printf("button_state: %d\n",state);
-        if(state == BTN_HOLD_1){
-          if(btn_context == 0){
-              btn_context = 1;
-              all_test_with_display(ch_gl, break_off);//blocking stream
-              btn_context = 2;
-          }else if(btn_context == 1){ //we'll never get here while test
 
-          }else if(btn_context == 2){ // finish testing
-              btn_context = 0;
-              show_vibor_kanalov();
-          }
-        }
-        old_state = state;
-    }
     if(tmp_tm != htim3.Instance->CNT){
         printf("%d dir:%d\n",htim3.Instance->CNT,htim3.Instance->CR1 & 0x10);
         tmp_tm = htim3.Instance->CNT;

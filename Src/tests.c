@@ -14,6 +14,7 @@
 #include "calibration.h"
 #include "modes.h"
 #include "boot_uart_if.h"
+#include "button_if.h"
 
 //--задержки перед измерениями АЦП
 #define DELAY_BOOT  1000 //1000ms
@@ -207,7 +208,7 @@ error_lpa calibration_dacs(const int cm, char break_if_error){
 Тест 3.1
 нижний ключ
 */
-error_lpa test_3_1(const int cm, char break_if_error){
+error_lpa test_3a(const int cm, char break_if_error){
 
     error_lpa r = {.stage = 3,.flag = {0},.type_er = {0}};
     //----подготовка реле -------------------
@@ -252,7 +253,7 @@ error_lpa test_3_1(const int cm, char break_if_error){
 Тест 3.2
 нижний ключ инверсия
 */
-error_lpa test_3_2(const int cm, char break_if_error){
+error_lpa test_3b(const int cm, char break_if_error){
 
     error_lpa r = {.stage = 4,.flag = {0},.type_er = {0}};
     //----подготовка реле -------------------
@@ -296,7 +297,7 @@ error_lpa test_3_2(const int cm, char break_if_error){
 тест 3.3 
 верхний ключ
 */
-error_lpa test_3_3(const int cm, char break_if_error){
+error_lpa test_3c(const int cm, char break_if_error){
 
     error_lpa r = {.stage = 5,.flag = {0},.type_er = {0}};
     //----подготовка реле -------------------
@@ -340,7 +341,7 @@ error_lpa test_3_3(const int cm, char break_if_error){
 тест 3.4
 верхний ключ инверсия
 */
-error_lpa test_3_4(const int cm, char break_if_error){
+error_lpa test_3d(const int cm, char break_if_error){
 
     error_lpa r = {.stage = 6,.flag = {0},.type_er = {0}};
     //----подготовка реле -------------------
@@ -381,7 +382,7 @@ error_lpa test_3_4(const int cm, char break_if_error){
     return r;
 }
 
-error_lpa test_4_1(const int cm, char break_if_error){
+error_lpa test_4a(const int cm, char break_if_error){
 
     error_lpa r = {.stage = 7,.flag = {0},.type_er = {0}};
     uint16_t data[2] = {0};
@@ -420,7 +421,7 @@ error_lpa test_4_1(const int cm, char break_if_error){
     return r;
 }
 
-error_lpa test_4_2(const int cm, char break_if_error){
+error_lpa test_4b(const int cm, char break_if_error){
 
     error_lpa r = {.stage = 8,.flag = {0},.type_er = {0}};
     uint16_t data[2] = {0};
@@ -463,7 +464,7 @@ char break_if_error - 0 - не останавливаемся по ошибке,
 */
 void all_test(const int cm, char break_if_error){
 
-    error_lpa (*cur_test[])(const int,char) = {test_1, test_2, calibration_dacs, test_3_1, test_3_2, test_3_3, test_3_4, test_4_1, test_4_2};
+    error_lpa (*cur_test[])(const int,char) = {test_1, test_2, calibration_dacs, test_3a, test_3b, test_3c, test_3d, test_4a, test_4b};
     const int l = sizeof(cur_test)/sizeof(cur_test[0]);
     error_lpa er[9] = {0};
 
@@ -498,7 +499,7 @@ void all_test(const int cm, char break_if_error){
 
 void all_test_with_display(const int cm, char break_if_error){
 
-    error_lpa (*cur_test[])(const int,char) = {test_1, test_2, calibration_dacs, test_3_1, test_3_2, test_3_3, test_3_4, test_4_1, test_4_2};
+    error_lpa (*cur_test[])(const int,char) = {test_1, test_2, calibration_dacs, test_3a, test_3b, test_3c, test_3d, test_4a, test_4b};
     const int l = sizeof(cur_test)/sizeof(cur_test[0]);
     error_lpa er[9] = {0};
     char flag = 0;

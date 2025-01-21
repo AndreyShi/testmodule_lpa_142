@@ -33,8 +33,9 @@ extern "C" {
 #endif
 
 extern void button_init(void);
-extern void button_task(void);
+extern void btn_processing(void);
 extern btn_flags button_state(button_id_t btn);
+extern int btn_task(void);
 
 #ifdef __cplusplus
 }

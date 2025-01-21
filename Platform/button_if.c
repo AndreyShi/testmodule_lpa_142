@@ -7,13 +7,18 @@
 #include "button_if.h"
 
 #include "app_export.h"
-
+#include "tests.h"
+#include "display.h"
+#include <stdio.h>
 //--------------------------------------------------
 const uint32_t debounce_to = 100;
 const uint32_t hold_to = 1000;
 
 //--------------------------------------------------
 enum _button_state state;
+//----переменная "защелка" для фильтрации переходного состояния кнопки
+static enum _button_state old_state;
+//--------------------------------------------------------------------
 /*}}}*/
 //--------------------------------------------------
 static btn_flags flags[3];
@@ -39,7 +44,7 @@ else
 /*
 this function takes 0.000000708 S
 */
-void button_task()/*{{{*/
+void btn_processing()/*{{{*/
 {
 uint8_t idx;
 static uint32_t timer = 0;
@@ -121,6 +126,26 @@ switch(state)/*{{{*/
 	break;
     };/*}}}*/
 }/*}}}*/
+
+int btn_task(){
+	if(old_state != state){
+        printf("button_state: %d\n",state);
+        if(state == BTN_HOLD_1){
+          if(btn_context == 0){
+              btn_context = 1;
+              all_test_with_display(ch_gl, break_off);//blocking stream
+              btn_context = 2;
+          }else if(btn_context == 1){ //we'll get here while test
+
+          }else if(btn_context == 2){ // finish testing
+              btn_context = 0;
+              show_vibor_kanalov();
+          }
+        }
+        old_state = state;
+    }
+	return 0;
+}
 //--------------------------------------------------
 btn_flags button_state(button_id_t btn)/*{{{*/
 {
