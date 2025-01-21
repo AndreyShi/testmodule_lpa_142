@@ -137,6 +137,7 @@ int btn_task(){
 			  if(res == 0)
                   {btn_context = 2;}
 			  else if (res == 1){
+				relay_init();
 				btn_context = 0;
                 show_vibor_kanalov();
 			  }
