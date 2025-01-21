@@ -506,7 +506,7 @@ int all_test_with_display(const int cm, char break_if_error){
 
     stages = 1;
     display_task(0);
-    if(btn_is_hold())
+    if(btn_break_is_pending == 1)
         { return 1;}
     //-----fw update----
     boot_update(); 
@@ -515,7 +515,7 @@ int all_test_with_display(const int cm, char break_if_error){
     for(int op = 0; op < l; op++){
         stages = 2 + op;
         display_task(0);
-        if(btn_is_hold())
+        if(btn_break_is_pending == 1)
             { return 1;}
         er[op] = cur_test[op](cm,break_if_error);
 
@@ -539,9 +539,5 @@ int all_test_with_display(const int cm, char break_if_error){
         stages = 12;
         display_task(0);
     }
-
-    //----relay init---
-    relay_init();
-    //-----------------
     return 0;
 }

@@ -219,7 +219,6 @@ while(1){
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   uint32_t tmp_tm = 0;
-  int images = 0;
 
   while (1)
   {
@@ -234,7 +233,7 @@ while(1){
     if(tmp_tm != htim3.Instance->CNT){
         printf("%d dir:%d\n",htim3.Instance->CNT,htim3.Instance->CR1 & 0x10);
         tmp_tm = htim3.Instance->CNT;
-        if (btn_context == 0){
+        if (btn_context == c_ChooseCh){
             if(ch_gl == 2)
                {ch_gl = 1;}
             else if(ch_gl == 1)

@@ -10,10 +10,11 @@
 #include "tests.h"
 #include "display.h"
 #include <stdio.h>
+#include "relay_if.h"
 //--------------------------------------------------
 const uint32_t debounce_to = 100;
 const uint32_t hold_to = 1000;
-
+int btn_break_is_pending;
 //--------------------------------------------------
 enum _button_state state;
 //----переменная "защелка" для фильтрации переходного состояния кнопки
@@ -125,26 +126,34 @@ switch(state)/*{{{*/
 	    { state = BTN_PUSHED; }
 	break;
     };/*}}}*/
+
+	if(btn_context == c_Testing){
+		if(state == BTN_HOLD_1){
+			btn_break_is_pending = 1;
+		}
+	}
 }/*}}}*/
 #define elif else if
 int btn_task(){
 	if(old_state != state){
         printf("button_state: %d\n",state);
         if(state == BTN_HOLD_1){
-          if(btn_context == 0){
-              btn_context = 1;
+          if(btn_context == c_ChooseCh){
+			  while(state != BTN_RELEASED) {;} //ждем отпускания кнопки
+			  btn_context = c_Testing;
+			  btn_break_is_pending = 0;
               int res = all_test_with_display(ch_gl, break_off);//blocking stream
+			  relay_init();
 			  if(res == 0)
-                  {btn_context = 2;}
-			  else if (res == 1){
-				relay_init();
-				btn_context = 0;
+                  {btn_context = c_Finish;}
+			  elif(res == 1){
+				btn_context = c_ChooseCh;
                 show_vibor_kanalov();
 			  }
-          }elif(btn_context == 1){ //we'll get here while test
+          }elif(btn_context == c_Testing){ //we'll get here while test
 
-          }elif(btn_context == 2){ // finish testing
-              btn_context = 0;
+          }elif(btn_context == c_Finish){ // finish c_Finish
+              btn_context = c_ChooseCh;
               show_vibor_kanalov();
           }
         }

@@ -27,6 +27,11 @@ enum _button_state {/*{{{*/
 extern enum _button_state state;
 extern int btn_context;
 extern int ch_gl; 
+extern int btn_break_is_pending;
+
+#define c_ChooseCh 0
+#define c_Testing  1
+#define c_Finish   2
 //--------------------------------------------------
 #ifdef __cplusplus
 extern "C" {
