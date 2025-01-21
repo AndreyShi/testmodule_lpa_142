@@ -126,7 +126,7 @@ switch(state)/*{{{*/
 	break;
     };/*}}}*/
 }/*}}}*/
-
+#define elif else if
 int btn_task(){
 	if(old_state != state){
         printf("button_state: %d\n",state);
@@ -135,9 +135,9 @@ int btn_task(){
               btn_context = 1;
               all_test_with_display(ch_gl, break_off);//blocking stream
               btn_context = 2;
-          }else if(btn_context == 1){ //we'll get here while test
+          }elif(btn_context == 1){ //we'll get here while test
 
-          }else if(btn_context == 2){ // finish testing
+          }elif(btn_context == 2){ // finish testing
               btn_context = 0;
               show_vibor_kanalov();
           }
