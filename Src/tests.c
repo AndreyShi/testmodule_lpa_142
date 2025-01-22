@@ -56,10 +56,10 @@ float tmp_f;
 uint16_t tmp;
 int ms[3][2] = {{CH_1,CH_2},{12,76},{20,80}}; // {{канал}{x координата состояний}{x координата ошибки}}
 float levels[8] = {LEVEL_1,LEVEL_2,LEVEL_3,LEVEL_4,LEVEL_5,LEVEL_6,LEVEL_7,LEVEL_8};
-int se31[8][2] = {{0,1},{0,0},{1,0},{1,1},{1,1},{1,0},{0,0},{0,1}}; //{in_input,in_error}
-int se32[8][2] = {{1,0},{1,1},{0,1},{0,0},{0,0},{0,1},{1,1},{1,0}}; //{in_input,in_error}
-int se33[8][2] = {{1,0},{1,1},{0,1},{0,0},{0,0},{0,1},{1,1},{1,0}}; //{in_input,in_error}
-int se34[8][2] = {{0,1},{0,0},{1,0},{1,1},{1,1},{1,0},{0,0},{0,1}}; //{in_input,in_error}
+int se3a[8][2] = {{0,1},{0,0},{1,0},{1,1},{1,1},{1,0},{0,0},{0,1}}; //{in_input,in_error}
+int se3b[8][2] = {{1,0},{1,1},{0,1},{0,0},{0,0},{0,1},{1,1},{1,0}}; //{in_input,in_error}
+int se3c[8][2] = {{1,0},{1,1},{0,1},{0,0},{0,0},{0,1},{1,1},{1,0}}; //{in_input,in_error}
+int se3d[8][2] = {{0,1},{0,0},{1,0},{1,1},{1,1},{1,0},{0,0},{0,1}}; //{in_input,in_error}
 char* sr  [8][1] = {{"Д\n"},{"Е\n"},{"Е\n"},{"Ж\n"},{"Ж\n"},{"Е\n"},{"Е\n"},{"Д\n"}};
 uint8_t sr_a [8] = {  _e   ,  _f   ,  _f   ,  _g   ,  _g   ,  _f   ,  _f   ,  _e};
 //char* sr_a[8][1] = {{"e\n"},{"f\n"},{"f\n"},{"g\n"},{"g\n"},{"f\n"},{"f\n"},{"e\n"}};
@@ -235,7 +235,7 @@ error_lpa test_3a(const int cm, char break_if_error){
 
             printf("3.1 канал %d ток %d %2.3f выход \"работа\": %d, \"ошибка\": %d ",ms[0][c],l,levels[l],in_input,in_error);
 
-            if(in_input == se31[l][0] && in_error == se31[l][1])
+            if(in_input == se3a[l][0] && in_error == se3a[l][1])
                 { printf("ок\n");}
             else
                 { 
@@ -280,7 +280,7 @@ error_lpa test_3b(const int cm, char break_if_error){
 
             printf("3.2 канал %d ток %d %2.3f выход \"работа\": %d, \"ошибка\": %d ",ms[0][c],l,levels[l],in_input,in_error);
 
-            if(in_input == se32[l][0] && in_error == se32[l][1])
+            if(in_input == se3b[l][0] && in_error == se3b[l][1])
                 { printf("ок\n");}
             else
                 { 
@@ -324,7 +324,7 @@ error_lpa test_3c(const int cm, char break_if_error){
 
             printf("3.3 канал %d ток %d %2.3f выход \"работа\": %d, \"ошибка\": %d ",ms[0][c],l,levels[l],in_input,in_error);
 
-            if(in_input == se33[l][0] && in_error == se33[l][1])
+            if(in_input == se3c[l][0] && in_error == se3c[l][1])
                 { printf("ок\n");}
             else
                 { 
@@ -368,7 +368,7 @@ error_lpa test_3d(const int cm, char break_if_error){
 
             printf("3.4 канал %d ток %d %2.3f выход \"работа\": %d, \"ошибка\": %d ",ms[0][c],l,levels[l],in_input,in_error);
 
-            if(in_input == se34[l][0] && in_error == se34[l][1])
+            if(in_input == se3d[l][0] && in_error == se3d[l][1])
                 { printf("ок\n");}
             else
                 { 
