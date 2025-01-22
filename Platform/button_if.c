@@ -16,7 +16,7 @@ const uint32_t debounce_to = 100;
 const uint32_t hold_to = 1000;
 int btn_break_is_pending;
 //--------------------------------------------------
-enum _button_state state;
+volatile enum _button_state state;
 //----переменная "защелка" для фильтрации переходного состояния кнопки
 static enum _button_state old_state;
 //--------------------------------------------------------------------
@@ -138,8 +138,10 @@ int btn_task(){
 	if(old_state != state){
         printf("button_state: %d\n",state);
         if(state == BTN_HOLD_1){
+          //--совершаем дальнейшие инструкции по отпусканию кнопки--
+		  while(state != BTN_RELEASED) {;} //в такой конструкции state должен быть с volatile
+          //--------------------------------------------------------
           if(btn_context == c_ChooseCh){
-			  while(state != BTN_RELEASED) {;} //ждем отпускания кнопки
 			  btn_context = c_Testing;
 			  btn_break_is_pending = 0;
               int res = all_test_with_display(ch_gl, break_off);//blocking stream
