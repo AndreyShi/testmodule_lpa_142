@@ -219,7 +219,7 @@ while(1){
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   uint32_t tmp_tm = 0;
-
+  uint32_t tm_filter = HAL_GetTick();
   while (1)
   {
     usb_packet ub = {.ch = 0,.cmd = 0,.dac_bin = 0,.data_f = 0.0F}; //инициализация пакета usb
@@ -233,11 +233,13 @@ while(1){
     if(tmp_tm != htim3.Instance->CNT){
         printf("%d dir:%d\n",htim3.Instance->CNT,htim3.Instance->CR1 & 0x10);
         tmp_tm = htim3.Instance->CNT;
-        if (btn_context == c_ChooseCh){
+
+        if (btn_context == c_ChooseCh && HAL_GetTick() - tm_filter > 250){
             if(ch_gl == 2)
                {ch_gl = 1;}
             else if(ch_gl == 1)
                {ch_gl = 2;}
+            tm_filter = HAL_GetTick();
         }
     }
     /* USER CODE END WHILE */
