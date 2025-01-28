@@ -5,10 +5,23 @@
 
 #include "app_config.h"
 #include "tim.h"
+#include "button_if.h"
+#include <stdio.h>
+#include "main.h"
+#include "tim.h"
 
 //--------------------------------------------------
 uint16_t old_value;
-
+int ch_gl       = 2; // 2 - два канала,  1 - канал
+//-----переменная "защелка" для фильтрации переходных состояний энкодера----------
+static uint32_t enc_cnt;
+//--------------------------------------------------------------------------------
+//-----переменная "защелка" для фильтрации энкодера по времени--------------------
+static uint32_t enc_timer;
+//--------------------------------------------------------------------------------
+//------переменные только для чтения из других модулей----------------------------
+extern const int btn_context;
+//--------------------------------------------------------------------------------
 volatile uint8_t  enc_idx;
 volatile uint16_t enc_values[128];
 //--------------------------------------------------
@@ -64,3 +77,24 @@ enc_callback(dir, value);
 __weak void enc_callback(uint8_t dir, uint16_t value)
 { }
 //--------------------------------------------------
+
+void enc_processing(void){
+
+    //enc_timer = HAL_GetTick(); // проверить время первого запуска
+
+    if(enc_cnt != htim3.Instance->CNT){
+        printf("%d dir:%d\n",htim3.Instance->CNT,htim3.Instance->CR1 & 0x10);
+
+        if (btn_context == c_ChooseCh){
+            if(HAL_GetTick() - enc_timer > 250){
+              if(ch_gl == 2)
+                {ch_gl = 1;}
+              else if(ch_gl == 1)
+                {ch_gl = 2;}
+              enc_timer = HAL_GetTick();
+            }
+        }
+        
+        enc_cnt = htim3.Instance->CNT;
+    }
+}

@@ -35,6 +35,9 @@
 uint8_t usb_trans_ok;
 uint8_t usb_com_open;
 static uint8_t usb_recieve_ok;
+//------переменные только для чтения из других модулей------------
+extern const int     ch_gl; 
+//----------------------------------------------------------------
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/

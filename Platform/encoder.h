@@ -18,6 +18,7 @@ extern uint16_t encoder_position(void);
 
 extern void enc_tim_isr(void);
 extern void enc_callback(uint8_t dir, uint16_t value);
+extern void enc_processing(void);
 
 #ifdef __cplusplus
 };
