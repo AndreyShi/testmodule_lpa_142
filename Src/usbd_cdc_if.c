@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_cdc_if.h"
+
 /* USER CODE BEGIN INCLUDE */
 #include "gpio_if.h"
 #include "tests.h"
@@ -32,7 +33,7 @@
 #include "button_if.h"
 #include "resources.h"
 #include "dac_if.h"
-uint8_t usb_trans_ok;
+static uint8_t usb_trans_ok;
 uint8_t usb_com_open;
 static uint8_t usb_recieve_ok;
 //------переменные только для чтения из других модулей------------
@@ -309,6 +310,22 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
   }
   USBD_CDC_SetTxBuffer(&hUsbDeviceFS, Buf, Len);
   result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
+  /*
+  Символ новый строки в определенных случаях теряется при выводе, к примеру:
+  printf("Hello\n");   - символ новый строки "\n" потеряется
+  printf("Hello\n",1); - вот так не потеряется
+
+  UPD: проверка выполнена
+  при printf("Hello\n") вызывается _write с len 5 "Hello", а затем 
+  сразу _write с len 1 "\n", usb cdc не успевает обработать вызовы _write
+  (надо подождать пока придет прерывание об отправленном пакете usb cdc) 
+  поэтому ждем тут отправки сообщения in while
+  */
+  uint32_t ticks = HAL_GetTick();
+  while(usb_com_open && !usb_trans_ok){
+    if(HAL_GetTick() - ticks > 5)
+        {break;}
+  }
   /* USER CODE END 7 */
   return result;
 }
