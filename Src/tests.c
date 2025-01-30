@@ -23,12 +23,12 @@
 #define DAC_TIMEOUT 1000 //1s
 
 ///старые пороги
-//---уровни используемые в предыдущем стенде
+//---уровни используемые в предыдущем стенде    
 #define LEVEL_1 0.1F  //0x00, 0x00, 0x00, 0x00  //0.0F
 #define LEVEL_2 0.4F  //0x3F, 0x00, 0x00, 0x00  //0.5F
 #define LEVEL_3 2.0F  //0x40, 0x00, 0x00, 0x00  //2.0F
-#define LEVEL_4 6.35F //0x40, 0xCB, 0x33, 0x33  //6.35F
-#define LEVEL_5 7.00F //0x40, 0xE0, 0x00, 0x00  //7.00F
+#define LEVEL_4 6.80F //0x40, 0xCB, 0x33, 0x33  //6.35F + 0.6F
+#define LEVEL_5 7.50F //0x40, 0xE0, 0x00, 0x00  //7.00F + 0.5F
 #define LEVEL_6 5.00F //0x40, 0xA0, 0x00, 0x00  //5.00F
 #define LEVEL_7 1.3F  //0x3F, 0xA6, 0x66, 0x66  //1.3F
 #define LEVEL_8 0.2F  //0x3E, 0x4C, 0xCC, 0xCD  //0.2F
@@ -55,11 +55,11 @@
 float tmp_f;
 uint16_t tmp;
 int ms[3][2] = {{CH_1,CH_2},{12,76},{20,80}}; // {{канал}{x координата состояний}{x координата ошибки}}
-float levels[8] = {LEVEL_1,LEVEL_2,LEVEL_3,LEVEL_4,LEVEL_5,LEVEL_6,LEVEL_7,LEVEL_8};
-int se3a[8][2] = {{0,1},{0,0},{1,0},{1,1},{1,1},{1,0},{0,0},{0,1}}; //{in_input,in_error}
-int se3b[8][2] = {{1,0},{1,1},{0,1},{0,0},{0,0},{0,1},{1,1},{1,0}}; //{in_input,in_error}
-int se3c[8][2] = {{1,0},{1,1},{0,1},{0,0},{0,0},{0,1},{1,1},{1,0}}; //{in_input,in_error}
-int se3d[8][2] = {{0,1},{0,0},{1,0},{1,1},{1,1},{1,0},{0,0},{0,1}}; //{in_input,in_error}
+float levels[8] = { LEVEL_1, LEVEL_2,LEVEL_3,LEVEL_4,LEVEL_5,LEVEL_6,LEVEL_7,LEVEL_8};
+int se3a[8][2] =    {{0,1},  {0,0},  {1,0},  {1,1},  {1,1},  {1,0},  {0,0},  {0,1}}; //{in_input,in_error}
+int se3b[8][2] =    {{1,0},  {1,1},  {0,1},  {0,0},  {0,0},  {0,1},  {1,1},  {1,0}}; //{in_input,in_error}
+int se3c[8][2] =    {{1,0},  {1,1},  {0,1},  {0,0},  {0,0},  {0,1},  {1,1},  {1,0}}; //{in_input,in_error}
+int se3d[8][2] =    {{0,1},  {0,0},  {1,0},  {1,1},  {1,1},  {1,0},  {0,0},  {0,1}}; //{in_input,in_error}
 char* sr  [8][1] = {{"Д\n"},{"Е\n"},{"Е\n"},{"Ж\n"},{"Ж\n"},{"Е\n"},{"Е\n"},{"Д\n"}};
 uint8_t sr_a [8] = {  _e   ,  _f   ,  _f   ,  _g   ,  _g   ,  _f   ,  _f   ,  _e};
 //char* sr_a[8][1] = {{"e\n"},{"f\n"},{"f\n"},{"g\n"},{"g\n"},{"f\n"},{"f\n"},{"e\n"}};
@@ -211,6 +211,7 @@ error_lpa calibration_dacs(const int cm, char break_if_error){
 error_lpa test_3a(const int cm, char break_if_error){
 
     error_lpa r = {.stage = 3,.flag = {0},.type_er = {0}};
+    float tmpf = 0.0F;
     //----подготовка реле -------------------
     for(int c = 0; c < cm; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
@@ -233,7 +234,9 @@ error_lpa test_3a(const int cm, char break_if_error){
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
             input_read(TM_142_INPUT_ERROR, ms[0][c], &in_error);
 
-            printf("3.1 канал %d ток %d %2.3f выход \"работа\": %d, \"ошибка\": %d ",ms[0][c],l,levels[l],in_input,in_error);
+            adc_get_value_f(ms[0][c], TM_142_ADC_FEEDBACK, &tmpf);
+
+            printf("3.1 канал %d ток %d %2.3f real: %2.3f выход \"работа\": %d, \"ошибка\": %d ",ms[0][c],l,levels[l],tmpf,in_input,in_error);
 
             if(in_input == se3a[l][0] && in_error == se3a[l][1])
                 { printf("ок\n");}
@@ -256,6 +259,7 @@ error_lpa test_3a(const int cm, char break_if_error){
 error_lpa test_3b(const int cm, char break_if_error){
 
     error_lpa r = {.stage = 4,.flag = {0},.type_er = {0}};
+    float tmpf = 0.0F;
     //----подготовка реле -------------------
     for(int c = 0; c < cm; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
@@ -278,7 +282,9 @@ error_lpa test_3b(const int cm, char break_if_error){
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
             input_read(TM_142_INPUT_ERROR, ms[0][c], &in_error);
 
-            printf("3.2 канал %d ток %d %2.3f выход \"работа\": %d, \"ошибка\": %d ",ms[0][c],l,levels[l],in_input,in_error);
+            adc_get_value_f(ms[0][c], TM_142_ADC_FEEDBACK, &tmpf);
+
+            printf("3.2 канал %d ток %d %2.3f real: %2.3f выход \"работа\": %d, \"ошибка\": %d ",ms[0][c],l,levels[l],tmpf,in_input,in_error);
 
             if(in_input == se3b[l][0] && in_error == se3b[l][1])
                 { printf("ок\n");}
@@ -300,6 +306,7 @@ error_lpa test_3b(const int cm, char break_if_error){
 error_lpa test_3c(const int cm, char break_if_error){
 
     error_lpa r = {.stage = 5,.flag = {0},.type_er = {0}};
+    float tmpf = 0.0F;
     //----подготовка реле -------------------
     for(int c = 0; c < cm; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
@@ -322,7 +329,9 @@ error_lpa test_3c(const int cm, char break_if_error){
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
             input_read(TM_142_INPUT_ERROR, ms[0][c], &in_error);
 
-            printf("3.3 канал %d ток %d %2.3f выход \"работа\": %d, \"ошибка\": %d ",ms[0][c],l,levels[l],in_input,in_error);
+            adc_get_value_f(ms[0][c], TM_142_ADC_FEEDBACK, &tmpf);
+
+            printf("3.3 канал %d ток %d %2.3f real: %2.3f выход \"работа\": %d, \"ошибка\": %d ",ms[0][c],l,levels[l],tmpf,in_input,in_error);
 
             if(in_input == se3c[l][0] && in_error == se3c[l][1])
                 { printf("ок\n");}
@@ -344,6 +353,7 @@ error_lpa test_3c(const int cm, char break_if_error){
 error_lpa test_3d(const int cm, char break_if_error){
 
     error_lpa r = {.stage = 6,.flag = {0},.type_er = {0}};
+    float tmpf = 0.0F;
     //----подготовка реле -------------------
     for(int c = 0; c < cm; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
@@ -366,7 +376,9 @@ error_lpa test_3d(const int cm, char break_if_error){
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
             input_read(TM_142_INPUT_ERROR, ms[0][c], &in_error);
 
-            printf("3.4 канал %d ток %d %2.3f выход \"работа\": %d, \"ошибка\": %d ",ms[0][c],l,levels[l],in_input,in_error);
+            adc_get_value_f(ms[0][c], TM_142_ADC_FEEDBACK, &tmpf);
+
+            printf("3.4 канал %d ток %d %2.3f real: %2.3f выход \"работа\": %d, \"ошибка\": %d ",ms[0][c],l,levels[l],tmpf,in_input,in_error);
 
             if(in_input == se3d[l][0] && in_error == se3d[l][1])
                 { printf("ок\n");}
@@ -400,8 +412,8 @@ error_lpa test_4a(const int cm, char break_if_error){
     //-----------------
     HAL_Delay(DELAY_2);
     //-----------------
-    tim_get_delay(ms[0][0], &data[0]); //sometimes we get error 1912 ticks on 1 channel, this test before main tests, avoid problem
-
+    //tim_get_delay(ms[0][0], &data[0]); //sometimes we get error 1912 ticks on 1 channel, this test before main tests, avoid problem
+    //30.01.25 куда делись ошибка 1912?
     for(int c = 0; c < cm; c++)
         { tim_get_delay(ms[0][c], &data[c]);}
 
@@ -439,6 +451,8 @@ error_lpa test_4b(const int cm, char break_if_error){
     //-----------------
     HAL_Delay(DELAY_2);
     //-----------------
+    //tim_get_delay(ms[0][0], &data[0]); //sometimes we get error 1912 ticks on 1 channel, this test before main tests, avoid problem
+    //30.01.25 куда делись ошибка 1912?
     for(int c = 0; c < cm; c++)
         { tim_get_delay(ms[0][c], &data[c]);}
         
@@ -447,7 +461,7 @@ error_lpa test_4b(const int cm, char break_if_error){
         printf("4.2 канал %d, задержка: %d ",ms[0][c], data[c]);
         if(data[c] > 360)
             { 
-                printf("П\n");
+                printf("П\n"); //иногда вылезает ошибка с задержкой 1912, надо разбираться
                 set_error(&r, c, _p);
                 if(break_if_error == 1)
                     {break;}
