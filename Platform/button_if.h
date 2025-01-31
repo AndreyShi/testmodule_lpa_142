@@ -27,9 +27,10 @@ enum _button_state {/*{{{*/
 extern volatile enum _button_state state;
 extern int btn_break_is_pending;
 
-#define c_ChooseCh 0
-#define c_Testing  1
-#define c_Finish   2
+#define c_ChooseCh    0
+#define c_Testing     1
+#define c_Finish      2
+#define c_Diagnostics 3
 //--------------------------------------------------
 #ifdef __cplusplus
 extern "C" {

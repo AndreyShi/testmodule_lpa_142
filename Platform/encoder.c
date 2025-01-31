@@ -9,7 +9,10 @@
 #include <stdio.h>
 #include "main.h"
 #include "tim.h"
-
+#include "dac_if.h"
+#include "relay_if.h"
+#include "adc_if.h"
+#include "gpio_if.h"
 //--------------------------------------------------
 uint16_t old_value;
 int ch_gl       = 2; // 2 - два канала,  1 - канал
@@ -21,6 +24,9 @@ static uint32_t enc_timer;
 //--------------------------------------------------------------------------------
 //------переменные только для чтения из других модулей----------------------------
 extern const int btn_context;
+//--------------------------------------------------------------------------------
+//------переменная для хранения промежуточных значение с энкодера для диагностики цапа
+uint32_t enc_cnt_diag;
 //--------------------------------------------------------------------------------
 volatile uint8_t  enc_idx;
 volatile uint16_t enc_values[128];
@@ -83,7 +89,7 @@ void enc_processing(void){
     //enc_timer = HAL_GetTick(); // проверить время первого запуска
 
     if(enc_cnt != htim3.Instance->CNT){
-        printf("%d dir:%d\n",htim3.Instance->CNT,htim3.Instance->CR1 & 0x10);
+        //printf("%d dir:%d\n",htim3.Instance->CNT,htim3.Instance->CR1 & 0x10);
 
         if (btn_context == c_ChooseCh){
             if(HAL_GetTick() - enc_timer > 250){
@@ -91,6 +97,32 @@ void enc_processing(void){
                 {ch_gl = 1;}
               else if(ch_gl == 1)
                 {ch_gl = 2;}
+              enc_timer = HAL_GetTick();
+            }
+        }else if (btn_context == c_Diagnostics){
+            if(HAL_GetTick() - enc_timer > 250){
+              float tmp_f = 0.0F;
+
+              if(htim3.Instance->CR1 & 0x10)
+                  { enc_cnt_diag--;}
+              else
+                  { enc_cnt_diag++;}
+
+              if(enc_cnt_diag > 70)
+                  {enc_cnt_diag = 70;}
+
+              dac_set_i(ch_gl, enc_cnt_diag * 0.1F);
+              //-----------------
+              HAL_Delay(400);
+              //-----------------
+              state_t in_input,in_error;
+              input_read(TM_142_INPUT_INPUT, ch_gl, &in_input);
+              input_read(TM_142_INPUT_ERROR, ch_gl, &in_error);
+
+              adc_get_value_f(ch_gl, TM_142_ADC_FEEDBACK, &tmp_f);
+
+              printf("%d. set: %2.3f, real: %2.3f, input: %d, error %d\n", enc_cnt_diag, enc_cnt_diag * 0.1F, tmp_f, in_input, in_error);
+
               enc_timer = HAL_GetTick();
             }
         }

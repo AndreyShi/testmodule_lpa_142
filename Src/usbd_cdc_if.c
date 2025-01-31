@@ -39,6 +39,9 @@ static uint8_t usb_recieve_ok;
 //------переменные только для чтения из других модулей------------
 extern const int     ch_gl; 
 //----------------------------------------------------------------
+//------переменные только для чтения/записи из других модулей-----
+extern int btn_context;
+//----------------------------------------------------------------
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -390,15 +393,21 @@ void usb_parse(usb_packet* pk)
          pk->cmd = -3;
          pk->ch = atoi((const char*)&UserRxBufferFS[7]);
          pk->data_f = atof((const char*)&UserRxBufferFS[9]);
+         if(pk->ch != 1 && pk->ch != 2)
+             {printf("ошибка выбора канала! первый: 1, второй: 2\n");}
     }else if(strncmp((const char*)UserRxBufferFS,"цап",3) == 0){            //[строка:цап][пробел][int:канал][пробел][bin:данные]
          pk->cmd = -4;
          pk->ch = atoi((const char*)&UserRxBufferFS[7]);
          pk->dac_bin = atoi((const char*)&UserRxBufferFS[9]);
+         if(pk->ch != 1 && pk->ch != 2)
+             {printf("ошибка выбора канала! первый: 1, второй: 2\n");}
     }else if(strcmp((const char*)UserRxBufferFS, "калибровка цап") == 0){   //[строка:калибровка цап]
          pk->cmd =  3;
     }else if(strncmp((const char*)UserRxBufferFS,"ацп ток",7) == 0){        //[строка:ацп ток][пробел][int:канал]
          pk->cmd = -5;
          pk->ch = atoi((const char*)&UserRxBufferFS[14]);
+         if(pk->ch != 1 && pk->ch != 2)
+             {printf("ошибка выбора канала! первый: 1, второй: 2\n");}
     }else if(strcmp((const char*)UserRxBufferFS, "boot") == 0){             //[строка:boot]
          pk->cmd = -6;
     }else if(strcmp((const char*)UserRxBufferFS, "boot_nb") == 0){          //[строка:boot_nb]
@@ -421,6 +430,15 @@ void usb_parse(usb_packet* pk)
        pk->dt = atoi((const char*)&UserRxBufferFS[7]);
     }else if(strcmp((const char*)UserRxBufferFS, "relay init") == 0){
       pk->cmd = -12;
+    }else if(strncmp((const char*)UserRxBufferFS, "диагностика",11) == 0){    //[строка:диагностика][пробел][int:канал]
+      pk->cmd = -13;
+      pk->ch = atoi((const char*)&UserRxBufferFS[12]);
+      if(pk->ch != 1 && pk->ch != 2)
+        {printf("ошибка выбора канала! первый: 1, второй: 2\n");}
+    }else if(strcmp((const char*)UserRxBufferFS, "ручная диагностика вкл") == 0){
+        btn_context = c_Diagnostics;
+    }else if(strcmp((const char*)UserRxBufferFS, "ручная диагностика выкл") == 0){
+        btn_context = c_ChooseCh;
     }
 
     memset(UserRxBufferFS,0,APP_RX_DATA_SIZE);//обнуляем буфер (иначе накладываются предыдущие команды)
@@ -491,6 +509,38 @@ void usb_task(usb_packet* ub)
        relay_set(TM_142_RELAY_SENSOR, ub->dt, TM_142_SENSOR_ANA);//K6
     }else if( ub->cmd == -12){
       relay_init();
+    }else if( ub->cmd == -13){
+        float tmp_f = 0.0F;
+
+        printf("UP\n");
+        for(int i = 0; i < (int)(7.100F/0.1F); i++){
+            dac_set_i(ub->ch, i * 0.1F);
+            //-----------------
+            HAL_Delay(400);
+            //-----------------
+            state_t in_input,in_error;
+            input_read(TM_142_INPUT_INPUT, ub->ch, &in_input);
+            input_read(TM_142_INPUT_ERROR, ub->ch, &in_error);
+
+            adc_get_value_f(ub->ch, TM_142_ADC_FEEDBACK, &tmp_f);
+
+            printf("%d. set: %2.3f, real: %2.3f, input: %d, error %d\n", i, i * 0.1F, tmp_f, in_input, in_error);
+        }
+
+        printf("DOWN\n");
+        for(int i = 69; i > -1; i--){
+            dac_set_i(ub->ch, i * 0.1F);
+            //-----------------
+            HAL_Delay(400);
+            //-----------------
+            state_t in_input,in_error;
+            input_read(TM_142_INPUT_INPUT, ub->ch, &in_input);
+            input_read(TM_142_INPUT_ERROR, ub->ch, &in_error);
+
+            adc_get_value_f(ub->ch, TM_142_ADC_FEEDBACK, &tmp_f);
+
+            printf("%d. set: %2.3f, real: %2.3f, input: %d, error %d\n", i, i * 0.1F, tmp_f, in_input, in_error);
+        }
     }
 }
 
