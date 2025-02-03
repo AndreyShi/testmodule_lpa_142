@@ -282,6 +282,13 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HardFault_Handler(void)/*{{{*/
+{
+render_image(0, 0, true,1, &hf_img);
+
+while(1) { };
+}/*}}}*/
+
 int _write(int file, char *ptr, int len)
 {
     (void)file;

@@ -100,16 +100,16 @@ void enc_processing(void){
               enc_timer = HAL_GetTick();
             }
         }else if (btn_context == c_Diagnostics){
-            if(HAL_GetTick() - enc_timer > 250){
+            if(HAL_GetTick() - enc_timer > 100){
               float tmp_f = 0.0F;
 
               if(htim3.Instance->CR1 & 0x10)
-                  { enc_cnt_diag--;}
-              else
                   { enc_cnt_diag++;}
+              else
+                  { enc_cnt_diag--;}
 
               if(enc_cnt_diag > 70)
-                  {enc_cnt_diag = 70;}
+                  {enc_cnt_diag = 0;}
 
               dac_set_i(ch_gl, enc_cnt_diag * 0.1F);
               //-----------------

@@ -40,7 +40,8 @@ static uint8_t usb_recieve_ok;
 extern const int     ch_gl; 
 //----------------------------------------------------------------
 //------переменные только для чтения/записи из других модулей-----
-extern int btn_context;
+extern int       btn_context;
+extern uint32_t enc_cnt_diag;
 //----------------------------------------------------------------
 /* USER CODE END INCLUDE */
 
@@ -285,7 +286,7 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
-  USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+  //USBD_CDC_ReceivePacket(&hUsbDeviceFS);
   usb_recieve_ok = 1;
   return (USBD_OK);
   /* USER CODE END 6 */
@@ -363,9 +364,6 @@ void usb_parse(usb_packet* pk)
 {
     if(usb_recieve_ok == 0)
         { return;}
-    __disable_irq(); //работаем с буфером UserRxBufferFS изменяемым в прерывании
-
-    usb_recieve_ok = 0;
 
     if(strcmp((const char*)UserRxBufferFS,       "тест 1") == 0)            //[строка:тест 1]
         {pk->cmd =  1;}
@@ -390,24 +388,27 @@ void usb_parse(usb_packet* pk)
     else if(strcmp((const char*)UserRxBufferFS,  "вкл 24") == 0)            //[строка:вкл 24]
         {pk->cmd = -2;}
     else if(strncmp((const char*)UserRxBufferFS, "ток",3) == 0){            //[строка:ток][пробел][int:канал][пробел][float:данные]
-         pk->cmd = -3;
          pk->ch = atoi((const char*)&UserRxBufferFS[7]);
          pk->data_f = atof((const char*)&UserRxBufferFS[9]);
          if(pk->ch != 1 && pk->ch != 2)
              {printf("ошибка выбора канала! первый: 1, второй: 2\n");}
+         else
+             {pk->cmd = -3;}
     }else if(strncmp((const char*)UserRxBufferFS,"цап",3) == 0){            //[строка:цап][пробел][int:канал][пробел][bin:данные]
-         pk->cmd = -4;
          pk->ch = atoi((const char*)&UserRxBufferFS[7]);
          pk->dac_bin = atoi((const char*)&UserRxBufferFS[9]);
          if(pk->ch != 1 && pk->ch != 2)
              {printf("ошибка выбора канала! первый: 1, второй: 2\n");}
+         else
+             {pk->cmd = -4;}
     }else if(strcmp((const char*)UserRxBufferFS, "калибровка цап") == 0){   //[строка:калибровка цап]
          pk->cmd =  3;
-    }else if(strncmp((const char*)UserRxBufferFS,"ацп ток",7) == 0){        //[строка:ацп ток][пробел][int:канал]
-         pk->cmd = -5;
+    }else if(strncmp((const char*)UserRxBufferFS,"ацп ток",7) == 0){        //[строка:ацп ток][пробел][int:канал]   
          pk->ch = atoi((const char*)&UserRxBufferFS[14]);
          if(pk->ch != 1 && pk->ch != 2)
              {printf("ошибка выбора канала! первый: 1, второй: 2\n");}
+         else
+             {pk->cmd = -5;}
     }else if(strcmp((const char*)UserRxBufferFS, "boot") == 0){             //[строка:boot]
          pk->cmd = -6;
     }else if(strcmp((const char*)UserRxBufferFS, "boot_nb") == 0){          //[строка:boot_nb]
@@ -431,18 +432,22 @@ void usb_parse(usb_packet* pk)
     }else if(strcmp((const char*)UserRxBufferFS, "relay init") == 0){
       pk->cmd = -12;
     }else if(strncmp((const char*)UserRxBufferFS, "диагностика",11) == 0){    //[строка:диагностика][пробел][int:канал]
-      pk->cmd = -13;
-      pk->ch = atoi((const char*)&UserRxBufferFS[12]);
+      pk->ch = atoi((const char*)&UserRxBufferFS[11 * 2 + 1]); // 11 символов в кириллице в utf * 2 + 1 пробел
       if(pk->ch != 1 && pk->ch != 2)
-        {printf("ошибка выбора канала! первый: 1, второй: 2\n");}
+        { printf("ошибка выбора канала! первый: 1, второй: 2\n");}
+      else
+        { pk->cmd = -13;}
     }else if(strcmp((const char*)UserRxBufferFS, "ручная диагностика вкл") == 0){
         btn_context = c_Diagnostics;
+        enc_cnt_diag = 0;
     }else if(strcmp((const char*)UserRxBufferFS, "ручная диагностика выкл") == 0){
         btn_context = c_ChooseCh;
-    }
-
+    }else
+         { printf("неизвестная команда\n");}
+        
+    usb_recieve_ok = 0;
     memset(UserRxBufferFS,0,APP_RX_DATA_SIZE);//обнуляем буфер (иначе накладываются предыдущие команды)
-  __enable_irq();//ждем следующую команду
+    USBD_CDC_ReceivePacket(&hUsbDeviceFS);//ждем следующую команду
   return;
 }
 
@@ -501,6 +506,10 @@ void usb_task(usb_packet* ub)
           { res = set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_BOT | DIRECT_OUT | DIRECT_ERR);}
       else if(ub->dt == 1)
           { res = set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_BOT | INVERTED_OUT | INVERTED_ERR);}
+      else if(ub->dt == 2)
+          { res = set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_TOP | DIRECT_OUT | DIRECT_ERR);}
+      else if(ub->dt == 3)
+          { res = set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_TOP | INVERTED_OUT | INVERTED_ERR);}
 
       printf("set_lpa_mode %d: %d",ub->dt,res);
     }else if( ub->cmd == -10){ //K6 on
@@ -513,33 +522,103 @@ void usb_task(usb_packet* ub)
         float tmp_f = 0.0F;
 
         printf("UP\n");
+        char* p_prev = "\0";
+        char buf_prv[150] = {0};
+        char* p_M[4] = {"обрыв","выкл","вкл","КЗ","\0"};
+        int perexod = 0;
+        //начальная инициализация "обрыв"
+        state_t prev_in_input = 0;
+        state_t prev_in_error = 1;
+
         for(int i = 0; i < (int)(7.100F/0.1F); i++){
+
+            //от 3 мА до 5 мА пропускаем для ускорения процесса
+            if(i >= 25 && i <= 55){continue;}
+
             dac_set_i(ub->ch, i * 0.1F);
             //-----------------
-            HAL_Delay(400);
+            HAL_Delay(200);
             //-----------------
             state_t in_input,in_error;
             input_read(TM_142_INPUT_INPUT, ub->ch, &in_input);
             input_read(TM_142_INPUT_ERROR, ub->ch, &in_error);
 
+            char* p;
+            if(in_input == 0 && in_error == 1)
+                {p = "обрыв";}
+            else if(in_input == 0 && in_error == 0)
+                {p = "выкл";}
+            else if(in_input == 1 && in_error == 0)
+                {p = "вкл";}
+            else if(in_input == 1 && in_error == 1)
+                {p = "КЗ";}
+            else
+                {p = "несоотвествие выходов";}
+
             adc_get_value_f(ub->ch, TM_142_ADC_FEEDBACK, &tmp_f);
 
-            printf("%d. set: %2.3f, real: %2.3f, input: %d, error %d\n", i, i * 0.1F, tmp_f, in_input, in_error);
+            if((prev_in_input == in_input && prev_in_error == in_error) || i == 0){
+               //snprintf(buf_prv,150,"set: %2.1f, real: %2.3f, in: %d, er %d \n", i, i * 0.1F, tmp_f, in_input, in_error);
+               p_prev = p;
+               prev_in_input = in_input;
+               prev_in_error = in_error;
+               if(i == 0)
+                  { printf("%s",p_M[perexod++]);}
+               printf("*");
+            }else{ //обнаружен переход
+               //printf("\n%s",buf_prv); //выводим предыдущие
+               snprintf(buf_prv,150,"\nset: %2.1f, real: %2.3f, in: %d, er %d \n",i * 0.1F, tmp_f, in_input, in_error); 
+               printf("%s",buf_prv);
+               p_prev = p;
+               prev_in_input = in_input;
+               prev_in_error = in_error;
+               printf("%s",p_M[perexod++]);
+            }
         }
 
-        printf("DOWN\n");
-        for(int i = 69; i > -1; i--){
+        printf("\nDOWN\n");
+        for(int i = 70; i > -1; i--){
+            //от 3 мА до 5 мА пропускаем для ускорения процесса
+            if(i >= 25 && i <= 55){continue;}
+
             dac_set_i(ub->ch, i * 0.1F);
             //-----------------
-            HAL_Delay(400);
+            HAL_Delay(200);
             //-----------------
             state_t in_input,in_error;
             input_read(TM_142_INPUT_INPUT, ub->ch, &in_input);
             input_read(TM_142_INPUT_ERROR, ub->ch, &in_error);
+            char* p = "\0";
+            if(in_input == 0 && in_error == 1)
+                {p = "обрыв";}
+            else if(in_input == 0 && in_error == 0)
+                {p = "выкл";}
+            else if(in_input == 1 && in_error == 0)
+                {p = "вкл";}
+            else if(in_input == 1 && in_error == 1)
+                {p = "КЗ";}
+            else
+                {p = "несоотвествие выходов";}
 
             adc_get_value_f(ub->ch, TM_142_ADC_FEEDBACK, &tmp_f);
 
-            printf("%d. set: %2.3f, real: %2.3f, input: %d, error %d\n", i, i * 0.1F, tmp_f, in_input, in_error);
+            if((prev_in_input == in_input && prev_in_error == in_error) || i == 70){
+               //snprintf(buf_prv,150,"set: %2.1f, real: %2.3f, in: %d, er %d \n", i, i * 0.1F, tmp_f, in_input, in_error);
+               p_prev = p;
+               prev_in_input = in_input;
+               prev_in_error = in_error;
+               if(i == 70)
+                  { printf("%s",p_M[--perexod]);}
+               printf("*");
+            }else{ //обнаружен переход
+               //printf("\n%s",buf_prv); //выводим предыдущие
+               snprintf(buf_prv,150,"\nset: %2.1f, real: %2.3f, in: %d, er %d \n",i * 0.1F, tmp_f, in_input, in_error); 
+               printf("%s",buf_prv);
+               p_prev = p;
+               prev_in_input = in_input;
+               prev_in_error = in_error;
+               printf("%s",p_M[--perexod]);
+            }
         }
     }
 }
