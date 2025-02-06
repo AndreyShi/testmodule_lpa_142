@@ -43,6 +43,13 @@ extern const int     ch_gl;
 extern int       btn_context;
 extern uint32_t enc_cnt_diag;
 //----------------------------------------------------------------
+/*
+при выводе в консоль используется кодировка UTF8 из набора символов UNICODE
+если символ "А" в UNICODE это 0x0410 в UTF8 это 0xD090 
+т. е. прибавить к UNICODE коду 0xC2 ,если больше 7f (от 0x00 по 0x7f UNICODE и UTF8 совпадают) 
+и получим код UTF8
+символ UTF8 ,если код > 7F, хранится как два байта char
+*/
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -443,7 +450,7 @@ void usb_parse(usb_packet* pk)
     }else if(strcmp((const char*)UserRxBufferFS, "ручная диагностика выкл") == 0){
         btn_context = c_ChooseCh;
     }else
-         { printf("неизвестная команда\n");}
+         { printf("неизвестная команда ☺\n");}
         
     usb_recieve_ok = 0;
     memset(UserRxBufferFS,0,APP_RX_DATA_SIZE);//обнуляем буфер (иначе накладываются предыдущие команды)
@@ -555,10 +562,10 @@ void usb_task(usb_packet* ub)
 
             adc_get_value_f(ub->ch, TM_142_ADC_FEEDBACK, &tmp_f);
 
-            if(0)
-                { printf("set: %2.1f, real: %2.3f, вых: %d, ош %d \n",i * 0.1F, tmp_f, in_input, in_error);}//выводим текущее
+            if(0) // выводим каждый шаг
+                { printf("set↑: %2.1f, real: %2.3f, вых: %d, ош %d \n",i * 0.1F, tmp_f, in_input, in_error);}//выводим текущее
             else if((prev_in_input == in_input && prev_in_error == in_error) || i == 0){
-               snprintf(buf_prv,150,"set: %2.1f, real: %2.3f, вых: %d, ош %d \n",i * 0.1F, tmp_f, in_input, in_error);
+               snprintf(buf_prv,150,"set↑: %2.1f, real: %2.3f, вых: %d, ош %d \n",i * 0.1F, tmp_f, in_input, in_error);
                p_prev = p;
                prev_in_input = in_input;
                prev_in_error = in_error;
@@ -567,7 +574,7 @@ void usb_task(usb_packet* ub)
                //printf("*");
             }else{ //обнаружен переход
                printf("%s %s",p_M[perexod++],buf_prv); //выводим предыдущие
-               printf("%s set: %2.1f, real: %2.3f, вых: %d, ош %d \n",p_M[perexod], i * 0.1F, tmp_f, in_input, in_error);//выводим текущее
+               printf("%s set↑: %2.1f, real: %2.3f, вых: %d, ош %d \n",p_M[perexod], i * 0.1F, tmp_f, in_input, in_error);//выводим текущее
                p_prev = p;
                prev_in_input = in_input;
                prev_in_error = in_error;
@@ -599,10 +606,10 @@ void usb_task(usb_packet* ub)
                 {p = "несоотвествие выходов";}
 
             adc_get_value_f(ub->ch, TM_142_ADC_FEEDBACK, &tmp_f);
-            if(0)
-                { printf("set: %2.1f, real: %2.3f, вых: %d, ош %d \n",i * 0.1F, tmp_f, in_input, in_error);}//выводим текущее
+            if(0) // выводим каждый шаг
+                { printf("set↓: %2.1f, real: %2.3f, вых: %d, ош %d \n",i * 0.1F, tmp_f, in_input, in_error);}//выводим текущее
             else if((prev_in_input == in_input && prev_in_error == in_error)){
-               snprintf(buf_prv,150,"set: %2.1f, real: %2.3f, вых: %d, ош %d \n",i * 0.1F, tmp_f, in_input, in_error);
+               snprintf(buf_prv,150,"set↓: %2.1f, real: %2.3f, вых: %d, ош %d \n",i * 0.1F, tmp_f, in_input, in_error);
                p_prev = p;
                prev_in_input = in_input;
                prev_in_error = in_error;
@@ -611,7 +618,7 @@ void usb_task(usb_packet* ub)
             }else{ //обнаружен переход
                //if(strcmp(p, "выкл") == 0){
                    printf("%s %s",p_M[perexod--],buf_prv); //выводим предыдущие
-                   printf("%s set: %2.1f, real: %2.3f, вых: %d, ош %d \n",p_M[perexod], i * 0.1F, tmp_f, in_input, in_error);//выводим текущее
+                   printf("%s set↓: %2.1f, real: %2.3f, вых: %d, ош %d \n",p_M[perexod], i * 0.1F, tmp_f, in_input, in_error);//выводим текущее
               // }
                p_prev = p;
                prev_in_input = in_input;
