@@ -520,11 +520,9 @@ void usb_task(usb_packet* ub)
       relay_init();
     }else if( ub->cmd == -13){
         float tmp_f = 0.0F;
-
-        printf("UP\n");
         char* p_prev = "\0";
         char buf_prv[150] = {0};
-        char* p_M[4] = {"обрыв","выкл","вкл","КЗ","\0"};
+        char* p_M[4] = {"обрыв","выкл ","вкл  ","КЗ   ","\nстоп\n"};
         int perexod = 0;
         //начальная инициализация "обрыв"
         state_t prev_in_input = 0;
@@ -557,26 +555,26 @@ void usb_task(usb_packet* ub)
 
             adc_get_value_f(ub->ch, TM_142_ADC_FEEDBACK, &tmp_f);
 
-            if((prev_in_input == in_input && prev_in_error == in_error) || i == 0){
-               //snprintf(buf_prv,150,"set: %2.1f, real: %2.3f, in: %d, er %d \n", i, i * 0.1F, tmp_f, in_input, in_error);
+            if(0)
+                { printf("set: %2.1f, real: %2.3f, вых: %d, ош %d \n",i * 0.1F, tmp_f, in_input, in_error);}//выводим текущее
+            else if((prev_in_input == in_input && prev_in_error == in_error) || i == 0){
+               snprintf(buf_prv,150,"set: %2.1f, real: %2.3f, вых: %d, ош %d \n",i * 0.1F, tmp_f, in_input, in_error);
                p_prev = p;
                prev_in_input = in_input;
                prev_in_error = in_error;
                if(i == 0)
-                  { printf("%s",p_M[perexod++]);}
-               printf("*");
+                  { printf("%s %s",p_M[perexod],buf_prv);}
+               //printf("*");
             }else{ //обнаружен переход
-               //printf("\n%s",buf_prv); //выводим предыдущие
-               snprintf(buf_prv,150,"\nset: %2.1f, real: %2.3f, in: %d, er %d \n",i * 0.1F, tmp_f, in_input, in_error); 
-               printf("%s",buf_prv);
+               printf("%s %s",p_M[perexod++],buf_prv); //выводим предыдущие
+               printf("%s set: %2.1f, real: %2.3f, вых: %d, ош %d \n",p_M[perexod], i * 0.1F, tmp_f, in_input, in_error);//выводим текущее
                p_prev = p;
                prev_in_input = in_input;
                prev_in_error = in_error;
-               printf("%s",p_M[perexod++]);
             }
         }
-
-        printf("\nDOWN\n");
+        
+        printf("\n");
         for(int i = 70; i > -1; i--){
             //от 3 мА до 5 мА пропускаем для ускорения процесса
             if(i >= 25 && i <= 55){continue;}
@@ -601,23 +599,23 @@ void usb_task(usb_packet* ub)
                 {p = "несоотвествие выходов";}
 
             adc_get_value_f(ub->ch, TM_142_ADC_FEEDBACK, &tmp_f);
-
-            if((prev_in_input == in_input && prev_in_error == in_error) || i == 70){
-               //snprintf(buf_prv,150,"set: %2.1f, real: %2.3f, in: %d, er %d \n", i, i * 0.1F, tmp_f, in_input, in_error);
+            if(0)
+                { printf("set: %2.1f, real: %2.3f, вых: %d, ош %d \n",i * 0.1F, tmp_f, in_input, in_error);}//выводим текущее
+            else if((prev_in_input == in_input && prev_in_error == in_error)){
+               snprintf(buf_prv,150,"set: %2.1f, real: %2.3f, вых: %d, ош %d \n",i * 0.1F, tmp_f, in_input, in_error);
                p_prev = p;
                prev_in_input = in_input;
                prev_in_error = in_error;
-               if(i == 70)
-                  { printf("%s",p_M[--perexod]);}
-               printf("*");
+               if(i == 0)
+                  { printf("%s %s",p_M[perexod],buf_prv);}
             }else{ //обнаружен переход
-               //printf("\n%s",buf_prv); //выводим предыдущие
-               snprintf(buf_prv,150,"\nset: %2.1f, real: %2.3f, in: %d, er %d \n",i * 0.1F, tmp_f, in_input, in_error); 
-               printf("%s",buf_prv);
+               //if(strcmp(p, "выкл") == 0){
+                   printf("%s %s",p_M[perexod--],buf_prv); //выводим предыдущие
+                   printf("%s set: %2.1f, real: %2.3f, вых: %d, ош %d \n",p_M[perexod], i * 0.1F, tmp_f, in_input, in_error);//выводим текущее
+              // }
                p_prev = p;
                prev_in_input = in_input;
                prev_in_error = in_error;
-               printf("%s",p_M[--perexod]);
             }
         }
     }

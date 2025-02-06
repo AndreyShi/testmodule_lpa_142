@@ -121,7 +121,7 @@ void enc_processing(void){
 
               adc_get_value_f(ch_gl, TM_142_ADC_FEEDBACK, &tmp_f);
 
-              printf("%d. set: %2.3f, real: %2.3f, input: %d, error %d\n", enc_cnt_diag, enc_cnt_diag * 0.1F, tmp_f, in_input, in_error);
+              printf("%d. set: %2.1f, real: %2.3f, input: %d, error %d\n", enc_cnt_diag, enc_cnt_diag * 0.1F, tmp_f, in_input, in_error);
 
               enc_timer = HAL_GetTick();
             }
