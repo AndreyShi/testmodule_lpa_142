@@ -440,7 +440,7 @@ void usb_parse(usb_packet* pk)
       pk->cmd = -12;
     }else if(strncmp((const char*)UserRxBufferFS, "диагностика",11) == 0){    //[строка:диагностика][пробел][int:канал]
       pk->ch = atoi((const char*)&UserRxBufferFS[11 * 2 + 1]); // 11 символов в кириллице в utf * 2 + 1 пробел
-      if(pk->ch != 1 && pk->ch != 2)
+      if(pk->ch != 1 && pk->ch != 2 && pk->ch != 3)
         { printf("ошибка выбора канала! первый: 1, второй: 2\n");}
       else
         { pk->cmd = -13;}
@@ -527,7 +527,20 @@ void usb_task(usb_packet* ub)
       relay_init();
     }else if( ub->cmd == -13){
 
-        diagnostics(ub->ch);
+        while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_ON) == 0) { ;}
+        HAL_Delay(400);
+        if(ub->ch == 1 || ub->ch == 2)
+            { diagnostics(ub->ch);}
+        else if(ub->ch == 3){
+
+          for(int i = 1; i < ub->ch;i++){
+             printf("канал %d\n",i);
+             diagnostics(i);
+          }
+        }
+
+        printf("exit\n");
+        while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { ;}
     }
 }
 

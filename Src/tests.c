@@ -575,7 +575,7 @@ void diagnostics(const int cm){
 
             dac_set_i(cm, i * 0.1F);
             //-----------------
-            HAL_Delay(200);
+            HAL_Delay(400); // для старта нужна задержка побольше
             //-----------------
             state_t in_input,in_error;
             input_read(TM_142_INPUT_INPUT, cm, &in_input);
@@ -615,13 +615,17 @@ void diagnostics(const int cm){
         }
         
         printf("\n");
-        for(int i = 70; i > -1; i--){
+        perexod = 2;// "вкл"
+        //начальная инициализация "вкл"
+        prev_in_input = 1;
+        prev_in_error = 0;
+        for(int i = 20; i > 9; i--){
             //от 3 мА до 5 мА пропускаем для ускорения процесса
             if(i >= 25 && i <= 55){continue;}
 
             dac_set_i(cm, i * 0.1F);
             //-----------------
-            HAL_Delay(200);
+            HAL_Delay(400);
             //-----------------
             state_t in_input,in_error;
             input_read(TM_142_INPUT_INPUT, cm, &in_input);
@@ -658,4 +662,5 @@ void diagnostics(const int cm){
                prev_in_error = in_error;
             }
         }
+
 }
