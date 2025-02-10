@@ -556,3 +556,106 @@ int all_test_with_display(const int cm, char break_if_error){
     }
     return 0;
 }
+
+void diagnostics(const int cm){
+
+        float tmp_f = 0.0F;
+        char* p_prev = "\0";
+        char buf_prv[150] = {0};
+        char* p_M[4] = {"обрыв","выкл ","вкл  ","КЗ   ","\nстоп\n"};
+        int perexod = 0;
+        //начальная инициализация "обрыв"
+        state_t prev_in_input = 0;
+        state_t prev_in_error = 1;
+
+        for(int i = 0; i < (int)(7.100F/0.1F); i++){
+
+            //от 3 мА до 5 мА пропускаем для ускорения процесса
+            if(i >= 25 && i <= 55){continue;}
+
+            dac_set_i(cm, i * 0.1F);
+            //-----------------
+            HAL_Delay(200);
+            //-----------------
+            state_t in_input,in_error;
+            input_read(TM_142_INPUT_INPUT, cm, &in_input);
+            input_read(TM_142_INPUT_ERROR, cm, &in_error);
+
+            char* p;
+            if(in_input == 0 && in_error == 1)
+                {p = "обрыв";}
+            else if(in_input == 0 && in_error == 0)
+                {p = "выкл";}
+            else if(in_input == 1 && in_error == 0)
+                {p = "вкл";}
+            else if(in_input == 1 && in_error == 1)
+                {p = "КЗ";}
+            else
+                {p = "несоотвествие выходов";}
+
+            adc_get_value_f(cm, TM_142_ADC_FEEDBACK, &tmp_f);
+
+            if(0) // выводим каждый шаг
+                { printf("set↑: %2.1f, real: %2.3f, вых: %d, ош %d \n",i * 0.1F, tmp_f, in_input, in_error);}//выводим текущее
+            else if((prev_in_input == in_input && prev_in_error == in_error) || i == 0){
+               snprintf(buf_prv,150,"set↑: %2.1f, real: %2.3f, вых: %d, ош %d \n",i * 0.1F, tmp_f, in_input, in_error);
+               p_prev = p;
+               prev_in_input = in_input;
+               prev_in_error = in_error;
+               if(i == 0)
+                  { printf("%s %s",p_M[perexod],buf_prv);}
+               //printf("*");
+            }else{ //обнаружен переход
+               printf("%s %s",p_M[perexod++],buf_prv); //выводим предыдущие
+               printf("%s set↑: %2.1f, real: %2.3f, вых: %d, ош %d \n",p_M[perexod], i * 0.1F, tmp_f, in_input, in_error);//выводим текущее
+               p_prev = p;
+               prev_in_input = in_input;
+               prev_in_error = in_error;
+            }
+        }
+        
+        printf("\n");
+        for(int i = 70; i > -1; i--){
+            //от 3 мА до 5 мА пропускаем для ускорения процесса
+            if(i >= 25 && i <= 55){continue;}
+
+            dac_set_i(cm, i * 0.1F);
+            //-----------------
+            HAL_Delay(200);
+            //-----------------
+            state_t in_input,in_error;
+            input_read(TM_142_INPUT_INPUT, cm, &in_input);
+            input_read(TM_142_INPUT_ERROR, cm, &in_error);
+            char* p = "\0";
+            if(in_input == 0 && in_error == 1)
+                {p = "обрыв";}
+            else if(in_input == 0 && in_error == 0)
+                {p = "выкл";}
+            else if(in_input == 1 && in_error == 0)
+                {p = "вкл";}
+            else if(in_input == 1 && in_error == 1)
+                {p = "КЗ";}
+            else
+                {p = "несоотвествие выходов";}
+
+            adc_get_value_f(cm, TM_142_ADC_FEEDBACK, &tmp_f);
+            if(0) // выводим каждый шаг
+                { printf("set↓: %2.1f, real: %2.3f, вых: %d, ош %d \n",i * 0.1F, tmp_f, in_input, in_error);}//выводим текущее
+            else if((prev_in_input == in_input && prev_in_error == in_error)){
+               snprintf(buf_prv,150,"set↓: %2.1f, real: %2.3f, вых: %d, ош %d \n",i * 0.1F, tmp_f, in_input, in_error);
+               p_prev = p;
+               prev_in_input = in_input;
+               prev_in_error = in_error;
+               if(i == 0)
+                  { printf("%s %s",p_M[perexod],buf_prv);}
+            }else{ //обнаружен переход
+               //if(strcmp(p, "выкл") == 0){
+                   printf("%s %s",p_M[perexod--],buf_prv); //выводим предыдущие
+                   printf("%s set↓: %2.1f, real: %2.3f, вых: %d, ош %d \n",p_M[perexod], i * 0.1F, tmp_f, in_input, in_error);//выводим текущее
+              // }
+               p_prev = p;
+               prev_in_input = in_input;
+               prev_in_error = in_error;
+            }
+        }
+}
