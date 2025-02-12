@@ -15,7 +15,9 @@
 #include "modes.h"
 #include "boot_uart_if.h"
 #include "button_if.h"
-
+//------переменные только для чтения из других модулей------------
+extern volatile const int btn_break_is_pending;
+//----------------------------------------------------------------
 //--задержки перед измерениями АЦП
 #define DELAY_BOOT  1000 //1000ms
 #define DELAY_1     500  //500ms
@@ -25,24 +27,24 @@
 ///старые пороги
 //---уровни используемые в предыдущем стенде  
 #define LEVEL_1 0.011F  //0x00, 0x00, 0x00, 0x00  //0.0F
-#define LEVEL_2 0.5F  //0x3F, 0x00, 0x00, 0x00  //0.5F
-#define LEVEL_3 2.0F  //0x40, 0x00, 0x00, 0x00  //2.0F
-#define LEVEL_4 6.35F //0x40, 0xCB, 0x33, 0x33  //6.35F
-#define LEVEL_5 7.00F //0x40, 0xE0, 0x00, 0x00  //7.00F
-#define LEVEL_6 5.00F //0x40, 0xA0, 0x00, 0x00  //5.00F
-#define LEVEL_7 1.3F  //0x3F, 0xA6, 0x66, 0x66  //1.3F
-#define LEVEL_8 0.2F  //0x3E, 0x4C, 0xCC, 0xCD  //0.2F
+#define LEVEL_2 0.5F    //0x3F, 0x00, 0x00, 0x00  //0.5F
+#define LEVEL_3 2.0F    //0x40, 0x00, 0x00, 0x00  //2.0F
+#define LEVEL_4 6.35F   //0x40, 0xCB, 0x33, 0x33  //6.35F
+#define LEVEL_5 7.00F   //0x40, 0xE0, 0x00, 0x00  //7.00F
+#define LEVEL_6 5.00F   //0x40, 0xA0, 0x00, 0x00  //5.00F
+#define LEVEL_7 1.3F    //0x3F, 0xA6, 0x66, 0x66  //1.3F
+#define LEVEL_8 0.2F    //0x3E, 0x4C, 0xCC, 0xCD  //0.2F
 //
 
-
-//#define LEVEL_1 0.1F  //0x00, 0x00, 0x00, 0x00  //0.0F
-//#define LEVEL_2 0.4F  //0x3F, 0x00, 0x00, 0x00  //0.5F
-//#define LEVEL_3 2.0F  //0x40, 0x00, 0x00, 0x00  //2.0F
-//#define LEVEL_4 6.80F //0x40, 0xCB, 0x33, 0x33  //6.35F + 0.6F
-//#define LEVEL_5 7.50F //0x40, 0xE0, 0x00, 0x00  //7.00F + 0.5F
-//#define LEVEL_6 5.00F //0x40, 0xA0, 0x00, 0x00  //5.00F
-//#define LEVEL_7 1.3F  //0x3F, 0xA6, 0x66, 0x66  //1.3F
-//#define LEVEL_8 0.2F  //0x3E, 0x4C, 0xCC, 0xCD  //0.2F
+//новые пороги
+//#define LEVEL_1 0.1F  //0x00, 0x00, 0x00, 0x00  //0.0F точно обрыв
+//#define LEVEL_2 0.5F  //0x3F, 0x00, 0x00, 0x00  //0.5F точно не обрыв
+//#define LEVEL_3 2.0F  //0x40, 0x00, 0x00, 0x00  //2.0F точно вкл
+//#define LEVEL_4 6.5F  //0x40, 0xCB, 0x33, 0x33  //6.5F точно не КЗ
+//#define LEVEL_5 7.0F  //0x40, 0xE0, 0x00, 0x00  //7.0F точно КЗ
+//#define LEVEL_6 5.0F  //0x40, 0xA0, 0x00, 0x00  //5.0F точно вкл
+//#define LEVEL_7 1.3F  //0x3F, 0xA6, 0x66, 0x66  //1.3F точно выкл
+//#define LEVEL_8 0.2F  //0x3E, 0x4C, 0xCC, 0xCD  //0.2F точно обрыв
 //==
 //---------------------------------
 //таблица соответствий ошибок русского алфавита  и английского
@@ -239,6 +241,8 @@ error_lpa test_3a(const int cm, char break_if_error){
     
     for(int c = 0; c < cm; c++){ // c - канал
         for(int l = 0; l < sizeof(levels)/sizeof(float); l++){
+            if(btn_break_is_pending == 1)
+                { return r;}
             dac_set_i(ms[0][c],levels[l]);
             //-----------------
             HAL_Delay(DELAY_2);
@@ -288,6 +292,8 @@ error_lpa test_3b(const int cm, char break_if_error){
     //---------------------------------------
     for(int c = 0; c < cm; c++){         // c - канал
         for(int l = 0; l < sizeof(levels)/sizeof(float); l++){
+            if(btn_break_is_pending == 1)
+            { return r;}
             dac_set_i(ms[0][c],levels[l]);
             //-----------------
             HAL_Delay(DELAY_2);
@@ -336,6 +342,8 @@ error_lpa test_3c(const int cm, char break_if_error){
     //---------------------------------------
     for(int c = 0; c < cm; c++){ // c - канал
         for(int l = 0; l < sizeof(levels)/sizeof(float); l++){
+            if(btn_break_is_pending == 1)
+            { return r;}
             dac_set_i(ms[0][c],levels[l]);
             //-----------------
             HAL_Delay(DELAY_2);
@@ -384,6 +392,8 @@ error_lpa test_3d(const int cm, char break_if_error){
     //---------------------------------------
     for(int c = 0; c < cm; c++){ // c - канал
         for(int l = 0; l < sizeof(levels)/sizeof(float); l++){
+            if(btn_break_is_pending == 1)
+            { return r;}
             dac_set_i(ms[0][c],levels[l]);
             //-----------------
             HAL_Delay(DELAY_2);
@@ -540,11 +550,11 @@ int all_test_with_display(const int cm, char break_if_error){
     stages = 1;
     display_task(0);
     if(btn_break_is_pending == 1)
-        { return 1;}
+        { return lets_show_vibor_kanalov;}
     //-----fw update----
     if(boot_update() == 0){
         printf("\nboot_update() вернул FALSE!\n\n");
-        return 1;
+        return lets_show_vibor_kanalov;
     } 
     //------------------
 
@@ -552,7 +562,7 @@ int all_test_with_display(const int cm, char break_if_error){
         stages = 2 + op;
         display_task(0);
         if(btn_break_is_pending == 1)
-            { return 1;}
+            { return lets_show_vibor_kanalov;}
         er[op] = cur_test[op](cm,break_if_error);
 
         if(break_if_error == 1){ 
@@ -575,7 +585,7 @@ int all_test_with_display(const int cm, char break_if_error){
         stages = 12;
         display_task(0);
     }
-    return 0;
+    return lets_dont_change_show;
 }
 
 void diagnostics(const int cm){

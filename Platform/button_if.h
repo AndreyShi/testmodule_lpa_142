@@ -24,8 +24,8 @@ enum _button_state {/*{{{*/
     BTN_PUSHED,
     BTN_RELEASE_DEBOUNCE,
 };
-extern volatile enum _button_state state;
-extern int btn_break_is_pending;
+
+
 
 #define c_ChooseCh    0
 #define c_Testing     1

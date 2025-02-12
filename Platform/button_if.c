@@ -11,14 +11,15 @@
 #include "display.h"
 #include <stdio.h>
 #include "relay_if.h"
+#include "dac_if.h"
 //--------------------------------------------------
 const uint32_t debounce_to = 100;
 const uint32_t hold_to = 1000;
-int btn_break_is_pending;
+volatile int btn_break_is_pending;
 //--------------------------------------------------
-volatile enum _button_state state;
+volatile enum _button_state state_bt;
 //----переменная "защелка" для фильтрации переходного состояния кнопки
-static enum _button_state old_state;
+static enum _button_state old_state_bt;
 //--------------------------------------------------------------------
 //------переменные только для чтения из других модулей------------
 extern const int     ch_gl; 
@@ -36,13 +37,13 @@ button_state(TM_142_BUTTON_GO);
 button_state(TM_142_BUTTON_RIGHT);
 
 if(IS_NOT_PUSHED)
-    { state = BTN_RELEASED; }
+    { state_bt = BTN_RELEASED; }
 else
     {
     flags[TM_142_BUTTON_GO - BUTTON_BASE].pushed  = 1;
     flags[TM_142_BUTTON_GO - BUTTON_BASE].clicked = 1;
     flags[TM_142_BUTTON_GO - BUTTON_BASE].hold_1  = 1;
-    state = BTN_PUSHED;
+    state_bt = BTN_PUSHED;
     }
 }/*}}}*/
 //--------------------------------------------------
@@ -56,7 +57,7 @@ static uint32_t timer = 0;
 
 // conventional button
 idx = TM_142_BUTTON_GO - BUTTON_BASE;
-switch(state)/*{{{*/
+switch(state_bt)/*{{{*/
     {
     case BTN_RELEASED:
 	if(IS_NOT_PUSHED)
@@ -65,7 +66,7 @@ switch(state)/*{{{*/
 	flags[idx].pushed   = 1;
 	flags[idx].released = 0;
 	timer = HAL_GetTick();
-	state = BTN_PUSH_DEBOUNCE;
+	state_bt = BTN_PUSH_DEBOUNCE;
 	break;
 
     case BTN_PUSH_DEBOUNCE:
@@ -76,13 +77,13 @@ switch(state)/*{{{*/
 	if(IS_PUSHED)
 	    {
 	    flags[idx].clicked = 1;
-	    state = BTN_HOLD_1;
+	    state_bt = BTN_HOLD_1;
 	    }
 	else
 	    {
 	    flags[idx].pushed   = 0;
 	    flags[idx].released = 1;
-	    state = BTN_RELEASE_DEBOUNCE;
+	    state_bt = BTN_RELEASE_DEBOUNCE;
 	    }
 	break;
 
@@ -94,7 +95,7 @@ switch(state)/*{{{*/
 		flags[idx].pushed   = 0;
 		flags[idx].released = 1;
 		timer = HAL_GetTick();
-		state = BTN_RELEASE_DEBOUNCE;
+		state_bt = BTN_RELEASE_DEBOUNCE;
 		//update_button(STATE_OFF);
 		}
 
@@ -103,7 +104,7 @@ switch(state)/*{{{*/
 
 	flags[idx].hold_1 = 1;
 	timer = HAL_GetTick();
-	state = BTN_PUSHED;
+	state_bt = BTN_PUSHED;
 	//update_button(STATE_ON);
 	break;
 
@@ -112,7 +113,7 @@ switch(state)/*{{{*/
 	    { break; }
 
 	timer = HAL_GetTick();
-	state = BTN_RELEASE_DEBOUNCE;
+	state_bt = BTN_RELEASE_DEBOUNCE;
 	break;
 
     case BTN_RELEASE_DEBOUNCE:
@@ -123,36 +124,39 @@ switch(state)/*{{{*/
 	    {
 	    flags[idx].pushed   = 0;
 	    flags[idx].released = 1;
-	    state = BTN_RELEASED;
+	    state_bt = BTN_RELEASED;
 	    //update_button(STATE_OFF);
 	    }
 	else
-	    { state = BTN_PUSHED; }
+	    { state_bt = BTN_PUSHED; }
 	break;
     };/*}}}*/
 
 	if(btn_context == c_Testing){
-		if(state == BTN_HOLD_1){
+		if(state_bt == BTN_HOLD_1){
 			btn_break_is_pending = 1;
 		}
 	}
 }/*}}}*/
 #define elif else if
 int btn_task(){
-	if(old_state != state){
-        printf("button_state: %d\n",state);
-        if(state == BTN_HOLD_1){
+	if(old_state_bt != state_bt){
+        //printf("button_state: %d\n",state_bt);
+        if(state_bt == BTN_HOLD_1){
           //--совершаем дальнейшие инструкции по отпусканию кнопки--
-		  while(state != BTN_RELEASED) {;} //в такой конструкции state должен быть с volatile
+		  while(state_bt != BTN_RELEASED) {;} //в такой конструкции state_bt должен быть с volatile
           //--------------------------------------------------------
           if(btn_context == c_ChooseCh){
 			  btn_context = c_Testing;
 			  btn_break_is_pending = 0;
               int res = all_test_with_display(ch_gl, break_on);//blocking stream
+              //-----все реле в исходное состояние и 24 отключаем от барьера---
+			  dac_set(CH_ALL, 0);
 			  relay_init();
-			  if(res == 0)
+              //---------------------
+			  if(res == lets_dont_change_show)
                   {btn_context = c_Finish;}
-			  elif(res == 1){
+			  elif(res == lets_show_vibor_kanalov){
 				btn_context = c_ChooseCh;
                 show_vibor_kanalov();
 			  }
@@ -163,14 +167,14 @@ int btn_task(){
               show_vibor_kanalov();
           }
         }
-        old_state = state;
+        old_state_bt = state_bt;
     }
 	return 0;
 }
 
 int btn_is_hold(void){
 	int res = 0;
-	if(state == BTN_HOLD_1)
+	if(state_bt == BTN_HOLD_1)
 	    {res = 1;}
 	return res;
 }

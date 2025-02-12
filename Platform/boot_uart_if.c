@@ -109,7 +109,10 @@ boot_uart.Instance->DR = DEFAULT_MODE;
 while(1)
     {
 		cmd = boot_uart.Instance->DR;
-		if(cmd != 0 && cmd != 255)
+		//если барьер не подключен то будет выводиться 255
+		//а если барьер подключен и "думает" то будет выводится 0
+		//здесь эти значения фильтруются чтобы не захломлять терминал
+		if(cmd != 0 && cmd != 255) 
 			{printf("uart return: %d is symbol: \'%c\'\n",cmd,cmd);}
 		if(cmd == 'O' || cmd == 'E')
 		{
