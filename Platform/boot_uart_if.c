@@ -109,7 +109,7 @@ boot_uart.Instance->DR = DEFAULT_MODE;
 while(1)
     {
 		cmd = boot_uart.Instance->DR;
-		if(cmd != 0)
+		if(cmd != 0 && cmd != 255)
 			{printf("uart return: %d is symbol: \'%c\'\n",cmd,cmd);}
 		if(cmd == 'O' || cmd == 'E')
 		{

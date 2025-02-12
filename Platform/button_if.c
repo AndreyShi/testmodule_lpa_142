@@ -148,7 +148,7 @@ int btn_task(){
           if(btn_context == c_ChooseCh){
 			  btn_context = c_Testing;
 			  btn_break_is_pending = 0;
-              int res = all_test_with_display(ch_gl, break_off);//blocking stream
+              int res = all_test_with_display(ch_gl, break_on);//blocking stream
 			  relay_init();
 			  if(res == 0)
                   {btn_context = c_Finish;}
