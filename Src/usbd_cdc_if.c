@@ -49,6 +49,12 @@ extern uint32_t enc_cnt_diag;
 т. е. прибавить к UNICODE коду 0xC2 ,если больше 7f (от 0x00 по 0x7f UNICODE и UTF8 совпадают) 
 и получим код UTF8
 символ UTF8 ,если код > 7F, хранится как два байта char
+для работы с терминалом Putty
+в Terminal -> Local Echo        -> Froce ON
+  Terminal -> Local Line Ending -> Froce ON
+  Implicit CR in evere LF -> ON
+  Implicit LF in evere CR -> ON
+затем нажать на этойже вкладке Open
 */
 /* USER CODE END INCLUDE */
 
