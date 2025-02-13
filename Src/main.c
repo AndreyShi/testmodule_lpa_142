@@ -130,6 +130,7 @@ int main(void)
   //MX_USART3_UART_Init();
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
+  id_read();
   dac_start();
   ssd1306_init();
   button_init();

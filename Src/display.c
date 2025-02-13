@@ -5,6 +5,7 @@
 #include "ssd1306.h"
 #include "relay_if.h"
 #include "tests.h"
+#include "gpio_if.h"
 
 typedef struct {
     bool has_digit;
@@ -49,6 +50,7 @@ static uint8_t disp_usb_com_open = 255;
 static uint8_t disp_lpa_power    = 255;
 static int     disp_ch_gl        = 255;
 static uint8_t disp_stages       =   0; //не обновлять при вкл питания
+static uint8_t disp_id           = 255;
 //----------------------------------------------------------------
 //------переменные только для чтения из других модулей------------
 extern const uint8_t usb_com_open;
@@ -124,7 +126,8 @@ void display_task(void* some_data){
       
       disp_stages = stages;   //защелка
       disp_usb_com_open = 255;//добавляем поверх usb_img
-      disp_lpa_power = 255;   //добавляем поверх power_img
+      disp_lpa_power    = 255;//добавляем поверх power_img
+      disp_id           = 255;//добавляем поверх id
       render_now = true;
     }
 
@@ -140,7 +143,8 @@ void display_task(void* some_data){
         render_now = true;
         disp_ch_gl = ch_gl;     //защелка
         disp_usb_com_open = 255;//добавляем поверх usb_img
-        disp_lpa_power = 255;   //добавляем поверх power_img
+        disp_lpa_power    = 255;//добавляем поверх power_img
+        disp_id           = 255;//добавляем поверх id
     }
 
     if(disp_usb_com_open != usb_com_open){
@@ -159,6 +163,12 @@ void display_task(void* some_data){
            {render_box(59, 2, power_img.w, power_img.h, true);}//очистить
        render_now = true;
        disp_lpa_power = lpa_power; //защелка
+    }
+
+    if(disp_id != id_read()){
+        render_text(121, 0, 0,0, "%d",id_read());//отрендерить номер id в правом верхнем углу
+        render_now = true;
+        disp_id = id_read(); //защелка
     }
 
     if(render_now){
