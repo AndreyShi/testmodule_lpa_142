@@ -70,14 +70,22 @@ uint16_t tmp;
 int ms[3][2] = {{CH_1,CH_2},{12,76},{20,80}}; // {{канал}{x координата состояний}{x координата ошибки}}
 //                  обрыв    обрыв    вкл     КЗ      КЗ      вкл     выкл    обрыв
 float levels[8] = { LEVEL_1, LEVEL_2,LEVEL_3,LEVEL_4,LEVEL_5,LEVEL_6,LEVEL_7,LEVEL_8};
-int se3a[8][2] =    {{0,1},  {0,0},  {1,0},  {1,1},  {1,1},  {1,0},  {0,0},  {0,1}}; //{in_input,in_error}
-int se3b[8][2] =    {{1,0},  {1,1},  {0,1},  {0,0},  {0,0},  {0,1},  {1,1},  {1,0}}; //{in_input,in_error}
-int se3c[8][2] =    {{1,0},  {1,1},  {0,1},  {0,0},  {0,0},  {0,1},  {1,1},  {1,0}}; //{in_input,in_error}
-int se3d[8][2] =    {{0,1},  {0,0},  {1,0},  {1,1},  {1,1},  {1,0},  {0,0},  {0,1}}; //{in_input,in_error}
+int se3a[8][2]  =   {{0,1},  {0,0},  {1,0},  {1,1},  {1,1},  {1,0},  {0,0},  {0,1}}; //{in_input,in_error}
+int se3b[8][2]  =   {{1,0},  {1,1},  {0,1},  {0,0},  {0,0},  {0,1},  {1,1},  {1,0}}; //{in_input,in_error}
+int se3c[8][2]  =   {{1,0},  {1,1},  {0,1},  {0,0},  {0,0},  {0,1},  {1,1},  {1,0}}; //{in_input,in_error}
+int se3d[8][2]  =   {{0,1},  {0,0},  {1,0},  {1,1},  {1,1},  {1,0},  {0,0},  {0,1}}; //{in_input,in_error}
+
 char* sr  [8][1] = {{"Д\n"},{"Д\n"},{"Е\n"},{"Ж\n"},{"Ж\n"},{"Е\n"},{"Е\n"},{"Д\n"}};
 uint8_t sr_a [8] = {  _e   ,  _e   ,  _f   ,  _g   ,  _g   ,  _f   ,  _f   ,  _e};
-//char* sr_a[8][1] = {{"e\n"},{"f\n"},{"f\n"},{"g\n"},{"g\n"},{"f\n"},{"f\n"},{"e\n"}};
 
+/*
+Ошибки З, И, К, Л, проверяются две комбинации которые физически не должны появляться на уровне LEVEL_1.
+внизу комбинации только для уровня LEVEL_1 (обрыв)
+*/
+int se3a_Z[2][2] = {{1,1},{1,0}};
+int se3b_I[2][2] = {{0,0},{0,1}};
+int se3c_K[2][2] = {{0,0},{0,1}};
+int se3d_L[2][2] = {{1,1},{1,0}};
 //--------------------
 //текущий вывод на экран
 //--------------------
@@ -257,13 +265,22 @@ error_lpa test_3a(const int cm, char break_if_error){
 
             if(in_input == se3a[l][0] && in_error == se3a[l][1])
                 { printf("ок\n");}
-            else
-                { 
+            else if(l == 0){
+                if((in_input == se3a_Z[0][0] && in_error == se3a_Z[0][1]) || 
+                   (in_input == se3a_Z[1][0] && in_error == se3a_Z[1][1]))
+                   {
+                      printf("З\n");
+                      set_error(&r, c, _h);
+                      if(break_if_error == 1)
+                          {return r;}
+                   }
+            }else
+                 { 
                     printf(sr[l][0]);
                     set_error(&r, c, sr_a[l]);
                     if(break_if_error == 1)
                         {return r;}
-                }
+                 }
         }
         printf("\n");
     }
@@ -308,7 +325,16 @@ error_lpa test_3b(const int cm, char break_if_error){
 
             if(in_input == se3b[l][0] && in_error == se3b[l][1])
                 { printf("ок\n");}
-            else
+            else if(l == 0){
+                if((in_input == se3b_I[0][0] && in_error == se3b_I[0][1]) || 
+                   (in_input == se3b_I[1][0] && in_error == se3b_I[1][1]))
+                    {
+                        printf("И\n");
+                        set_error(&r, c, _i);
+                        if(break_if_error == 1)
+                            {return r;}
+                    }
+            }else
                 { 
                     printf(sr[l][0]);
                     set_error(&r, c, sr_a[l]);
@@ -358,7 +384,16 @@ error_lpa test_3c(const int cm, char break_if_error){
 
             if(in_input == se3c[l][0] && in_error == se3c[l][1])
                 { printf("ок\n");}
-            else
+            else if(l == 0){
+                if((in_input == se3c_K[0][0] && in_error == se3c_K[0][1]) || 
+                   (in_input == se3c_K[1][0] && in_error == se3c_K[1][1]))
+                    {
+                        printf("К\n");
+                        set_error(&r, c, _k);
+                        if(break_if_error == 1)
+                            {return r;}
+                    }
+            }else
                 { 
                     printf(sr[l][0]);
                     set_error(&r, c, sr_a[l]);
@@ -408,7 +443,16 @@ error_lpa test_3d(const int cm, char break_if_error){
 
             if(in_input == se3d[l][0] && in_error == se3d[l][1])
                 { printf("ок\n");}
-            else
+            else if(l == 0){
+                if((in_input == se3d_L[0][0] && in_error == se3d_L[0][1]) || 
+                   (in_input == se3d_L[1][0] && in_error == se3d_L[1][1]))
+                    {
+                        printf("Л\n");
+                        set_error(&r, c, _l);
+                        if(break_if_error == 1)
+                            {return r;}
+                    }
+            }else
                 { 
                     printf(sr[l][0]);
                     set_error(&r, c, sr_a[l]);
