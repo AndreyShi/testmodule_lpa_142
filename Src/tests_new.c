@@ -23,29 +23,6 @@ extern volatile const int btn_break_is_pending;
 #define DELAY_1     500  //500ms
 #define DELAY_2     400  //400ms
 #define DAC_TIMEOUT 1000 //1s
-
-///старые пороги
-//---уровни используемые в предыдущем стенде  
-#define LEVEL_1 0.011F  //0x00, 0x00, 0x00, 0x00  //0.0F
-#define LEVEL_2 0.5F    //0x3F, 0x00, 0x00, 0x00  //0.5F
-#define LEVEL_3 2.0F    //0x40, 0x00, 0x00, 0x00  //2.0F
-#define LEVEL_4 6.35F   //0x40, 0xCB, 0x33, 0x33  //6.35F
-#define LEVEL_5 7.00F   //0x40, 0xE0, 0x00, 0x00  //7.00F
-#define LEVEL_6 5.00F   //0x40, 0xA0, 0x00, 0x00  //5.00F
-#define LEVEL_7 1.3F    //0x3F, 0xA6, 0x66, 0x66  //1.3F
-#define LEVEL_8 0.2F    //0x3E, 0x4C, 0xCC, 0xCD  //0.2F
-//
-
-//новые пороги
-//#define LEVEL_1 0.1F    //0.1F точно обрыв    +
-//#define LEVEL_2 0.4F    //0.4F точно не обрыв +
-//#define LEVEL_3 2.1F    //2.1F точно вкл      +
-//#define LEVEL_4 6.5F    //6.5F точно не КЗ    +
-//#define LEVEL_5 7.0F    //7.0F точно КЗ       +
-//#define LEVEL_6 1.6F    //1.6F точно вкл      +
-//#define LEVEL_7 1.2F    //1.2F точно выкл     +
-//#define LEVEL_8 0.1F    //0.1F точно обрыв    +
-//==
 //---------------------------------
 //таблица соответствий ошибок русского алфавита  и английского
 //---------------------------------
@@ -68,23 +45,55 @@ extern volatile const int btn_break_is_pending;
 float tmp_f;
 uint16_t tmp;
 int ms[3][2] = {{CH_1,CH_2},{12,76},{20,80}}; // {{канал}{x координата состояний}{x координата ошибки}}
-//                  обрыв    обрыв    вкл     КЗ      КЗ      вкл     выкл    обрыв
-float levels[8] = { LEVEL_1, LEVEL_2,LEVEL_3,LEVEL_4,LEVEL_5,LEVEL_6,LEVEL_7,LEVEL_8};
-int se3a[8][2]  =   {{0,1},  {0,0},  {1,0},  {1,1},  {1,1},  {1,0},  {0,0},  {0,1}}; //{in_input,in_error}
-int se3b[8][2]  =   {{1,0},  {1,1},  {0,1},  {0,0},  {0,0},  {0,1},  {1,1},  {1,0}}; //{in_input,in_error}
-int se3c[8][2]  =   {{1,0},  {1,1},  {0,1},  {0,0},  {0,0},  {0,1},  {1,1},  {1,0}}; //{in_input,in_error}
-int se3d[8][2]  =   {{0,1},  {0,0},  {1,0},  {1,1},  {1,1},  {1,0},  {0,0},  {0,1}}; //{in_input,in_error}
+#define start 0
+#define poisk 1
+#define end   2
 
-char* sr  [8][1] = {{"Д\n"},{"Д\n"},{"Е\n"},{"Ж\n"},{"Ж\n"},{"Е\n"},{"Е\n"},{"Д\n"}};
-uint8_t sr_a [8] = {  _e   ,  _e   ,  _f   ,  _g   ,  _g   ,  _f   ,  _f   ,  _e};
-/*
-Ошибки З, И, К, Л, проверяются две комбинации которые физически не должны появляться на уровне LEVEL_1.
-внизу комбинации только для уровня LEVEL_1 (обрыв)
-*/
-int se3a_Z[2][2] = {{1,1},{1,0}};
-int se3b_I[2][2] = {{0,0},{0,1}};
-int se3c_K[2][2] = {{0,0},{0,1}};
-int se3d_L[2][2] = {{1,1},{1,0}};
+#define ZIKL_s {"З\n", "И\n", "К\n", "Л\n"}
+#define ZIKL_i {_h, _i, _k, _l}
+
+#define INV(x) !x
+
+typedef struct _levels
+{
+    float tok;              //выставляемый ток
+    uint8_t t[2];           //правильный   выход и ошибка
+    uint8_t f[2];           //неправильный выход и ошибка
+    uint8_t step;           //шаг start/poisk/end
+
+    char* sr;               //ошибка в случае правильный/неправильный
+    uint8_t sr_int;         //ошибка в случае правильный/неправильный (числовой эквивалент)
+
+    char* sr_un      [4];   //ошибка в случае не правильный и не неправильный
+    uint8_t sr_un_int[4];   //ошибка в случае не правильный и не неправильный (числовой эквивалент)
+}lvls;
+
+lvls lvs[] = {
+                    {0.1, {0,1}, {0,0}, start, "Д\n", _e, ZIKL_s, ZIKL_i},  //точно обрыв
+                    {0.2, {0,0}, {0,1}, poisk, "Д\n", _e, ZIKL_s, ZIKL_i},  //окно переключения на выкл
+                    {0.3, {0,0}, {0,1}, poisk, "Д\n", _e, ZIKL_s, ZIKL_i},  //окно переключения на выкл
+                    {0.4, {0,0}, {0,1}, end  , "Д\n", _e, ZIKL_s, ZIKL_i},  //точно выкл
+
+                    {1.6, {0,0}, {1,0}, start, "Е\n", _f, ZIKL_s, ZIKL_i},  //точно выкл
+                    {1.7, {1,0}, {0,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на вкл
+                    {1.8, {1,0}, {0,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на вкл
+                    {1.9, {1,0}, {0,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на вкл
+                    {2.0, {1,0}, {0,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на вкл
+                    {2.1, {1,0}, {0,0}, end  , "Е\n", _f, ZIKL_s, ZIKL_i},  //точно вкл
+
+                    {6.5, {1,0}, {1,1}, start, "Ж\n", _g, ZIKL_s, ZIKL_i},  //точно вкл
+                    {6.6, {1,1}, {1,0}, poisk, "Ж\n", _g, ZIKL_s, ZIKL_i},  //окно переключения на КЗ
+                    {6.7, {1,1}, {1,0}, poisk, "Ж\n", _g, ZIKL_s, ZIKL_i},  //окно переключения на КЗ
+                    {6.8, {1,1}, {1,0}, poisk, "Ж\n", _g, ZIKL_s, ZIKL_i},  //окно переключения на КЗ
+                    {6.9, {1,1}, {1,0}, poisk, "Ж\n", _g, ZIKL_s, ZIKL_i},  //окно переключения на КЗ
+                    {7.0, {1,1}, {1,0}, end  , "Ж\n", _g, ZIKL_s, ZIKL_i},  //точно КЗ
+
+                    {1.6, {1,0}, {0,0}, start, "Е\n", _f, ZIKL_s, ZIKL_i},  //точно вкл
+                    {1.5, {0,0}, {1,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на выкл
+                    {1.4, {0,0}, {1,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на выкл
+                    {1.3, {0,0}, {1,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на выкл
+                    {1.2, {0,0}, {1,0}, end  , "Е\n", _f, ZIKL_s, ZIKL_i},  //точно выкл
+                };
 //--------------------
 //текущий вывод на экран
 //--------------------
@@ -247,39 +256,48 @@ error_lpa test_3a(const int cm, char break_if_error){
     //---------------------------------------
     
     for(int c = 0; c < cm; c++){ // c - канал
-        for(int l = 0; l < sizeof(levels)/sizeof(float); l++){
+        for(int l = 0; l < sizeof(lvs)/sizeof(lvls); l++){
             if(btn_break_is_pending == 1)
                 { return r;}
-            dac_set_i(ms[0][c],levels[l]);
+            dac_set_i(ms[0][c],lvs[l].tok);
             //-----------------
             HAL_Delay(DELAY_2);
             //-----------------
             state_t in_input,in_error;
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
             input_read(TM_142_INPUT_ERROR, ms[0][c], &in_error);
-
             adc_get_value_f(ms[0][c], TM_142_ADC_FEEDBACK, &tmpf);
+            printf("3a канал %d set %2.2f real: %2.3f, вых: %d, ош: %d ",ms[0][c],lvs[l].tok,tmpf,in_input,in_error);
 
-            printf("3a канал %d set %2.2f real: %2.3f, вых: %d, ош: %d ",ms[0][c],levels[l],tmpf,in_input,in_error);
+            if(in_input == lvs[l].t[0] && in_error == lvs[l].t[1])
+                { 
+                    printf("ок\n");
+                    if(lvs[l].step == poisk)  // нашли в окне
+                        { while(lvs[++l].step != poisk) {;}} 
+                    else if(lvs[l].step == end){  //нашли в конце, ошибка?
 
-            if(in_input == se3a[l][0] && in_error == se3a[l][1])
-                { printf("ок\n");}
-            else if(l == 0){
-                if((in_input == se3a_Z[0][0] && in_error == se3a_Z[0][1]) || 
-                   (in_input == se3a_Z[1][0] && in_error == se3a_Z[1][1]))
-                   {
-                      printf("З\n");
-                      set_error(&r, c, _h);
-                      if(break_if_error == 1)
-                          {return r;}
-                   }
-            }else
-                 { 
-                    printf(sr[l][0]);
-                    set_error(&r, c, sr_a[l]);
+                    }
+                }
+            else if(in_input == lvs[l].f[0] && in_error == lvs[l].f[1])
+                {
+                    if(lvs[l].step == start || lvs[l].step == end){
+                        printf(lvs[l].sr);
+                        set_error(&r, c, lvs[l].sr_int);
+                        if(break_if_error == 1)
+                            {return r;}
+                    }
+                    else
+                        { printf("\n");}
+                }
+            else
+                {
+                    printf(lvs[l].sr_un[0]);
+                    set_error(&r, c, lvs[l].sr_un_int[0]);
                     if(break_if_error == 1)
                         {return r;}
-                 }
+
+                } 
+
         }
         printf("\n");
     }
@@ -307,39 +325,47 @@ error_lpa test_3b(const int cm, char break_if_error){
     set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_BOT | INVERTED_OUT | INVERTED_ERR);//---здесь установить конфигурацию барьера по UART
     //---------------------------------------
     for(int c = 0; c < cm; c++){         // c - канал
-        for(int l = 0; l < sizeof(levels)/sizeof(float); l++){
+        for(int l = 0; l < sizeof(lvs)/sizeof(lvls); l++){
             if(btn_break_is_pending == 1)
             { return r;}
-            dac_set_i(ms[0][c],levels[l]);
+            dac_set_i(ms[0][c],lvs[l].tok);
             //-----------------
             HAL_Delay(DELAY_2);
             //-----------------
             state_t in_input,in_error;
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
             input_read(TM_142_INPUT_ERROR, ms[0][c], &in_error);
-
             adc_get_value_f(ms[0][c], TM_142_ADC_FEEDBACK, &tmpf);
+            printf("3b канал %d set %2.2f real: %2.3f, вых: %d, ош: %d ",ms[0][c],lvs[l].tok,tmpf,in_input,in_error);
 
-            printf("3b канал %d set %2.2f real: %2.3f, вых: %d, ош: %d ",ms[0][c],levels[l],tmpf,in_input,in_error);
+            if(in_input == INV(lvs[l].t[0]) && in_error == INV(lvs[l].t[1]))
+                { 
+                    printf("ок\n");
+                    if(lvs[l].step == poisk)  // нашли в окне
+                        { while(lvs[++l].step != poisk) {;}} 
+                    else if(lvs[l].step == end){  //нашли в конце, ошибка?
 
-            if(in_input == se3b[l][0] && in_error == se3b[l][1])
-                { printf("ок\n");}
-            else if(l == 0){
-                if((in_input == se3b_I[0][0] && in_error == se3b_I[0][1]) || 
-                   (in_input == se3b_I[1][0] && in_error == se3b_I[1][1]))
-                    {
-                        printf("И\n");
-                        set_error(&r, c, _i);
+                    }
+                }
+            else if(in_input == INV(lvs[l].f[0]) && in_error == INV(lvs[l].f[1]))
+                {
+                    if(lvs[l].step == start || lvs[l].step == end){
+                        printf(lvs[l].sr);
+                        set_error(&r, c, lvs[l].sr_int);
                         if(break_if_error == 1)
                             {return r;}
                     }
-            }else
-                { 
-                    printf(sr[l][0]);
-                    set_error(&r, c, sr_a[l]);
+                    else
+                        { printf("\n");}
+                }
+            else
+                {
+                    printf(lvs[l].sr_un[1]);
+                    set_error(&r, c, lvs[l].sr_un_int[1]);
                     if(break_if_error == 1)
                         {return r;}
-                }
+
+                } 
         }
         printf("\n");
     }
@@ -366,39 +392,47 @@ error_lpa test_3c(const int cm, char break_if_error){
     set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_TOP | DIRECT_OUT | DIRECT_ERR);//---здесь установить конфигурацию барьера по UART
     //---------------------------------------
     for(int c = 0; c < cm; c++){ // c - канал
-        for(int l = 0; l < sizeof(levels)/sizeof(float); l++){
+        for(int l = 0; l < sizeof(lvs)/sizeof(lvls); l++){
             if(btn_break_is_pending == 1)
             { return r;}
-            dac_set_i(ms[0][c],levels[l]);
+            dac_set_i(ms[0][c],lvs[l].tok);
             //-----------------
             HAL_Delay(DELAY_2);
             //-----------------
             state_t in_input,in_error;
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
             input_read(TM_142_INPUT_ERROR, ms[0][c], &in_error);
-
             adc_get_value_f(ms[0][c], TM_142_ADC_FEEDBACK, &tmpf);
+            printf("3c канал %d set %2.2f real: %2.3f, вых: %d, ош: %d ",ms[0][c],lvs[l].tok,tmpf,in_input,in_error);
 
-            printf("3c канал %d set %2.2f real: %2.3f, вых: %d, ош: %d ",ms[0][c],levels[l],tmpf,in_input,in_error);
+            if(in_input == INV(lvs[l].t[0]) && in_error == INV(lvs[l].t[1]))
+            { 
+                printf("ок\n");
+                if(lvs[l].step == poisk)  // нашли в окне
+                    { while(lvs[++l].step != poisk) {;}} 
+                else if(lvs[l].step == end){  //нашли в конце, ошибка?
 
-            if(in_input == se3c[l][0] && in_error == se3c[l][1])
-                { printf("ок\n");}
-            else if(l == 0){
-                if((in_input == se3c_K[0][0] && in_error == se3c_K[0][1]) || 
-                   (in_input == se3c_K[1][0] && in_error == se3c_K[1][1]))
-                    {
-                        printf("К\n");
-                        set_error(&r, c, _k);
-                        if(break_if_error == 1)
-                            {return r;}
-                    }
-            }else
-                { 
-                    printf(sr[l][0]);
-                    set_error(&r, c, sr_a[l]);
+                }
+            }
+            else if(in_input == INV(lvs[l].f[0]) && in_error == INV(lvs[l].f[1]))
+            {
+                if(lvs[l].step == start || lvs[l].step == end){
+                    printf(lvs[l].sr);
+                    set_error(&r, c, lvs[l].sr_int);
                     if(break_if_error == 1)
                         {return r;}
                 }
+                else
+                    { printf("\n");}
+            }
+            else
+            {
+                printf(lvs[l].sr_un[2]);
+                set_error(&r, c, lvs[l].sr_un_int[2]);
+                if(break_if_error == 1)
+                    {return r;}
+
+            } 
         }
         printf("\n");
     }
@@ -425,39 +459,47 @@ error_lpa test_3d(const int cm, char break_if_error){
     set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_TOP | INVERTED_OUT | INVERTED_ERR);//---здесь установить конфигурацию барьера по UART
     //---------------------------------------
     for(int c = 0; c < cm; c++){ // c - канал
-        for(int l = 0; l < sizeof(levels)/sizeof(float); l++){
+        for(int l = 0; l < sizeof(lvs)/sizeof(lvls); l++){
             if(btn_break_is_pending == 1)
             { return r;}
-            dac_set_i(ms[0][c],levels[l]);
+            dac_set_i(ms[0][c],lvs[l].tok);
             //-----------------
             HAL_Delay(DELAY_2);
             //-----------------
             state_t in_input,in_error;
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
             input_read(TM_142_INPUT_ERROR, ms[0][c], &in_error);
-
             adc_get_value_f(ms[0][c], TM_142_ADC_FEEDBACK, &tmpf);
+            printf("3d канал %d set %2.2f real: %2.3f, вых: %d, ош: %d ",ms[0][c],lvs[l].tok,tmpf,in_input,in_error);
 
-            printf("3d канал %d set %2.2f real: %2.3f, вых: %d, ош: %d ",ms[0][c],levels[l],tmpf,in_input,in_error);
+            if(in_input == lvs[l].t[0] && in_error == lvs[l].t[1])
+            { 
+                printf("ок\n");
+                if(lvs[l].step == poisk)  // нашли в окне
+                    { while(lvs[++l].step != poisk) {;}} 
+                else if(lvs[l].step == end){  //нашли в конце, ошибка?
 
-            if(in_input == se3d[l][0] && in_error == se3d[l][1])
-                { printf("ок\n");}
-            else if(l == 0){
-                if((in_input == se3d_L[0][0] && in_error == se3d_L[0][1]) || 
-                   (in_input == se3d_L[1][0] && in_error == se3d_L[1][1]))
-                    {
-                        printf("Л\n");
-                        set_error(&r, c, _l);
-                        if(break_if_error == 1)
-                            {return r;}
-                    }
-            }else
-                { 
-                    printf(sr[l][0]);
-                    set_error(&r, c, sr_a[l]);
+                }
+            }
+            else if(in_input == lvs[l].f[0] && in_error == lvs[l].f[1])
+            {
+                if(lvs[l].step == start || lvs[l].step == end){
+                    printf(lvs[l].sr);
+                    set_error(&r, c, lvs[l].sr_int);
                     if(break_if_error == 1)
                         {return r;}
                 }
+                else
+                    { printf("\n");}
+            }
+            else
+            {
+                printf(lvs[l].sr_un[3]);
+                set_error(&r, c, lvs[l].sr_un_int[3]);
+                if(break_if_error == 1)
+                    {return r;}
+
+            } 
         }
         printf("\n");
     }
