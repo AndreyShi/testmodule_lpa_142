@@ -261,7 +261,7 @@ error_lpa test_3a(const int cm, char break_if_error){
                 { return r;}
             dac_set_i(ms[0][c],lvs[l].tok);
             //-----------------
-            HAL_Delay(DELAY_2);
+            HAL_Delay(DELAY_2 - 200);
             //-----------------
             state_t in_input,in_error;
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
@@ -330,7 +330,7 @@ error_lpa test_3b(const int cm, char break_if_error){
                 { return r;}
             dac_set_i(ms[0][c],lvs[l].tok);
             //-----------------
-            HAL_Delay(DELAY_2);
+            HAL_Delay(DELAY_2 - 200);
             //-----------------
             state_t in_input,in_error;
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
@@ -397,7 +397,7 @@ error_lpa test_3c(const int cm, char break_if_error){
                 { return r;}
             dac_set_i(ms[0][c],lvs[l].tok);
             //-----------------
-            HAL_Delay(DELAY_2);
+            HAL_Delay(DELAY_2 - 200);
             //-----------------
             state_t in_input,in_error;
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
@@ -464,7 +464,7 @@ error_lpa test_3d(const int cm, char break_if_error){
                 { return r;}
             dac_set_i(ms[0][c],lvs[l].tok);
             //-----------------
-            HAL_Delay(DELAY_2);
+            HAL_Delay(DELAY_2 - 200);
             //-----------------
             state_t in_input,in_error;
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
