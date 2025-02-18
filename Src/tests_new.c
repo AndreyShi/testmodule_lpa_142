@@ -93,7 +93,7 @@ lvls lvs[] = {
                     {1.4, {0,0}, {1,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на выкл
                     {1.3, {0,0}, {1,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на выкл
                     {1.2, {0,0}, {1,0}, end  , "Е\n", _f, ZIKL_s, ZIKL_i},  //точно выкл
-                };
+             };
 //--------------------
 //текущий вывод на экран
 //--------------------
@@ -327,7 +327,7 @@ error_lpa test_3b(const int cm, char break_if_error){
     for(int c = 0; c < cm; c++){         // c - канал
         for(int l = 0; l < sizeof(lvs)/sizeof(lvls); l++){
             if(btn_break_is_pending == 1)
-            { return r;}
+                { return r;}
             dac_set_i(ms[0][c],lvs[l].tok);
             //-----------------
             HAL_Delay(DELAY_2);
@@ -394,7 +394,7 @@ error_lpa test_3c(const int cm, char break_if_error){
     for(int c = 0; c < cm; c++){ // c - канал
         for(int l = 0; l < sizeof(lvs)/sizeof(lvls); l++){
             if(btn_break_is_pending == 1)
-            { return r;}
+                { return r;}
             dac_set_i(ms[0][c],lvs[l].tok);
             //-----------------
             HAL_Delay(DELAY_2);
@@ -461,7 +461,7 @@ error_lpa test_3d(const int cm, char break_if_error){
     for(int c = 0; c < cm; c++){ // c - канал
         for(int l = 0; l < sizeof(lvs)/sizeof(lvls); l++){
             if(btn_break_is_pending == 1)
-            { return r;}
+                { return r;}
             dac_set_i(ms[0][c],lvs[l].tok);
             //-----------------
             HAL_Delay(DELAY_2);
