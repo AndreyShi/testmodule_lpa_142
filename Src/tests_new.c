@@ -69,30 +69,30 @@ typedef struct _levels
 }lvls;
 
 lvls lvs[] = {
-                    {0.1, {0,1}, {0,0}, start, "Д\n", _e, ZIKL_s, ZIKL_i},  //точно обрыв
-                    {0.2, {0,0}, {0,1}, poisk, "Д\n", _e, ZIKL_s, ZIKL_i},  //окно переключения на выкл
-                    {0.3, {0,0}, {0,1}, poisk, "Д\n", _e, ZIKL_s, ZIKL_i},  //окно переключения на выкл
-                    {0.4, {0,0}, {0,1}, end  , "Д\n", _e, ZIKL_s, ZIKL_i},  //точно выкл
+                    {0.1, {0,1}, {0,0}, start, "Д\n", _e, ZIKL_s, ZIKL_i},  //точно обрыв              0
+                    {0.2, {0,0}, {0,1}, poisk, "Д\n", _e, ZIKL_s, ZIKL_i},  //окно переключения на выкл1
+                    {0.3, {0,0}, {0,1}, poisk, "Д\n", _e, ZIKL_s, ZIKL_i},  //окно переключения на выкл2
+                    {0.4, {0,0}, {0,1}, end  , "Д\n", _e, ZIKL_s, ZIKL_i},  //точно выкл               3
 
-                    {1.6, {0,0}, {1,0}, start, "Е\n", _f, ZIKL_s, ZIKL_i},  //точно выкл
-                    {1.7, {1,0}, {0,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на вкл
-                    {1.8, {1,0}, {0,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на вкл
-                    {1.9, {1,0}, {0,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на вкл
-                    {2.0, {1,0}, {0,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на вкл
-                    {2.1, {1,0}, {0,0}, end  , "Е\n", _f, ZIKL_s, ZIKL_i},  //точно вкл
+                    {1.6, {0,0}, {1,0}, start, "Е\n", _f, ZIKL_s, ZIKL_i},  //точно выкл               4
+                    {1.7, {1,0}, {0,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на вкл 5
+                    {1.8, {1,0}, {0,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на вкл 6
+                    {1.9, {1,0}, {0,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на вкл 7
+                    {2.0, {1,0}, {0,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на вкл 8
+                    {2.1, {1,0}, {0,0}, end  , "Е\n", _f, ZIKL_s, ZIKL_i},  //точно вкл                9
 
-                    {6.5, {1,0}, {1,1}, start, "Ж\n", _g, ZIKL_s, ZIKL_i},  //точно вкл
-                    {6.6, {1,1}, {1,0}, poisk, "Ж\n", _g, ZIKL_s, ZIKL_i},  //окно переключения на КЗ
-                    {6.7, {1,1}, {1,0}, poisk, "Ж\n", _g, ZIKL_s, ZIKL_i},  //окно переключения на КЗ
-                    {6.8, {1,1}, {1,0}, poisk, "Ж\n", _g, ZIKL_s, ZIKL_i},  //окно переключения на КЗ
-                    {6.9, {1,1}, {1,0}, poisk, "Ж\n", _g, ZIKL_s, ZIKL_i},  //окно переключения на КЗ
-                    {7.0, {1,1}, {1,0}, end  , "Ж\n", _g, ZIKL_s, ZIKL_i},  //точно КЗ
+                    {6.5, {1,0}, {1,1}, start, "Ж\n", _g, ZIKL_s, ZIKL_i},  //точно вкл                10
+                    {6.6, {1,1}, {1,0}, poisk, "Ж\n", _g, ZIKL_s, ZIKL_i},  //окно переключения на КЗ  11
+                    {6.7, {1,1}, {1,0}, poisk, "Ж\n", _g, ZIKL_s, ZIKL_i},  //окно переключения на КЗ  12
+                    {6.8, {1,1}, {1,0}, poisk, "Ж\n", _g, ZIKL_s, ZIKL_i},  //окно переключения на КЗ  13
+                    {6.9, {1,1}, {1,0}, poisk, "Ж\n", _g, ZIKL_s, ZIKL_i},  //окно переключения на КЗ  14
+                    {7.0, {1,1}, {1,0}, end  , "Ж\n", _g, ZIKL_s, ZIKL_i},  //точно КЗ                 15
 
-                    {1.6, {1,0}, {0,0}, start, "Е\n", _f, ZIKL_s, ZIKL_i},  //точно вкл
-                    {1.5, {0,0}, {1,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на выкл
-                    {1.4, {0,0}, {1,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на выкл
-                    {1.3, {0,0}, {1,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на выкл
-                    {1.2, {0,0}, {1,0}, end  , "Е\n", _f, ZIKL_s, ZIKL_i},  //точно выкл
+                    {1.6, {1,0}, {0,0}, start, "Е\n", _f, ZIKL_s, ZIKL_i},  //точно вкл                16
+                    {1.5, {0,0}, {1,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на выкл17
+                    {1.4, {0,0}, {1,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на выкл18
+                    {1.3, {0,0}, {1,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на выкл19
+                    {1.2, {0,0}, {1,0}, end  , "Е\n", _f, ZIKL_s, ZIKL_i},  //точно выкл               20
              };
 //--------------------
 //текущий вывод на экран
@@ -254,29 +254,33 @@ error_lpa test_3a(const int cm, char break_if_error){
     //---------------------------------------
     set_lpa_mode(SENSOR_TYPE_NAMUR | OUTPUT_TYPE_BOT | DIRECT_OUT | DIRECT_ERR);//---здесь установить конфигурацию барьера по UART
     //---------------------------------------
-    
+    printf("▪ - начало, □ - переход в окне, ▬ - переход на границе\n");
     for(int c = 0; c < cm; c++){ // c - канал
         for(int l = 0; l < sizeof(lvs)/sizeof(lvls); l++){
             if(btn_break_is_pending == 1)
                 { return r;}
             dac_set_i(ms[0][c],lvs[l].tok);
             //-----------------
-            HAL_Delay(DELAY_2 - 200);
+            if(l == 0)
+                {HAL_Delay(DELAY_2 * 2);} // нужно побольше времени, ацп считывает с большим отклонением
+            else
+                {HAL_Delay(DELAY_2);}
             //-----------------
             state_t in_input,in_error;
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
             input_read(TM_142_INPUT_ERROR, ms[0][c], &in_error);
             adc_get_value_f(ms[0][c], TM_142_ADC_FEEDBACK, &tmpf);
-            printf("3a канал %d set %2.2f real: %2.3f, вых: %d, ош: %d ",ms[0][c],lvs[l].tok,tmpf,in_input,in_error);
+            printf("3a канал %d set %2.1f real: %2.3f, вых: %d, ош: %d ",ms[0][c],lvs[l].tok,tmpf,in_input,in_error);
 
             if(in_input == lvs[l].t[0] && in_error == lvs[l].t[1])
                 { 
-                    printf("ок\n");
-                    if(lvs[l].step == poisk)  // нашли в окне
-                        { while(lvs[++l].step != poisk) {;}} 
-                    else if(lvs[l].step == end){  //нашли в конце, ошибка?
-
-                    }
+                    if(lvs[l].step == poisk){      //нашли в окне 
+                        while(lvs[++l].step == poisk) {;}
+                        printf("□\n");
+                    }else if(lvs[l].step == end){  //нашли на границе, ошибка?
+                        printf("▬\n");
+                    }else
+                       {printf("▪\n");}            //start
                 }
             else if(in_input == lvs[l].f[0] && in_error == lvs[l].f[1])
                 {
@@ -330,22 +334,23 @@ error_lpa test_3b(const int cm, char break_if_error){
                 { return r;}
             dac_set_i(ms[0][c],lvs[l].tok);
             //-----------------
-            HAL_Delay(DELAY_2 - 200);
+            HAL_Delay(DELAY_2);
             //-----------------
             state_t in_input,in_error;
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
             input_read(TM_142_INPUT_ERROR, ms[0][c], &in_error);
             adc_get_value_f(ms[0][c], TM_142_ADC_FEEDBACK, &tmpf);
-            printf("3b канал %d set %2.2f real: %2.3f, вых: %d, ош: %d ",ms[0][c],lvs[l].tok,tmpf,in_input,in_error);
+            printf("3b канал %d set %2.1f real: %2.3f, вых: %d, ош: %d ",ms[0][c],lvs[l].tok,tmpf,in_input,in_error);
 
             if(in_input == INV(lvs[l].t[0]) && in_error == INV(lvs[l].t[1]))
                 { 
-                    printf("ок\n");
-                    if(lvs[l].step == poisk)  // нашли в окне
-                        { while(lvs[++l].step != poisk) {;}} 
-                    else if(lvs[l].step == end){  //нашли в конце, ошибка?
-
-                    }
+                    if(lvs[l].step == poisk){      //нашли в окне
+                        while(lvs[++l].step == poisk) {;}
+                        printf("□\n");
+                    }else if(lvs[l].step == end){  //нашли на границе, ошибка?
+                        printf("▬\n");
+                    }else
+                       {printf("▪\n");}            //start
                 }
             else if(in_input == INV(lvs[l].f[0]) && in_error == INV(lvs[l].f[1]))
                 {
@@ -397,22 +402,23 @@ error_lpa test_3c(const int cm, char break_if_error){
                 { return r;}
             dac_set_i(ms[0][c],lvs[l].tok);
             //-----------------
-            HAL_Delay(DELAY_2 - 200);
+            HAL_Delay(DELAY_2);
             //-----------------
             state_t in_input,in_error;
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
             input_read(TM_142_INPUT_ERROR, ms[0][c], &in_error);
             adc_get_value_f(ms[0][c], TM_142_ADC_FEEDBACK, &tmpf);
-            printf("3c канал %d set %2.2f real: %2.3f, вых: %d, ош: %d ",ms[0][c],lvs[l].tok,tmpf,in_input,in_error);
+            printf("3c канал %d set %2.1f real: %2.3f, вых: %d, ош: %d ",ms[0][c],lvs[l].tok,tmpf,in_input,in_error);
 
             if(in_input == INV(lvs[l].t[0]) && in_error == INV(lvs[l].t[1]))
             { 
-                printf("ок\n");
-                if(lvs[l].step == poisk)  // нашли в окне
-                    { while(lvs[++l].step != poisk) {;}} 
-                else if(lvs[l].step == end){  //нашли в конце, ошибка?
-
-                }
+                if(lvs[l].step == poisk){      //нашли в окне
+                    while(lvs[++l].step == poisk) {;}
+                    printf("□\n");
+                }else if(lvs[l].step == end){  //нашли на границе, ошибка?
+                    printf("▬\n");
+                }else
+                   {printf("▪\n");}            //start
             }
             else if(in_input == INV(lvs[l].f[0]) && in_error == INV(lvs[l].f[1]))
             {
@@ -464,22 +470,23 @@ error_lpa test_3d(const int cm, char break_if_error){
                 { return r;}
             dac_set_i(ms[0][c],lvs[l].tok);
             //-----------------
-            HAL_Delay(DELAY_2 - 200);
+            HAL_Delay(DELAY_2);
             //-----------------
             state_t in_input,in_error;
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
             input_read(TM_142_INPUT_ERROR, ms[0][c], &in_error);
             adc_get_value_f(ms[0][c], TM_142_ADC_FEEDBACK, &tmpf);
-            printf("3d канал %d set %2.2f real: %2.3f, вых: %d, ош: %d ",ms[0][c],lvs[l].tok,tmpf,in_input,in_error);
+            printf("3d канал %d set %2.1f real: %2.3f, вых: %d, ош: %d ",ms[0][c],lvs[l].tok,tmpf,in_input,in_error);
 
             if(in_input == lvs[l].t[0] && in_error == lvs[l].t[1])
             { 
-                printf("ок\n");
-                if(lvs[l].step == poisk)  // нашли в окне
-                    { while(lvs[++l].step != poisk) {;}} 
-                else if(lvs[l].step == end){  //нашли в конце, ошибка?
-
-                }
+                if(lvs[l].step == poisk){      //нашли в окне 
+                    while(lvs[++l].step == poisk) {;}
+                    printf("□\n");
+                }else if(lvs[l].step == end){  //нашли на границе, ошибка?
+                    printf("▬\n");
+                }else
+                   {printf("▪\n");}            //start 
             }
             else if(in_input == lvs[l].f[0] && in_error == lvs[l].f[1])
             {
