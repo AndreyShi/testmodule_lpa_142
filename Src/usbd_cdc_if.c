@@ -476,7 +476,7 @@ void usb_parse(usb_packet* pk)
       else
           {pk->cmd = -14;}
     }else if(strncmp((const char*)UserRxBufferFS,"ацп ток бин",20) == 0){          //[строка:ацп ток][пробел][int:канал]   
-      pk->ch = atoi((const char*)&UserRxBufferFS[9 * 2 + 3]);//9 символов в кириллице в utf * 2 + 2 пробела
+      pk->ch = atoi((const char*)&UserRxBufferFS[9 * 2 + 3]);//9 символов в кириллице в utf * 2 + 3 пробела
       if(pk->ch != 1 && pk->ch != 2)
           {printf("ошибка выбора канала! первый: 1, второй: 2\n");}
       else
