@@ -411,14 +411,14 @@ void usb_parse(usb_packet* pk)
         {pk->cmd = -1;}
     else if(strcmp((const char*)UserRxBufferFS,  "вкл 24") == 0)            //[строка:вкл 24]
         {pk->cmd = -2;}
-    else if(strncmp((const char*)UserRxBufferFS, "ток",3) == 0){            //[строка:ток][пробел][int:канал][пробел][float:данные]
+    else if(strncmp((const char*)UserRxBufferFS, "ток",6) == 0){            //[строка:ток][пробел][int:канал][пробел][float:данные]
          pk->ch = atoi((const char*)&UserRxBufferFS[7]);
          pk->data_f = atof((const char*)&UserRxBufferFS[9]);
          if(pk->ch != 1 && pk->ch != 2)
              {printf("ошибка выбора канала! первый: 1, второй: 2\n");}
          else
              {pk->cmd = -3;}
-    }else if(strncmp((const char*)UserRxBufferFS,"цап",3) == 0){            //[строка:цап][пробел][int:канал][пробел][bin:данные]
+    }else if(strncmp((const char*)UserRxBufferFS,"цап",6) == 0){            //[строка:цап][пробел][int:канал][пробел][bin:данные]
          pk->ch = atoi((const char*)&UserRxBufferFS[7]);
          pk->dac_bin = atoi((const char*)&UserRxBufferFS[9]);
          if(pk->ch != 1 && pk->ch != 2)
@@ -427,8 +427,8 @@ void usb_parse(usb_packet* pk)
              {pk->cmd = -4;}
     }else if(strcmp((const char*)UserRxBufferFS, "калибровка цап") == 0){   //[строка:калибровка цап]
          pk->cmd =  3;
-    }else if(strncmp((const char*)UserRxBufferFS,"ацп ток",7) == 0){        //[строка:ацп ток][пробел][int:канал]   
-         pk->ch = atoi((const char*)&UserRxBufferFS[14]);
+    }else if(strncmp((const char*)UserRxBufferFS,"ацп ток реал",22) == 0){        //[строка:ацп ток][пробел][int:канал]   
+         pk->ch = atoi((const char*)&UserRxBufferFS[23]);
          if(pk->ch != 1 && pk->ch != 2)
              {printf("ошибка выбора канала! первый: 1, второй: 2\n");}
          else
@@ -455,7 +455,7 @@ void usb_parse(usb_packet* pk)
        pk->dt = atoi((const char*)&UserRxBufferFS[7]);
     }else if(strcmp((const char*)UserRxBufferFS, "relay init") == 0){
       pk->cmd = -12;
-    }else if(strncmp((const char*)UserRxBufferFS, "диагностика",11) == 0){    //[строка:диагностика][пробел][int:канал]
+    }else if(strncmp((const char*)UserRxBufferFS, "диагностика",22) == 0){    //[строка:диагностика][пробел][int:канал]
       pk->ch = atoi((const char*)&UserRxBufferFS[11 * 2 + 1]); // 11 символов в кириллице в utf * 2 + 1 пробел
       if(pk->ch != 1 && pk->ch != 2 && pk->ch != 3)
         { printf("ошибка выбора канала! первый: 1, второй: 2\n");}
@@ -469,6 +469,18 @@ void usb_parse(usb_packet* pk)
     }else if(strcmp((const char*)UserRxBufferFS, "адрес платы") == 0){
       //printf("id_read: %d\n",id_read());
       printf("id_read: "BYTE_TO_BINARY_PATTERN, BYTE_TO_BINARY(id_read()));
+    }else if(strncmp((const char*)UserRxBufferFS,"ацп напр бин",22) == 0){        //[строка:ацп ток][пробел][int:канал]   
+      pk->ch = atoi((const char*)&UserRxBufferFS[10 * 2 + 3]);//10 символов в кириллице в utf * 2 + 3 пробела
+      if(pk->ch != 1 && pk->ch != 2)
+          {printf("ошибка выбора канала! первый: 1, второй: 2\n");}
+      else
+          {pk->cmd = -14;}
+    }else if(strncmp((const char*)UserRxBufferFS,"ацп ток бин",20) == 0){          //[строка:ацп ток][пробел][int:канал]   
+      pk->ch = atoi((const char*)&UserRxBufferFS[9 * 2 + 3]);//9 символов в кириллице в utf * 2 + 2 пробела
+      if(pk->ch != 1 && pk->ch != 2)
+          {printf("ошибка выбора канала! первый: 1, второй: 2\n");}
+      else
+          {pk->cmd = -15;}
     }else
          { printf("неизвестная команда ☺\n");}
         
@@ -561,6 +573,17 @@ void usb_task(usb_packet* ub)
 
         printf("exit\n");
         while(relay_set(TM_142_RELAY_POWER, CH_1, STATE_OFF) == 0) { ;}
+    }else if( ub->cmd == -14){
+      relay_set(TM_142_RELAY_U0,     ub->ch, TM_142_U0_ENABLE); //K7 //это реле надо включить
+      uint16_t tmp = 0;
+      adc_get_value(ub->ch, TM_142_ADC_OPENCIRC, &tmp);
+      printf("ацп %d напр бин %d", ub->ch, tmp);
+    }else if( ub->cmd == -15){
+      relay_set(TM_142_RELAY_U0,     ub->ch, TM_142_U0_DISABLE);//K7
+      relay_set(TM_142_RELAY_SENSOR, ub->ch, TM_142_SENSOR_ANA);//K6
+      uint16_t tmp = 0;
+      adc_get_value(ub->ch, TM_142_ADC_FEEDBACK, &tmp);
+      printf("ацп %d ток бин %d", ub->ch, tmp);
     }
 }
 
