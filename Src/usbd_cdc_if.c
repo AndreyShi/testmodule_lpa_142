@@ -411,16 +411,16 @@ void usb_parse(usb_packet* pk)
         {pk->cmd = -1;}
     else if(strcmp((const char*)UserRxBufferFS,  "вкл 24") == 0)            //[строка:вкл 24]
         {pk->cmd = -2;}
-    else if(strncmp((const char*)UserRxBufferFS, "ток",6) == 0){            //[строка:ток][пробел][int:канал][пробел][float:данные]
-         pk->ch = atoi((const char*)&UserRxBufferFS[7]);
-         pk->data_f = atof((const char*)&UserRxBufferFS[9]);
+    else if(strncmp((const char*)UserRxBufferFS, "цап реал",15) == 0){      //[строка:цап реал][пробел][int:канал][пробел][float:данные]
+         pk->ch = atoi((const char*)&UserRxBufferFS[16]);
+         pk->data_f = atof((const char*)&UserRxBufferFS[18]);
          if(pk->ch != 1 && pk->ch != 2)
              {printf("ошибка выбора канала! первый: 1, второй: 2\n");}
          else
              {pk->cmd = -3;}
-    }else if(strncmp((const char*)UserRxBufferFS,"цап",6) == 0){            //[строка:цап][пробел][int:канал][пробел][bin:данные]
-         pk->ch = atoi((const char*)&UserRxBufferFS[7]);
-         pk->dac_bin = atoi((const char*)&UserRxBufferFS[9]);
+    }else if(strncmp((const char*)UserRxBufferFS,"цап бин",13) == 0){       //[строка:цап бин][пробел][int:канал][пробел][bin:данные]
+         pk->ch = atoi((const char*)&UserRxBufferFS[14]);
+         pk->dac_bin = atoi((const char*)&UserRxBufferFS[16]);
          if(pk->ch != 1 && pk->ch != 2)
              {printf("ошибка выбора канала! первый: 1, второй: 2\n");}
          else
