@@ -383,7 +383,10 @@ static int8_t CDC_TransmitCplt_FS(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
 }
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
-
+/*
+при использовании strncmp если сначала сравнивается strncmp("цап", 6), а потом ниже strncmp ("цап ток", 13)
+то всегда будет выполняться условие по "цап"
+*/
 void usb_parse(usb_packet* pk)
 {
     if(usb_recieve_ok == 0)
