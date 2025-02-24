@@ -66,33 +66,34 @@ typedef struct _levels
 
     char* sr_un      [4];   //ошибка в случае не правильный и не неправильный
     uint8_t sr_un_int[4];   //ошибка в случае не правильный и не неправильный (числовой эквивалент)
+    uint16_t dac_delay;     //пауза для цап после выставления тока
 }lvls;
 
 lvls lvs[] = {
-                    {0.1, {0,1}, {0,0}, start, "Д\n", _e, ZIKL_s, ZIKL_i},  //точно обрыв              0
-                    {0.2, {0,0}, {0,1}, poisk, "Д\n", _e, ZIKL_s, ZIKL_i},  //окно переключения на выкл1
-                    {0.3, {0,0}, {0,1}, poisk, "Д\n", _e, ZIKL_s, ZIKL_i},  //окно переключения на выкл2
-                    {0.4, {0,0}, {0,1}, end  , "Д\n", _e, ZIKL_s, ZIKL_i},  //точно выкл               3
+                    {0.1, {0,1}, {0,0}, start, "Д\n", _e, ZIKL_s, ZIKL_i, 500},  //точно обрыв              0
+                    {0.2, {0,0}, {0,1}, poisk, "Д\n", _e, ZIKL_s, ZIKL_i, 200},  //окно переключения на выкл1
+                    {0.3, {0,0}, {0,1}, poisk, "Д\n", _e, ZIKL_s, ZIKL_i, 200},  //окно переключения на выкл2
+                    {0.4, {0,0}, {0,1}, end  , "Д\n", _e, ZIKL_s, ZIKL_i, 200},  //точно выкл               3
 
-                    {1.6, {0,0}, {1,0}, start, "Е\n", _f, ZIKL_s, ZIKL_i},  //точно выкл               4
-                    {1.7, {1,0}, {0,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на вкл 5
-                    {1.8, {1,0}, {0,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на вкл 6
-                    {1.9, {1,0}, {0,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на вкл 7
-                    {2.0, {1,0}, {0,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на вкл 8
-                    {2.1, {1,0}, {0,0}, end  , "Е\n", _f, ZIKL_s, ZIKL_i},  //точно вкл                9
+                    {1.6, {0,0}, {1,0}, start, "Е\n", _f, ZIKL_s, ZIKL_i, 500},  //точно выкл               4
+                    {1.7, {1,0}, {0,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i, 200},  //окно переключения на вкл 5
+                    {1.8, {1,0}, {0,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i, 200},  //окно переключения на вкл 6
+                    {1.9, {1,0}, {0,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i, 200},  //окно переключения на вкл 7
+                    {2.0, {1,0}, {0,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i, 200},  //окно переключения на вкл 8
+                    {2.1, {1,0}, {0,0}, end  , "Е\n", _f, ZIKL_s, ZIKL_i, 200},  //точно вкл                9
 
-                    {6.5, {1,0}, {1,1}, start, "Ж\n", _g, ZIKL_s, ZIKL_i},  //точно вкл                10
-                    {6.6, {1,1}, {1,0}, poisk, "Ж\n", _g, ZIKL_s, ZIKL_i},  //окно переключения на КЗ  11
-                    {6.7, {1,1}, {1,0}, poisk, "Ж\n", _g, ZIKL_s, ZIKL_i},  //окно переключения на КЗ  12
-                    {6.8, {1,1}, {1,0}, poisk, "Ж\n", _g, ZIKL_s, ZIKL_i},  //окно переключения на КЗ  13
-                    {6.9, {1,1}, {1,0}, poisk, "Ж\n", _g, ZIKL_s, ZIKL_i},  //окно переключения на КЗ  14
-                    {7.0, {1,1}, {1,0}, end  , "Ж\n", _g, ZIKL_s, ZIKL_i},  //точно КЗ                 15
+                    {6.5, {1,0}, {1,1}, start, "Ж\n", _g, ZIKL_s, ZIKL_i, 500},  //точно вкл                10
+                    {6.6, {1,1}, {1,0}, poisk, "Ж\n", _g, ZIKL_s, ZIKL_i, 200},  //окно переключения на КЗ  11
+                    {6.7, {1,1}, {1,0}, poisk, "Ж\n", _g, ZIKL_s, ZIKL_i, 200},  //окно переключения на КЗ  12
+                    {6.8, {1,1}, {1,0}, poisk, "Ж\n", _g, ZIKL_s, ZIKL_i, 200},  //окно переключения на КЗ  13
+                    {6.9, {1,1}, {1,0}, poisk, "Ж\n", _g, ZIKL_s, ZIKL_i, 200},  //окно переключения на КЗ  14
+                    {7.0, {1,1}, {1,0}, end  , "Ж\n", _g, ZIKL_s, ZIKL_i, 200},  //точно КЗ                 15
 
-                    {1.6, {1,0}, {0,0}, start, "Е\n", _f, ZIKL_s, ZIKL_i},  //точно вкл                16
-                    {1.5, {0,0}, {1,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на выкл17
-                    {1.4, {0,0}, {1,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на выкл18
-                    {1.3, {0,0}, {1,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i},  //окно переключения на выкл19
-                    {1.2, {0,0}, {1,0}, end  , "Е\n", _f, ZIKL_s, ZIKL_i},  //точно выкл               20
+                    {1.6, {1,0}, {0,0}, start, "Е\n", _f, ZIKL_s, ZIKL_i, 500},  //точно вкл                16
+                    {1.5, {0,0}, {1,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i, 200},  //окно переключения на выкл17
+                    {1.4, {0,0}, {1,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i, 200},  //окно переключения на выкл18
+                    {1.3, {0,0}, {1,0}, poisk, "Е\n", _f, ZIKL_s, ZIKL_i, 200},  //окно переключения на выкл19
+                    {1.2, {0,0}, {1,0}, end  , "Е\n", _f, ZIKL_s, ZIKL_i, 200},  //точно выкл               20
              };
 //--------------------
 //текущий вывод на экран
@@ -261,10 +262,7 @@ error_lpa test_3a(const int cm, char break_if_error){
                 { return r;}
             dac_set_i(ms[0][c],lvs[l].tok);
             //-----------------
-            if(l == 0)
-                {HAL_Delay(DELAY_2 * 2);} // нужно побольше времени, ацп считывает с большим отклонением
-            else
-                {HAL_Delay(DELAY_2);}
+            HAL_Delay(lvs[l].dac_delay);
             //-----------------
             state_t in_input,in_error;
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
@@ -334,7 +332,7 @@ error_lpa test_3b(const int cm, char break_if_error){
                 { return r;}
             dac_set_i(ms[0][c],lvs[l].tok);
             //-----------------
-            HAL_Delay(DELAY_2);
+            HAL_Delay(lvs[l].dac_delay);
             //-----------------
             state_t in_input,in_error;
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
@@ -402,7 +400,7 @@ error_lpa test_3c(const int cm, char break_if_error){
                 { return r;}
             dac_set_i(ms[0][c],lvs[l].tok);
             //-----------------
-            HAL_Delay(DELAY_2);
+            HAL_Delay(lvs[l].dac_delay);
             //-----------------
             state_t in_input,in_error;
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
@@ -470,7 +468,7 @@ error_lpa test_3d(const int cm, char break_if_error){
                 { return r;}
             dac_set_i(ms[0][c],lvs[l].tok);
             //-----------------
-            HAL_Delay(DELAY_2);
+            HAL_Delay(lvs[l].dac_delay);
             //-----------------
             state_t in_input,in_error;
             input_read(TM_142_INPUT_INPUT, ms[0][c], &in_input);
