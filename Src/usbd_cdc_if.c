@@ -387,6 +387,7 @@ static int8_t CDC_TransmitCplt_FS(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
 при использовании strncmp если сначала сравнивается strncmp("цап", 6), а потом ниже strncmp ("цап ток", 13)
 то всегда будет выполняться условие по "цап"
 */
+#define compare_str(x,y,cnt) strncmp((const char*)x,y,cnt) == 0
 void usb_parse(usb_packet* pk)
 {
     if(usb_recieve_ok == 0)
@@ -484,6 +485,13 @@ void usb_parse(usb_packet* pk)
           {printf("ошибка выбора канала! первый: 1, второй: 2\n");}
       else
           {pk->cmd = -15;}
+    }else if(compare_str(UserRxBufferFS,"цап тест бин",22)){
+      pk->ch = atoi((const char*)&UserRxBufferFS[23]);
+      pk->dac_bin = atoi((const char*)&UserRxBufferFS[25]);
+      if(pk->ch != 1 && pk->ch != 2)
+          {printf("ошибка выбора канала! первый: 1, второй: 2\n");}
+      else
+          {pk->cmd = -16;}
     }else
          { printf("неизвестная команда ☺\n");}
         
@@ -587,6 +595,16 @@ void usb_task(usb_packet* ub)
       uint16_t tmp = 0;
       adc_get_value(ub->ch, TM_142_ADC_FEEDBACK, &tmp);
       printf("ацп %d ток бин %d", ub->ch, tmp);
+    }else if( ub->cmd == -16){
+      dac_set(ub->ch,ub->dac_bin);
+      int i = 15;
+      float tmp_f = 99999.9;
+      while(i--)
+      {
+        adc_get_value_f(ub->ch, TM_142_ADC_FEEDBACK, &tmp_f);
+        printf("%2.1f\n",tmp_f);
+        HAL_Delay(400);
+      }
     }
 }
 
