@@ -162,7 +162,7 @@ error_lpa test_2(const int cm, char break_if_error){
       relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_ANA);//K6
     }
     //----------------------------------------------------------------------------
-    HAL_Delay(DELAY_1);//пауза включения реле
+    //HAL_Delay(DELAY_1);//пауза включения реле
     //-----------------
     for(int c = 0; c < cm; c++){
       dac_set(ms[0][c],4095);//на ЦАП выставить 4095
@@ -209,7 +209,7 @@ error_lpa calibration_dacs(const int cm, char break_if_error){
       relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_ANA);//K6
     }
     //--------------------
-    HAL_Delay(DELAY_1);
+    //HAL_Delay(DELAY_1);
     //--------------------
     for(int c = 0; c < cm; c++){    // 0 - 1 канал, 1 - 2 канал
       for(int m = 0; m < 2; m++){  // min-0 max-1
@@ -283,6 +283,10 @@ error_lpa test_3a(const int cm, char break_if_error){
             else if(in_input == lvs[l].f[0] && in_error == lvs[l].f[1])
                 {
                     if(lvs[l].step == start || lvs[l].step == end){
+                        if(lvs[l].step == start)
+                            { printf("▪ ");}
+                        else if(lvs[l].step == end)
+                            { printf("▬ ");}
                         printf(lvs[l].sr);
                         set_error(&r, c, lvs[l].sr_int);
                         if(break_if_error == 1)
@@ -353,6 +357,10 @@ error_lpa test_3b(const int cm, char break_if_error){
             else if(in_input == INV(lvs[l].f[0]) && in_error == INV(lvs[l].f[1]))
                 {
                     if(lvs[l].step == start || lvs[l].step == end){
+                        if(lvs[l].step == start)
+                            { printf("▪ ");}
+                        else if(lvs[l].step == end)
+                            { printf("▬ ");}
                         printf(lvs[l].sr);
                         set_error(&r, c, lvs[l].sr_int);
                         if(break_if_error == 1)
@@ -421,6 +429,10 @@ error_lpa test_3c(const int cm, char break_if_error){
             else if(in_input == INV(lvs[l].f[0]) && in_error == INV(lvs[l].f[1]))
             {
                 if(lvs[l].step == start || lvs[l].step == end){
+                    if(lvs[l].step == start)
+                        { printf("▪ ");}
+                    else if(lvs[l].step == end)
+                        { printf("▬ ");}
                     printf(lvs[l].sr);
                     set_error(&r, c, lvs[l].sr_int);
                     if(break_if_error == 1)
@@ -489,6 +501,10 @@ error_lpa test_3d(const int cm, char break_if_error){
             else if(in_input == lvs[l].f[0] && in_error == lvs[l].f[1])
             {
                 if(lvs[l].step == start || lvs[l].step == end){
+                    if(lvs[l].step == start)
+                        { printf("▪ ");}
+                    else if(lvs[l].step == end)
+                        { printf("▬ ");}
                     printf(lvs[l].sr);
                     set_error(&r, c, lvs[l].sr_int);
                     if(break_if_error == 1)
