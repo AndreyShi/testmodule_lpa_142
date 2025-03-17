@@ -22,8 +22,8 @@ typedef struct {
 } failed_stage_t;
 
 /* replace the zero with appropriate data pointer */
-image_t channels_img =     {  46,  7,  true, 0 };
-image_t bg_img =           { 128, 64, false, 0 };
+image_t channels_img     = {  46,  7,  true, 0 };
+image_t bg_img           = { 128, 64, false, 0 };
 image_t script_stage_img = { 128, 64, false, 0 };
 image_t barr_control_img = { 107, 17, false, 0 };
 image_t status_img       = {  26, 10,  true, 0 };
@@ -46,11 +46,11 @@ failed_stage_t failed_stages[] = {/*{{{*/
 
 
 //------переменные "защелки" для одиночного вывода на дисплей-----
-static uint8_t disp_usb_com_open = 255;
-static uint8_t disp_lpa_power    = 255;
-static int     disp_ch_gl        = 255;
-static uint8_t disp_stages       =   0; //не обновлять при вкл питания
-static uint8_t disp_id           = 255;
+static uint8_t disp_usb_com_open = need_update_on_display;
+static uint8_t disp_lpa_power    = need_update_on_display;
+static int     disp_ch_gl        = need_update_on_display;
+static uint8_t disp_stages       = no_update_on_display; //не обновлять при вкл питания
+static uint8_t disp_id           = need_update_on_display;
 //----------------------------------------------------------------
 //------переменные только для чтения из других модулей------------
 extern const uint8_t usb_com_open;
@@ -86,7 +86,7 @@ void display_task(void* some_data){
           render_image(0, 0, false,0, &script_stage_img);
           display_channels_count();/* display channels count */
 
-      }else if(stages == 11 && some_data != 0){ //show errors
+      }else if(stages == 11 && some_data != NULL){ //show errors
 
             const image_t*   err_img;
             const error_lpa* err_p = (error_lpa*)some_data;
@@ -125,9 +125,9 @@ void display_task(void* some_data){
       }
       
       disp_stages = stages;   //защелка
-      disp_usb_com_open = 255;//добавляем поверх usb_img
-      disp_lpa_power    = 255;//добавляем поверх power_img
-      disp_id           = 255;//добавляем поверх id
+      disp_usb_com_open = need_update_on_display;//добавляем поверх usb_img
+      disp_lpa_power    = need_update_on_display;//добавляем поверх power_img
+      disp_id           = need_update_on_display;//добавляем поверх id
       render_now = true;
     }
 
@@ -142,9 +142,9 @@ void display_task(void* some_data){
         render_image(0, 0, false,0, &bg_img);
         render_now = true;
         disp_ch_gl = ch_gl;     //защелка
-        disp_usb_com_open = 255;//добавляем поверх usb_img
-        disp_lpa_power    = 255;//добавляем поверх power_img
-        disp_id           = 255;//добавляем поверх id
+        disp_usb_com_open = need_update_on_display;//добавляем поверх usb_img
+        disp_lpa_power    = need_update_on_display;//добавляем поверх power_img
+        disp_id           = need_update_on_display;//добавляем поверх id
     }
 
     if(disp_usb_com_open != usb_com_open){
@@ -189,5 +189,5 @@ void display_channels_count(void){
 и покажет выбор каналов
 */
 void show_vibor_kanalov(void){
-    disp_ch_gl = 255;
+    disp_ch_gl = need_update_on_display;
 }

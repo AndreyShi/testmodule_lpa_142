@@ -119,7 +119,7 @@ void set_error(error_lpa* er_p, uint8_t ch, uint8_t type_er){
 */
 error_lpa test_1(const int cm, char break_if_error){      
 
-       error_lpa r = {.stage = 0,.flag = {0},.type_er = {0}};
+       error_lpa r = {.stage = stage_CheckU,.flag = {0},.type_er = {0}};
 
        for(int c = 0; c < cm; c++){
             relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_ENABLE); //K7 
@@ -154,7 +154,7 @@ error_lpa test_1(const int cm, char break_if_error){
 */
 error_lpa test_2(const int cm, char break_if_error){
 
-    error_lpa r = {.stage = 1,.flag = {0},.type_er = {0}};
+    error_lpa r = {.stage = stage_CheckI,.flag = {0},.type_er = {0}};
 
     //------подключить аналоговый имитатор датчика (отключить К7 и К6)
     for(int c = 0; c < cm; c++){
@@ -195,7 +195,7 @@ error_lpa test_2(const int cm, char break_if_error){
 */
 error_lpa calibration_dacs(const int cm, char break_if_error){
 
-    error_lpa r = {.stage = 2,.flag = {0},.type_er = {0}};
+    error_lpa r = {.stage = stage_AutoDacCalibr,.flag = {0},.type_er = {0}};
 
     uint16_t dac_p[2][2] = {{0x200,0x600},{0x200,0x600}};  // [канал][{min,max}]
     float adc_p[2][2]    = {{0.0F ,0.0F },{0.0F ,0.0F }};  // [канал][{min,max}]
@@ -241,7 +241,7 @@ error_lpa calibration_dacs(const int cm, char break_if_error){
 */
 error_lpa test_3a(const int cm, char break_if_error){
 
-    error_lpa r = {.stage = 3,.flag = {0},.type_er = {0}};
+    error_lpa r = {.stage = stage_Check_bot,.flag = {0},.type_er = {0}};
     float tmpf = 0.0F;
     //----подготовка реле -------------------
     for(int c = 0; c < cm; c++){
@@ -316,7 +316,7 @@ error_lpa test_3a(const int cm, char break_if_error){
 */
 error_lpa test_3b(const int cm, char break_if_error){
 
-    error_lpa r = {.stage = 4,.flag = {0},.type_er = {0}};
+    error_lpa r = {.stage = stage_Check_bot_Inv,.flag = {0},.type_er = {0}};
     float tmpf = 0.0F;
     //----подготовка реле -------------------
     for(int c = 0; c < cm; c++){
@@ -388,7 +388,7 @@ error_lpa test_3b(const int cm, char break_if_error){
 */
 error_lpa test_3c(const int cm, char break_if_error){
 
-    error_lpa r = {.stage = 5,.flag = {0},.type_er = {0}};
+    error_lpa r = {.stage = stage_Check_top,.flag = {0},.type_er = {0}};
     float tmpf = 0.0F;
     //----подготовка реле -------------------
     for(int c = 0; c < cm; c++){
@@ -460,7 +460,7 @@ error_lpa test_3c(const int cm, char break_if_error){
 */
 error_lpa test_3d(const int cm, char break_if_error){
 
-    error_lpa r = {.stage = 6,.flag = {0},.type_er = {0}};
+    error_lpa r = {.stage = stage_Check_top_Inv,.flag = {0},.type_er = {0}};
     float tmpf = 0.0F;
     //----подготовка реле -------------------
     for(int c = 0; c < cm; c++){
@@ -529,7 +529,7 @@ error_lpa test_3d(const int cm, char break_if_error){
 
 error_lpa test_4a(const int cm, char break_if_error){
 
-    error_lpa r = {.stage = 7,.flag = {0},.type_er = {0}};
+    error_lpa r = {.stage = stage_Check_Freq_bot,.flag = {0},.type_er = {0}};
     uint16_t data[2] = {0};
     //----подготовка реле --------------
     for(int c = 0; c < cm; c++){
@@ -569,14 +569,14 @@ error_lpa test_4a(const int cm, char break_if_error){
 
 error_lpa test_4b(const int cm, char break_if_error){
 
-    error_lpa r = {.stage = 8,.flag = {0},.type_er = {0}};
+    error_lpa r = {.stage = stage_Check_Freq_top,.flag = {0},.type_er = {0}};
     uint16_t data[2] = {0};
     //----подготовка реле ----------------
     for(int c = 0; c < cm; c++){
         //подключить аналоговый имитатор датчика. (отключить К7 и К6) 
         relay_set(TM_142_RELAY_U0,     ms[0][c], TM_142_U0_DISABLE);// K7
         relay_set(TM_142_RELAY_SENSOR, ms[0][c], TM_142_SENSOR_DIG);//K6
-        //подключить входы барьера для режима «нижний ключ» (реле K2..K5).
+        //подключить входы барьера для режима «верхний ключ» (реле K2..K5).
         relay_set(TM_142_RELAY_INPUT,  ms[0][c], TM_142_TOP_SW);//K2K4
         relay_set(TM_142_RELAY_ERROR,  ms[0][c], TM_142_TOP_SW);//K3K5
     }
