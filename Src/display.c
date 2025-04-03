@@ -49,14 +49,14 @@ failed_stage_t failed_stages[] = {/*{{{*/
 static uint8_t disp_usb_com_open = need_update_on_display;
 static uint8_t disp_lpa_power    = need_update_on_display;
 static int     disp_ch_gl        = need_update_on_display;
-static uint8_t disp_stages       = no_update_on_display; //не обновлять при вкл питания
+static uint8_t disp_test_pic     = no_update_on_display; //не обновлять при вкл питания
 static uint8_t disp_id           = need_update_on_display;
 //----------------------------------------------------------------
 //------переменные только для чтения из других модулей------------
 extern const uint8_t usb_com_open;
 extern const uint8_t lpa_power;
 extern const int     ch_gl; 
-extern const uint8_t stages;
+extern const uint8_t cur_test_pic;
 //----------------------------------------------------------------
 /*
 TO DO лист
@@ -74,19 +74,21 @@ static void display_channels_count(void);
 void display_task(void* some_data){
     bool render_now = false;
 
-    if(disp_stages != stages){
-      if(stages == 1){
+    if(disp_test_pic != cur_test_pic){
+      if(cur_test_pic == pic_PROSHIVKA){
 
-          script_stage_img.data = script_stage_data[1];
+          script_stage_img.data = script_stage_data[cur_test_pic];
           render_image(0, 0, false,0, &script_stage_img);
 
-      }else if (stages == 2 || stages == 3 || stages == 4 || stages == 5 || stages == 6 || stages == 7 || stages == 8 || stages == 9 || stages == 10){
+      }else if (cur_test_pic == pic_TEST1  || cur_test_pic == pic_TEST2  || cur_test_pic == pic_SHESTERENKI ||
+                cur_test_pic == pic_TEST3a || cur_test_pic == pic_TEST3b || cur_test_pic == pic_TEST3c ||
+                cur_test_pic == pic_TEST3d || cur_test_pic == pic_TEST4a || cur_test_pic == pic_TEST4b){
 
-          script_stage_img.data = script_stage_data[stages];
+          script_stage_img.data = script_stage_data[cur_test_pic];
           render_image(0, 0, false,0, &script_stage_img);
           display_channels_count();/* display channels count */
 
-      }else if(stages == 11 && some_data != NULL){ //show errors
+      }else if(cur_test_pic == pic_OSHIBKA && some_data != NULL){ //show errors
 
             const image_t*   err_img;
             const error_lpa* err_p = (error_lpa*)some_data;
@@ -118,17 +120,17 @@ void display_task(void* some_data){
             else if(err_ch == 1)
                 { render_image(110, 44, false,0, &(err_numbers_img[1])); }
 
-      }else if(stages == 12){ //show success
+      }else if(cur_test_pic == pic_VSE_OK){ //show success
             render_box(0, 17, 128, success_img.h, true);//очистить
             render_image(45, 17, false,0, &success_img);        
             display_channels_count();/* display channels count */
       }
       
-      disp_stages = stages;   //защелка
+      disp_test_pic     = cur_test_pic;   //защелка
       disp_usb_com_open = need_update_on_display;//добавляем поверх usb_img
       disp_lpa_power    = need_update_on_display;//добавляем поверх power_img
       disp_id           = need_update_on_display;//добавляем поверх id
-      render_now = true;
+      render_now        = true;
     }
 
 
@@ -140,8 +142,8 @@ void display_task(void* some_data){
             { bg_img.data = bg_data[BG_TWO]; }
 
         render_image(0, 0, false,0, &bg_img);
-        render_now = true;
-        disp_ch_gl = ch_gl;     //защелка
+        render_now        = true;
+        disp_ch_gl        = ch_gl;     //защелка
         disp_usb_com_open = need_update_on_display;//добавляем поверх usb_img
         disp_lpa_power    = need_update_on_display;//добавляем поверх power_img
         disp_id           = need_update_on_display;//добавляем поверх id
@@ -152,7 +154,7 @@ void display_task(void* some_data){
             {render_image(88, 0, false,0, &usb_img);}
        else
             {render_box(88, 0, usb_img.w, usb_img.h, true);}//очистить
-       render_now = true;
+       render_now        = true;
        disp_usb_com_open = usb_com_open;//защелка
     }
 
@@ -161,14 +163,14 @@ void display_task(void* some_data){
            {render_image(59, 2, false,0, &power_img);}
        else
            {render_box(59, 2, power_img.w, power_img.h, true);}//очистить
-       render_now = true;
+       render_now     = true;
        disp_lpa_power = lpa_power; //защелка
     }
 
     if(disp_id != id_read()){
         render_text(121, 0, 0,0, "%d",id_read());//отрендерить номер id в правом верхнем углу
         render_now = true;
-        disp_id = id_read(); //защелка
+        disp_id    = id_read(); //защелка
     }
 
     if(render_now){

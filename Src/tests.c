@@ -88,7 +88,7 @@ int se3d_L[2][2] = {{1,1},{1,0}};
 //--------------------
 //текущий вывод на экран
 //--------------------
-uint8_t stages;
+uint8_t cur_test_pic;
 
 void set_error(error_lpa* er_p, uint8_t ch, uint8_t type_er){
 
@@ -590,7 +590,7 @@ int all_test_with_display(const int cm, char break_if_error){
     error_lpa er[9] = {0};
     char flag = 0;
 
-    stages = 1;
+    cur_test_pic = pic_PROSHIVKA;
     display_task(0);
     if(btn_break_is_pending == 1)
         { return lets_show_vibor_kanalov;}
@@ -602,7 +602,7 @@ int all_test_with_display(const int cm, char break_if_error){
     //------------------
 
     for(int op = 0; op < l; op++){
-        stages = 2 + op;
+        cur_test_pic = pic_TEST1 + op;
         display_task(0);
         if(btn_break_is_pending == 1)
             { return lets_show_vibor_kanalov;}
@@ -616,7 +616,7 @@ int all_test_with_display(const int cm, char break_if_error){
     //вывод первого по счету теста с ошибки
     for(int op = 0; op < l; op++){
         if(er[op].flag[ch0] == 1 || er[op].flag[ch1] == 1){
-            stages = 11;
+            cur_test_pic = pic_OSHIBKA;
             display_task((void*)&er[op]);
             flag = 1;
             break;
@@ -625,7 +625,7 @@ int all_test_with_display(const int cm, char break_if_error){
 
     //если ошибок нет, вывод "галочки"
     if(flag == 0){
-        stages = 12;
+        cur_test_pic = pic_VSE_OK;
         display_task(0);
     }
     return lets_dont_change_show;

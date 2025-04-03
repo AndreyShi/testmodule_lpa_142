@@ -741,7 +741,7 @@ static const uint8_t bg_data[BG_COUNT][128*8] = {/*{{{*/
 };/*}}}*/
 extern image_t bg_img;
 
-// testing stages
+// testing cur_test_pic
 static const uint8_t script_stage_data[11][128*8] = {/*{{{*/
     /* init */
 	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,/*{{{*/
