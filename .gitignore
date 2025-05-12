@@ -16,3 +16,5 @@
 eclipse.importer.warning.txt
 
 *.exe
+# python virt env 
+venv
